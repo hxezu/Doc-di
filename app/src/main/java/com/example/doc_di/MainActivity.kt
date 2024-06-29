@@ -6,10 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.doc_di.etc.NaviGraph
 import com.example.doc_di.ui.theme.Doc_diTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,14 +21,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    val navController = rememberNavController()
+                    NaviGraph(navController)
                 }
             }
         }
     }
-}
-
-@Composable
-fun MainScreen() {
-    Text(text = "Hello World!!")
 }
