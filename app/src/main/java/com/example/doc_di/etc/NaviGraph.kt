@@ -5,24 +5,28 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.chatbot.ChatbotScreen
-import com.example.doc_di.home.HomeScreen
+import com.example.doc_di.home.Home
+import com.example.doc_di.home.Profile
 import com.example.doc_di.management.ManagementScreen
-import com.example.doc_di.search.SearchScreen
-import com.example.doc_di.searchresult.SearchResultScreen
+import com.example.doc_di.search.Search
+import com.example.doc_di.searchresult.SearchResult
 
 @Composable
 fun NaviGraph(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = Routes.HomeScreen.route){
-        composable(route = Routes.HomeScreen.route){
-            HomeScreen(navController = navController)
+    NavHost(navController = navController, startDestination = Routes.home.route){
+        composable(route = Routes.home.route){
+            Home(navController = navController)
+        }
+        composable(route = Routes.profile.route){
+            Profile(navController= navController)
         }
 
-        composable(route = Routes.searchScreen.route){
-            SearchScreen(navController = navController)
+        composable(route = Routes.search.route){
+            Search(navController = navController)
         }
 
-        composable(route = Routes.searchResultScreen.route){
-            SearchResultScreen(navController = navController)
+        composable(route = Routes.searchResult.route){
+            SearchResult(navController = navController)
         }
 
         composable(route = Routes.chatbotScreen.route){

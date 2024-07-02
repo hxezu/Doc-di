@@ -29,12 +29,12 @@ fun BottomNavigationBar(navController: NavController) {
             BtmBarItem(
                 title = "홈 화면",
                 icon = painterResource(id = R.drawable.home),
-                route = Routes.HomeScreen.route
+                route = Routes.home.route
             ),
             BtmBarItem(
                 title = "검색 화면",
                 icon = painterResource(id = R.drawable.pill),
-                route = Routes.searchScreen.route
+                route = Routes.search.route
             ),
             BtmBarItem(
                 title = "챗봇 화면",

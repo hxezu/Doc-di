@@ -1,9 +1,10 @@
 package com.example.doc_di.etc
 
 sealed class Routes(val route: String) {
-    object HomeScreen: Routes("HomeScreen")
-    object searchScreen: Routes("SearchScreen")
-    object searchResultScreen: Routes("SearchResultScreen")
+    object home: Routes("Home")
+    object search: Routes("Search")
+    object searchResult: Routes("SearchResult")
     object chatbotScreen: Routes("chatbotScreen")
     object managementScreen: Routes("managementScreen")
+    object profile: Routes("profile")
 }
