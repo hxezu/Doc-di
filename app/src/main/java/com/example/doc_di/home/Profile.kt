@@ -1,5 +1,13 @@
 package com.example.doc_di.home
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +46,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,6 +67,8 @@ import java.util.TimeZone
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Profile(navController: NavController) {
+    val context = LocalContext.current
+
     var name by remember { mutableStateOf("")}
 
     var relationExpanded by remember{ mutableStateOf(false)}
@@ -74,6 +88,33 @@ fun Profile(navController: NavController) {
     val bloodTypeOptions = listOf<String>("A", "B", "O", "AB")
     var bloodType by remember { mutableStateOf(bloodTypeOptions[0])}
 
+    var imageUri by remember { mutableStateOf<Uri?>(null)}
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null)}
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ){ uri : Uri? ->
+        uri?.let {
+            imageUri = it
+            val source = if(Build.VERSION.SDK_INT < 28){
+                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+            }
+            else{
+                val source = ImageDecoder.createSource(context.contentResolver, uri)
+                ImageDecoder.decodeBitmap(source)
+            }
+            imageBitmap = source.asImageBitmap()
+        }
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ){bitmap: Bitmap? ->
+        bitmap?.let {
+            imageBitmap = it.asImageBitmap()
+        }
+    }
+
     val textFieldHeight = 60.dp
     val labelSize = 14.sp
     val labelColor = Color(0xFF747F9E)
@@ -83,6 +124,7 @@ fun Profile(navController: NavController) {
     val dropDownColor = Color(0xFF69BBBB)
 
     var showDatePicker by remember { mutableStateOf(false) }
+    var showImagePickerDialog by remember{ mutableStateOf(false)}
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -101,15 +143,47 @@ fun Profile(navController: NavController) {
                 .clickable { navController.popBackStack() }
         )
 
-        Image(
-            painter = painterResource(id = R.drawable.user_image),
-            contentDescription = "프로필 사진",
+        Box(
             modifier = Modifier
                 .size(124.dp)
                 .clickable {
-                    // 사진 갤러리에서 선택
+                    showImagePickerDialog = true
                 }
-        )
+                .clip(RoundedCornerShape(52.dp))
+        ){
+            if (imageBitmap != null){
+                Image(
+                    bitmap = imageBitmap!!,
+                    contentDescription = "프로필 사진",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
+            else{
+                Image(
+                    painter = painterResource(id = R.drawable.user_image),
+                    contentDescription = "프로필 사진",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
+        }
+
+        if (showImagePickerDialog){
+            ImagePickerDialog(
+                onDismiss = { showImagePickerDialog = false },
+                onGalleryClick = {
+                    showImagePickerDialog=false
+                    galleryLauncher.launch("image/*")
+                },
+                onCameraClick = {
+                    showImagePickerDialog = false
+                    cameraLauncher.launch()
+                }
+            )
+        }
 
         OutlinedTextField(
             value = name,
