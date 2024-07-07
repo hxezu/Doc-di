@@ -12,6 +12,7 @@ import com.example.doc_di.management.ManagementScreen
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchMethod
 import com.example.doc_di.search.SearchViewModel
+import com.example.doc_di.searchresult.PillInformation
 import com.example.doc_di.searchresult.SearchResult
 
 @Composable
@@ -36,6 +37,10 @@ fun NaviGraph(navController: NavHostController) {
 
         composable(route = Routes.searchResult.route){
             SearchResult(navController = navController)
+        }
+
+        composable(route = Routes.pillInformation.route){
+            PillInformation(navController = navController)
         }
 
         composable(route = Routes.chatbotScreen.route){

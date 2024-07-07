@@ -224,7 +224,7 @@ fun SearchMethod(
                 )
 
                 androidx.compose.material.Button(
-                    onClick = { TODO("검색 결과 화면으로 이동" ) },
+                    onClick = { navController.navigate(Routes.searchResult.route) },
                     colors = androidx.compose.material.ButtonDefaults.textButtonColors(mainSearchColor),
                     modifier = Modifier
                         .size(328.dp, 60.dp)
@@ -461,7 +461,7 @@ fun SearchMethod(
                     }
 
                     androidx.compose.material.Button(
-                        onClick = { TODO("검색 결과 화면으로 이동") },
+                        onClick = { navController.navigate(Routes.searchResult.route) },
                         colors = androidx.compose.material.ButtonDefaults.textButtonColors(
                             mainSearchColor
                         ),

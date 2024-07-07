@@ -5,6 +5,7 @@ sealed class Routes(val route: String) {
     object search: Routes("Search")
     object searchMethod: Routes("SearchMethod")
     object searchResult: Routes("SearchResult")
+    object pillInformation: Routes("PillInformation")
     object chatbotScreen: Routes("chatbotScreen")
     object managementScreen: Routes("managementScreen")
     object profile: Routes("profile")
