@@ -13,11 +13,13 @@ import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchMethod
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.searchresult.PillInformation
+import com.example.doc_di.searchresult.PillInformationViewModel
 import com.example.doc_di.searchresult.SearchResult
 
 @Composable
 fun NaviGraph(navController: NavHostController) {
     val searchViewModel : SearchViewModel = viewModel()
+    val pillViewModel : PillInformationViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = Routes.home.route){
         composable(route = Routes.home.route){
@@ -40,7 +42,7 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.pillInformation.route){
-            PillInformation(navController = navController)
+            PillInformation(navController = navController, pillViewModel = pillViewModel)
         }
 
         composable(route = Routes.chatbotScreen.route){
