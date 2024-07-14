@@ -11,6 +11,6 @@ import com.example.doc_di.etc.BottomNavigationBar
 @Composable
 fun ChatbotScreen(navController: NavController) {
     Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) {
-        Text("혜주/챗봇 리스트 화면")
+        Text("혜주")
     }
 }
