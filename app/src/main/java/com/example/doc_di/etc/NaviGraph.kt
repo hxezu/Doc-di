@@ -6,7 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.chatbot.ChatListScreen
-import com.example.doc_di.home.HomeScreen
+import com.example.doc_di.home.Home
+import com.example.doc_di.home.Profile
 import com.example.doc_di.management.ManagementScreen
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchMethod
