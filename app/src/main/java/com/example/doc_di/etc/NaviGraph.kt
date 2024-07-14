@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.doc_di.chatbot.ChatbotScreen
+import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.home.HomeScreen
 import com.example.doc_di.management.ManagementScreen
 import com.example.doc_di.search.SearchScreen
@@ -26,7 +26,7 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.chatbotScreen.route){
-            ChatbotScreen(navController = navController)
+            ChatListScreen(navController = navController)
         }
 
         composable(route = Routes.managementScreen.route){
