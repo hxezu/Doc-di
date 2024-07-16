@@ -155,9 +155,9 @@ fun PillInformation(
                 ){
                     item {
                         Card(
-                            shape = MaterialTheme.shapes.medium,
+                            shape = MaterialTheme.shapes.small,
                             colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
@@ -180,9 +180,9 @@ fun PillInformation(
 
                     item{
                         Card(
-                            shape = MaterialTheme.shapes.medium,
+                            shape = MaterialTheme.shapes.small,
                             colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
@@ -201,9 +201,9 @@ fun PillInformation(
 
                     item{
                         Card(
-                            shape = MaterialTheme.shapes.medium,
+                            shape = MaterialTheme.shapes.small,
                             colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
@@ -231,9 +231,9 @@ fun PillInformation(
                 ){
                     item {
                         Card(
-                            shape = MaterialTheme.shapes.medium,
+                            shape = MaterialTheme.shapes.small,
                             colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
@@ -265,9 +265,9 @@ fun PillInformation(
                 ){
                     item {
                         Card(
-                            shape = MaterialTheme.shapes.medium,
+                            shape = MaterialTheme.shapes.small,
                             colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
@@ -290,9 +290,9 @@ fun PillInformation(
 
                     item{
                         Card(
-                            shape = MaterialTheme.shapes.medium,
+                            shape = MaterialTheme.shapes.small,
                             colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
@@ -383,7 +383,7 @@ fun PillInformation(
                 ){
                     item {
                         Card(
-                            shape = MaterialTheme.shapes.medium,
+                            shape = MaterialTheme.shapes.small,
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -410,7 +410,7 @@ fun PillInformation(
                     }
                     item {
                         Card(
-                            shape = MaterialTheme.shapes.medium,
+                            shape = MaterialTheme.shapes.small,
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             modifier = Modifier
                                 .fillMaxWidth()

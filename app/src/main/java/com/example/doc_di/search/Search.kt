@@ -118,7 +118,7 @@ fun Search(navController: NavController, searchViewModel: SearchViewModel) {
                     modifier = Modifier
                         .size(130.dp)
                         .clickable {
-                            TODO("진료 기록 조회 화면")
+                            navController.navigate(Routes.medicalAppointmentRecord.route)
                         }
                 )
                 Image(
@@ -127,7 +127,7 @@ fun Search(navController: NavController, searchViewModel: SearchViewModel) {
                     modifier = Modifier
                         .size(130.dp)
                         .clickable {
-                            TODO("처방 기록 조회 화면")
+                            navController.navigate(Routes.prescriptionRecord.route)
                         }
                 )
             }

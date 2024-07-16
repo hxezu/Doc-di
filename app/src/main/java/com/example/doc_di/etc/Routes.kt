@@ -6,9 +6,10 @@ sealed class Routes(val route: String) {
     object searchMethod: Routes("SearchMethod")
     object searchResult: Routes("SearchResult")
     object pillInformation: Routes("PillInformation")
-    object medicaAppointmentRecord: Routes("MedicalAppointmentRecord")
+    object medicalAppointmentRecord: Routes("MedicalAppointmentRecord")
     object prescriptionRecord: Routes("PrescriptionRecord")
-    object chatbotScreen: Routes("chatbotScreen")
+    object prescribedMedicineList: Routes("PrescribedMedicineList")
+    object chatListScreen: Routes("chatListScreen")
     object managementScreen: Routes("managementScreen")
     object profile: Routes("profile")
 }

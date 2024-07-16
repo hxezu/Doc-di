@@ -9,6 +9,9 @@ import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.Profile
 import com.example.doc_di.management.ManagementScreen
+import com.example.doc_di.search.MedicalAppointmentRecord
+import com.example.doc_di.search.PrescribedMedicineList
+import com.example.doc_di.search.PrescriptionRecord
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchMethod
 import com.example.doc_di.search.SearchViewModel
@@ -45,7 +48,19 @@ fun NaviGraph(navController: NavHostController) {
             PillInformation(navController = navController, pillViewModel = pillViewModel)
         }
 
-        composable(route = Routes.chatbotScreen.route){
+        composable(route = Routes.medicalAppointmentRecord.route){
+            MedicalAppointmentRecord(navController = navController)
+        }
+
+        composable(route = Routes.prescriptionRecord.route){
+            PrescriptionRecord(navController = navController)
+        }
+        
+        composable(route = Routes.prescribedMedicineList.route){
+            PrescribedMedicineList(navController = navController)
+        }
+
+        composable(route = Routes.chatListScreen.route){
             ChatListScreen(navController = navController)
         }
 
