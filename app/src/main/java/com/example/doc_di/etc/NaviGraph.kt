@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.chatbot.ChatListScreen
+import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.Profile
 import com.example.doc_di.management.ManagementScreen
@@ -28,6 +29,11 @@ fun NaviGraph(navController: NavHostController) {
         composable(route = Routes.home.route){
             Home(navController = navController)
         }
+        
+        composable(route = Routes.appointmentSchedule.route){
+            AppointmentSchedule(navController = navController)
+        }
+        
         composable(route = Routes.profile.route){
             Profile(navController= navController)
         }
