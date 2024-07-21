@@ -44,12 +44,14 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.home.BtmBarViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun PillInformation(
     navController: NavController,
-    pillViewModel: PillInformationViewModel
+    pillViewModel: PillInformationViewModel,
+    btmBarViewModel: BtmBarViewModel
 ) {
     val titleColor = Color(0xFF303437)
     val cardTitleColor = Color(0xFF333333)
@@ -68,7 +70,7 @@ fun PillInformation(
         1 to 1
     )
 
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) {
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier

@@ -71,6 +71,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.home.BtmBarViewModel
 import com.example.doc_di.home.ImagePickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,7 +79,8 @@ import com.example.doc_di.home.ImagePickerDialog
 @Composable
 fun SearchMethod(
     navController:NavController,
-    searchViewModel: SearchViewModel
+    searchViewModel: SearchViewModel,
+    btmBarViewModel: BtmBarViewModel
 ) {
     val context = LocalContext.current
 
@@ -130,7 +132,7 @@ fun SearchMethod(
 
     var showImagePickerDialog by remember{ mutableStateOf(false)}
 
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) {
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -546,7 +548,8 @@ fun SearchMethod(
 @Composable
 fun SearchMethodPreview() {
     val navController = rememberNavController()
-    val searchViewModel:SearchViewModel = viewModel()
+    val searchViewModel: SearchViewModel = viewModel()
+    val btmBarViewModel: BtmBarViewModel = viewModel()
     searchViewModel.showSearch[0] = true
-    SearchMethod(navController = navController, searchViewModel = searchViewModel)
+    SearchMethod(navController = navController, searchViewModel = searchViewModel, btmBarViewModel = btmBarViewModel)
 }

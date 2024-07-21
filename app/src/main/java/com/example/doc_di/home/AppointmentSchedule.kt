@@ -46,7 +46,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AppointmentSchedule(navController: NavController) {
+fun AppointmentSchedule(navController: NavController, btmBarViewModel: BtmBarViewModel) {
     var reservedTreatment by remember { mutableStateOf(true) }
    // var pastTreatment by remember { mutableStateOf(false) }
 
@@ -73,7 +73,7 @@ fun AppointmentSchedule(navController: NavController) {
     val pastCardElevation = if(!reservedTreatment) CardDefaults.cardElevation(2.dp) else CardDefaults.cardElevation(0.dp)
 
 
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) {
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,

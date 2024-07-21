@@ -36,13 +36,14 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.home.BtmBarViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun PrescriptionRecord(navController: NavController) {
+fun PrescriptionRecord(navController: NavController, btmBarViewModel: BtmBarViewModel) {
     val titleColor = Color(0xFF303437)
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) {
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
         Column (
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,

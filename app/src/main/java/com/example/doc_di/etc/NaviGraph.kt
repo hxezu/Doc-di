@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.home.AppointmentSchedule
+import com.example.doc_di.home.BtmBarViewModel
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.Profile
 import com.example.doc_di.management.ManagementScreen
@@ -24,14 +25,15 @@ import com.example.doc_di.searchresult.SearchResult
 fun NaviGraph(navController: NavHostController) {
     val searchViewModel : SearchViewModel = viewModel()
     val pillViewModel : PillInformationViewModel = viewModel()
+    val btmBarViewModel :BtmBarViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = Routes.home.route){
         composable(route = Routes.home.route){
-            Home(navController = navController)
+            Home(navController = navController, btmBarViewModel = btmBarViewModel)
         }
         
         composable(route = Routes.appointmentSchedule.route){
-            AppointmentSchedule(navController = navController)
+            AppointmentSchedule(navController = navController, btmBarViewModel = btmBarViewModel)
         }
         
         composable(route = Routes.profile.route){
@@ -39,39 +41,39 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.search.route){
-            Search(navController = navController ,searchViewModel = searchViewModel)
+            Search(navController = navController ,searchViewModel = searchViewModel, btmBarViewModel = btmBarViewModel)
         }
 
         composable(route = Routes.searchMethod.route){
-            SearchMethod(navController = navController, searchViewModel = searchViewModel)
+            SearchMethod(navController = navController, searchViewModel = searchViewModel, btmBarViewModel = btmBarViewModel)
         }
 
         composable(route = Routes.searchResult.route){
-            SearchResult(navController = navController)
+            SearchResult(navController = navController, btmBarViewModel = btmBarViewModel)
         }
 
         composable(route = Routes.pillInformation.route){
-            PillInformation(navController = navController, pillViewModel = pillViewModel)
+            PillInformation(navController = navController, pillViewModel = pillViewModel, btmBarViewModel = btmBarViewModel)
         }
 
         composable(route = Routes.medicalAppointmentRecord.route){
-            MedicalAppointmentRecord(navController = navController)
+            MedicalAppointmentRecord(navController = navController, btmBarViewModel = btmBarViewModel)
         }
 
         composable(route = Routes.prescriptionRecord.route){
-            PrescriptionRecord(navController = navController)
+            PrescriptionRecord(navController = navController, btmBarViewModel = btmBarViewModel)
         }
         
         composable(route = Routes.prescribedMedicineList.route){
-            PrescribedMedicineList(navController = navController)
+            PrescribedMedicineList(navController = navController, btmBarViewModel = btmBarViewModel)
         }
 
         composable(route = Routes.chatListScreen.route){
-            ChatListScreen(navController = navController)
+            ChatListScreen(navController = navController, btmBarViewModel = btmBarViewModel)
         }
 
         composable(route = Routes.managementScreen.route){
-            ManagementScreen(navController = navController)
+            ManagementScreen(navController = navController, btmBarViewModel = btmBarViewModel)
         }
     }
 }

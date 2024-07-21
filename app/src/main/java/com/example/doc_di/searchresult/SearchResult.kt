@@ -32,16 +32,17 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.home.BtmBarViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SearchResult(navController: NavController) {
+fun SearchResult(navController: NavController, btmBarViewModel: BtmBarViewModel) {
     val titleColor = Color(0xFF303437)
     val cardPillTextColor = Color(0xFF262C3D)
     val reviewTextColor = Color(0xFF747F9E)
     val starColor = Color(0xFFFFC107)
 
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) {
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier

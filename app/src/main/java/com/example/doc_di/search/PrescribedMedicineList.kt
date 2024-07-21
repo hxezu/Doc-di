@@ -35,15 +35,16 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.home.BtmBarViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun PrescribedMedicineList(navController: NavController) {
+fun PrescribedMedicineList(navController: NavController, btmBarViewModel: BtmBarViewModel) {
     // 실제로는 약 리스트 받아와서  선택 한 것에 대해서만 true를 만들고 해당 것만 보일 것
     val headlineColor = Color(0xFF404446)
     val titleColor = Color(0xFF303437)
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) {
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,

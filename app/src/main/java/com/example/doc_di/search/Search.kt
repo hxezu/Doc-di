@@ -33,12 +33,13 @@ import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.SnappingLazyRow
+import com.example.doc_di.home.BtmBarViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun Search(navController: NavController, searchViewModel: SearchViewModel) {
+fun Search(navController: NavController, searchViewModel: SearchViewModel, btmBarViewModel: BtmBarViewModel) {
     val items = mutableListOf(
         R.drawable.search_text,
         R.drawable.search_shape,
@@ -48,7 +49,7 @@ fun Search(navController: NavController, searchViewModel: SearchViewModel) {
     val listState = rememberLazyListState()
     val scope= rememberCoroutineScope()
 
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) {
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
         Column (
             verticalArrangement = Arrangement.SpaceAround,
             modifier = Modifier
@@ -167,5 +168,6 @@ fun Search(navController: NavController, searchViewModel: SearchViewModel) {
 fun SearchPreview() {
     val navController = rememberNavController()
     val searchViewModel:SearchViewModel = viewModel()
-    Search(navController = navController, searchViewModel = searchViewModel)
+    val btmBarViewModel: BtmBarViewModel = viewModel()
+    Search(navController = navController, searchViewModel = searchViewModel, btmBarViewModel = btmBarViewModel)
 }

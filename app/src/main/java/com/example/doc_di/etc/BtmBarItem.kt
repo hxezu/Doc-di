@@ -1,9 +1,8 @@
 package com.example.doc_di.etc
 
-import androidx.compose.ui.graphics.painter.Painter
-
 data class BtmBarItem (
     val title: String,
-    val icon: Painter,
-    val route: String
+    val iconResourceId: Int,
+    val route: String,
+    var selected: Boolean,
 )

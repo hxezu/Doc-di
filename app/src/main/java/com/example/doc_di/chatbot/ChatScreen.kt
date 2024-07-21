@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
@@ -54,12 +55,13 @@ import com.example.doc_di.data.Chat
 import com.example.doc_di.data.Person
 import com.example.doc_di.data.chatList
 import com.example.doc_di.etc.BottomNavigationBar
+import com.example.doc_di.home.BtmBarViewModel
 import com.example.doc_di.ui.theme.*
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChatScreen(navController: NavController) {
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) {
+fun ChatScreen(navController: NavController, btmBarViewModel: BtmBarViewModel) {
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
             paddingValues ->
         var message by remember { mutableStateOf("") }
         val data = navController.previousBackStackEntry?.savedStateHandle?.get<Person>("data") ?: Person()
@@ -254,7 +256,8 @@ fun UserNameRow(
 @Composable
 fun ChatScreenPreview(){
     val navController = rememberNavController()
-    ChatScreen(navController = navController)
+    val btmBarViewModel: BtmBarViewModel = viewModel()
+    ChatScreen(navController = navController, btmBarViewModel = btmBarViewModel)
 }
 
 @Preview(showBackground = true, name = "CustomTextField Preview")

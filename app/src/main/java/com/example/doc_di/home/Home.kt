@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
@@ -46,7 +47,7 @@ import com.example.doc_di.etc.Routes
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun Home(navController: NavController) {
+fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
     val greetTextColor = Color(0xFF303437)
     val titleColor = Color(0xFF404446)
     val cardPillColor = Color(0xFF202325)
@@ -60,7 +61,7 @@ fun Home(navController: NavController) {
     val cardTextColor = Color(0xFF72777A)
 
 
-    Scaffold(bottomBar = {BottomNavigationBar(navController = navController)}) {
+    Scaffold(bottomBar = {BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)}) {
         Column (
             verticalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
@@ -104,11 +105,10 @@ fun Home(navController: NavController) {
                                 .width(280.dp)
                         ) {
                             Card(
-                                onClick = { navController.navigate(Routes.appointmentSchedule.route) },
+                                onClick = {navController.navigate(Routes.appointmentSchedule.route)},
                                 colors = CardDefaults.cardColors(Color(0xFFF0F0FF)),
                                 elevation = CardDefaults.cardElevation(1.dp),
                                 modifier = Modifier
-                                //.width(280.dp)
                             ) {
                                 Row(
                                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -185,7 +185,6 @@ fun Home(navController: NavController) {
                                 colors = CardDefaults.cardColors(Color(0xFFFFF9F0)),
                                 elevation = CardDefaults.cardElevation(1.dp),
                                 modifier = Modifier
-                                //.width(280.dp)
                             ) {
                                 Row(
                                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -269,7 +268,11 @@ fun Home(navController: NavController) {
                 ) {
                     item {
                         Card(
-                            onClick = { navController.navigate(Routes.pillInformation.route) },
+                            onClick = {
+                                btmBarViewModel.btmNavBarItems[0].selected = false
+                                btmBarViewModel.btmNavBarItems[1].selected = true
+                                navController.navigate(Routes.pillInformation.route)
+                            },
                             colors = CardDefaults.cardColors(Color.White),
                             elevation = CardDefaults.cardElevation(1.dp),
                             modifier = Modifier
@@ -341,7 +344,11 @@ fun Home(navController: NavController) {
 
                     item {
                         Card(
-                            onClick = { navController.navigate(Routes.pillInformation.route) },
+                            onClick = {
+                                btmBarViewModel.btmNavBarItems[0].selected = false
+                                btmBarViewModel.btmNavBarItems[1].selected = true
+                                navController.navigate(Routes.pillInformation.route)
+                            },
                             colors = CardDefaults.cardColors(Color.White),
                             elevation = CardDefaults.cardElevation(1.dp),
                             modifier = Modifier
@@ -420,5 +427,6 @@ fun Home(navController: NavController) {
 @Composable
 fun HomePreview() {
     val navController = rememberNavController()
-    Home(navController = navController)
+    val btmBarViewModel: BtmBarViewModel = viewModel()
+    Home(navController = navController, btmBarViewModel = btmBarViewModel)
 }
