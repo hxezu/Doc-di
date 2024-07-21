@@ -104,7 +104,7 @@ fun Home(navController: NavController) {
                                 .width(280.dp)
                         ) {
                             Card(
-                                onClick = { /* TODO{진료 일정 화면으로}*/ },
+                                onClick = { navController.navigate(Routes.appointmentSchedule.route) },
                                 colors = CardDefaults.cardColors(Color(0xFFF0F0FF)),
                                 elevation = CardDefaults.cardElevation(1.dp),
                                 modifier = Modifier
@@ -181,7 +181,7 @@ fun Home(navController: NavController) {
                                 .width(280.dp)
                         ) {
                             Card(
-                                onClick = { /* TODO{진료 일정 화면으로}*/ },
+                                onClick = { navController.navigate(Routes.appointmentSchedule.route) },
                                 colors = CardDefaults.cardColors(Color(0xFFFFF9F0)),
                                 elevation = CardDefaults.cardElevation(1.dp),
                                 modifier = Modifier
@@ -269,7 +269,7 @@ fun Home(navController: NavController) {
                 ) {
                     item {
                         Card(
-                            onClick = { /* TODO{복용알림의 약 수정 화면으로}*/ },
+                            onClick = { navController.navigate(Routes.pillInformation.route) },
                             colors = CardDefaults.cardColors(Color.White),
                             elevation = CardDefaults.cardElevation(1.dp),
                             modifier = Modifier
@@ -341,7 +341,7 @@ fun Home(navController: NavController) {
 
                     item {
                         Card(
-                            onClick = { /* TODO{복용알림의 약 수정 화면으로}*/ },
+                            onClick = { navController.navigate(Routes.pillInformation.route) },
                             colors = CardDefaults.cardColors(Color.White),
                             elevation = CardDefaults.cardElevation(1.dp),
                             modifier = Modifier

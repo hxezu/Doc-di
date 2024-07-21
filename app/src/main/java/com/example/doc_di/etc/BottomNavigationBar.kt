@@ -39,7 +39,7 @@ fun BottomNavigationBar(navController: NavController) {
             BtmBarItem(
                 title = "챗봇 화면",
                 icon = painterResource(id = R.drawable.chatbot),
-                route = Routes.chatbotScreen.route
+                route = Routes.chatListScreen.route
             ),
             BtmBarItem(
                 title = "복용 관리 화면",
