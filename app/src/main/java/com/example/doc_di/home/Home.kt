@@ -314,7 +314,7 @@ fun Home(navController: NavController) {
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "식후",
+                                        text = "주로 그람양...",
                                         color = cardTextColor
                                     )
                                 }
@@ -386,7 +386,7 @@ fun Home(navController: NavController) {
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "식전",
+                                        text = "해열제",
                                         color = cardTextColor
                                     )
                                 }
