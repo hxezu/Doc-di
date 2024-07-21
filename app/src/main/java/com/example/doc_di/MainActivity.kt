@@ -10,10 +10,20 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.etc.NaviGraph
 import com.example.doc_di.ui.theme.Doc_diTheme
+import com.example.doc_di.util.SettingsPreferences
+import dagger.hilt.android.AndroidEntryPoint
+import kotlin.random.Random
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (!SettingsPreferences.getInstance(this).isUserAvailable()) {
+            val randomSixDigitNumber = Random.nextInt(100000, 1000000)
+            SettingsPreferences.getInstance(this).setUserId(randomSixDigitNumber)
+        }
+
         setContent {
             Doc_diTheme {
                 // A surface container using the 'background' color from the theme

@@ -1,9 +1,7 @@
 package com.example.doc_di.management
 
-import android.adservices.topics.Topic
 import android.annotation.SuppressLint
 import android.os.Build
-import android.widget.CalendarView
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,8 +17,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -48,13 +50,26 @@ import com.example.doc_di.etc.BottomNavigationBar
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import com.example.doc_di.util.SettingsPreferences
+import java.time.LocalTime
+import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ManagementScreen(navController: NavController) {
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) {
-            paddingValues ->
-        CalendarApp(userId = 123)
+    val context = LocalContext.current // Context 가져오기
+    val userId = remember { SettingsPreferences.getInstance(context).getUserId() } // UserId 가져오기
+
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues) // Padding to avoid overlapping with the bottom bar
+        ) {
+            item {
+                CalendarApp(userId) // Content inside the LazyColumn
+            }
+        }
     }
 }
 
@@ -70,7 +85,6 @@ fun CalendarApp(userId : Int){
         Column(modifier = Modifier
             .fillMaxSize()
             .background(androidx.compose.material.MaterialTheme.colors.background)){
-            TopBar()
             Spacer(modifier = Modifier.height(16.dp))
             MonthNavigation(currentMonth, onPrevMonth = {
                 currentMonth = currentMonth.minusMonths(1)
@@ -79,7 +93,6 @@ fun CalendarApp(userId : Int){
                 currentMonth = currentMonth.plusMonths(1)
                 selectedDate = if (currentMonth == YearMonth.now()) LocalDate.now() else currentMonth.atDay(1)
             })
-            Spacer(modifier = Modifier.height(16.dp))
             CalendarView(currentMonth, selectedDate, onDateSelected = { date ->
                 selectedDate = date
             }, onSwipeRight = {
@@ -91,11 +104,38 @@ fun CalendarApp(userId : Int){
                 selectedDate = if (currentMonth == YearMonth.now()) LocalDate.now() else currentMonth.atDay(1)
 
             })
+            CalendarTaskScreen(userId = userId, selectedDate.format(dateFormatter))
+        }
+        if (isDialogOpen) {
+            AddTaskDialog(
+                userId,
+                date = selectedDate.format(dateFormatter),
+                time = getCurrentTime(),
+                onDismiss = { isDialogOpen = false },
+                onSaveTask = {
+                    isDialogOpen = false
+                }
+            )
+        }
 
-
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(20.dp),
+            onClick = {isDialogOpen = true},
+            containerColor = Color(0xFFE5FF7F)
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add Task", tint = Color.Black)
         }
 
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun getCurrentTime(): String {
+    val currentTime = LocalTime.now()
+    val formatter = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
+    return currentTime.format(formatter)
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -230,38 +270,10 @@ fun MonthNavigation(currentMonth: YearMonth, onPrevMonth: () -> Unit, onNextMont
     }
 }
 
-@Composable
-fun TopBar(){
-    val context = LocalContext.current
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(4.dp)
-            .background(androidx.compose.material.MaterialTheme.colors.background)
-            .height(60.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ){
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "My Calender",
-                fontSize = 18.sp,
-                color = androidx.compose.material.MaterialTheme.colors.onBackground
-            )
-        }
-    }
-
-}
 
 @Preview(showBackground = true)
 @Composable
-fun CManagementScreenPreview(){
+fun ManagementScreenPreview(){
     val navController = rememberNavController()
     ManagementScreen(navController = navController)
 }
