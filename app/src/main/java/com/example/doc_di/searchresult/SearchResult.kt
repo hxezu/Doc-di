@@ -3,7 +3,6 @@ package com.example.doc_di.searchresult
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -47,27 +46,17 @@ fun SearchResult(navController: NavController, btmBarViewModel: BtmBarViewModel)
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp)
+                .padding(horizontal = 40.dp)
+                .padding(top = 48.dp)
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+            Image(
+                painter = painterResource(id = R.drawable.back),
+                contentDescription = "뒤로가기",
                 modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.backarrow),
-                    contentDescription = "이전",
-                    modifier = Modifier.size(44.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.close),
-                    contentDescription = "검색 닫기",
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clickable { navController.navigate(Routes.search.route) }
-                )
-            }
+                    .size(30.dp)
+                    .align(Alignment.Start)
+                    .clickable { navController.popBackStack() }
+            )
             Text(
                 text = "검색 결과",
                 fontSize = 24.sp,
@@ -75,7 +64,6 @@ fun SearchResult(navController: NavController, btmBarViewModel: BtmBarViewModel)
                 color = titleColor,
                 modifier = Modifier
                     .padding(vertical = 40.dp)
-                    .padding(start = 16.dp)
                     .align(Alignment.Start)
             )
             Card(
@@ -85,7 +73,7 @@ fun SearchResult(navController: NavController, btmBarViewModel: BtmBarViewModel)
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .padding(bottom = 16.dp)
                     .clickable { navController.navigate(Routes.pillInformation.route) }
                 ) {
                 Row(
@@ -125,7 +113,7 @@ fun SearchResult(navController: NavController, btmBarViewModel: BtmBarViewModel)
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .padding(bottom = 16.dp)
                     .clickable { navController.navigate(Routes.pillInformation.route) }
             ) {
                 Row(

@@ -1,9 +1,7 @@
 package com.example.doc_di.management
 
-import android.adservices.topics.Topic
 import android.annotation.SuppressLint
 import android.os.Build
-import android.widget.CalendarView
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -49,20 +46,21 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
+import com.example.doc_di.home.BtmBarViewModel
+import com.example.doc_di.util.SettingsPreferences
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import com.example.doc_di.util.SettingsPreferences
-import java.time.LocalTime
 import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ManagementScreen(navController: NavController) {
+fun ManagementScreen(navController: NavController, btmBarViewModel : BtmBarViewModel) {
     val context = LocalContext.current // Context 가져오기
     val userId = remember { SettingsPreferences.getInstance(context).getUserId() } // UserId 가져오기
 
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) { paddingValues ->
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -87,7 +85,7 @@ fun CalendarApp(userId : Int){
         Column(modifier = Modifier
             .fillMaxSize()
             .background(androidx.compose.material.MaterialTheme.colors.background)){
-            TopBar()
+            //TopBar()
             Spacer(modifier = Modifier.height(16.dp))
             MonthNavigation(currentMonth, onPrevMonth = {
                 currentMonth = currentMonth.minusMonths(1)
@@ -279,5 +277,5 @@ fun MonthNavigation(currentMonth: YearMonth, onPrevMonth: () -> Unit, onNextMont
 @Composable
 fun ManagementScreenPreview(){
     val navController = rememberNavController()
-    ManagementScreen(navController = navController)
+    //ManagementScreen(navController = navController)
 }

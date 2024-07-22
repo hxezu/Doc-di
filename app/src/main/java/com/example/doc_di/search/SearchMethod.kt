@@ -137,27 +137,17 @@ fun SearchMethod(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 24.dp)
+                .padding(top = 48.dp)
         ){
-            Row (
-                horizontalArrangement = Arrangement.SpaceBetween,
+            Image(
+                painter = painterResource(id = R.drawable.back),
+                contentDescription = "뒤로가기",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.backarrow),
-                    contentDescription = "이전",
-                    modifier = Modifier.size(44.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.close),
-                    contentDescription = "검색 닫기",
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clickable { navController.navigate(Routes.search.route) }
-                )
-            }
+                    .padding(start =  40.dp)
+                    .size(30.dp)
+                    .align(Alignment.Start)
+                    .clickable { navController.popBackStack() }
+            )
 
             Row (
                 horizontalArrangement = Arrangement.SpaceEvenly,

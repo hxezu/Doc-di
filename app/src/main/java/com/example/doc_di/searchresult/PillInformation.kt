@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
-import com.example.doc_di.etc.Routes
 import com.example.doc_di.home.BtmBarViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -75,27 +74,17 @@ fun PillInformation(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp)
+                .padding(horizontal = 40.dp)
+                .padding(top = 48.dp)
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+            Image(
+                painter = painterResource(id = R.drawable.back),
+                contentDescription = "뒤로가기",
                 modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.backarrow),
-                    contentDescription = "이전",
-                    modifier = Modifier.size(44.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.close),
-                    contentDescription = "검색 닫기",
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clickable { navController.navigate(Routes.search.route) }
-                )
-            }
+                    .size(30.dp)
+                    .align(Alignment.Start)
+                    .clickable { navController.popBackStack() }
+            )
             Text(
                 text = "타이레놀정 160mg",
                 fontSize = 24.sp,
@@ -103,7 +92,6 @@ fun PillInformation(
                 color = titleColor,
                 modifier = Modifier
                     .padding(vertical = 40.dp)
-                    .padding(start = 16.dp)
                     .align(Alignment.Start)
             )
             Image(
@@ -115,8 +103,10 @@ fun PillInformation(
             Spacer(modifier = Modifier.height(16.dp))
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(16.dp),
-                modifier = Modifier.fillMaxWidth()
+                contentPadding = PaddingValues(vertical =  16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp)
             ){
                 items(4){ index ->
                     Button(
@@ -162,7 +152,7 @@ fun PillInformation(
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                                .padding(bottom = 16.dp)
                         ) {
                             Column(
                                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -187,7 +177,7 @@ fun PillInformation(
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                                .padding(bottom = 16.dp)
                         ) {
                             Column(
                                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -208,7 +198,7 @@ fun PillInformation(
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                                .padding(bottom = 16.dp)
                         ) {
                             Column(
                                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -238,7 +228,7 @@ fun PillInformation(
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                                .padding(bottom = 16.dp)
                         ) {
                             Column(
                                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -272,7 +262,7 @@ fun PillInformation(
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                                .padding(bottom = 16.dp)
                         ) {
                             Column(
                                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -297,7 +287,7 @@ fun PillInformation(
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                                .padding(bottom = 16.dp)
                         ) {
                             Column(
                                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -314,7 +304,7 @@ fun PillInformation(
             }
 
             if(pillViewModel.showSearch[3]){
-                Row (modifier = Modifier.padding(16.dp)) {
+                Row () {
                     Column {
                         Row (
                             verticalAlignment = Alignment.CenterVertically,
@@ -389,7 +379,7 @@ fun PillInformation(
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(vertical =  16.dp)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -416,7 +406,7 @@ fun PillInformation(
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(vertical = 16.dp)
                         ) {
                             Column(
                                 modifier = Modifier
