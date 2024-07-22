@@ -1,9 +1,7 @@
 package com.example.doc_di.management
 
-import android.adservices.topics.Topic
 import android.annotation.SuppressLint
 import android.os.Build
-import android.widget.CalendarView
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,8 +18,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -63,14 +63,12 @@ fun ManagementScreen(navController: NavController) {
     val userId = remember { SettingsPreferences.getInstance(context).getUserId() } // UserId 가져오기
 
     Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) { paddingValues ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Padding to avoid overlapping with the bottom bar
+                .padding(paddingValues)
         ) {
-            item {
-                CalendarApp(userId) // Content inside the LazyColumn
-            }
+            CalendarApp(userId)
         }
     }
 }
@@ -84,10 +82,11 @@ fun CalendarApp(userId : Int){
     var isDialogOpen by remember { mutableStateOf(false)}
 
     Box(modifier = Modifier.fillMaxSize()){
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .background(androidx.compose.material.MaterialTheme.colors.background)){
-            TopBar()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(androidx.compose.material.MaterialTheme.colors.background)
+        ){
             Spacer(modifier = Modifier.height(16.dp))
             MonthNavigation(currentMonth, onPrevMonth = {
                 currentMonth = currentMonth.minusMonths(1)
