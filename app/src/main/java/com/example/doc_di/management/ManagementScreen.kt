@@ -19,8 +19,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,22 +45,33 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
-import com.example.doc_di.home.BtmBarViewModel
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import com.example.doc_di.util.SettingsPreferences
+import java.time.LocalTime
+import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ManagementScreen(navController: NavController, btmBarViewModel: BtmBarViewModel) {
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
-            paddingValues ->
-        CalendarApp(userId = 123)
+fun ManagementScreen(navController: NavController) {
+    val context = LocalContext.current // Context 가져오기
+    val userId = remember { SettingsPreferences.getInstance(context).getUserId() } // UserId 가져오기
+
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues) // Padding to avoid overlapping with the bottom bar
+        ) {
+            item {
+                CalendarApp(userId) // Content inside the LazyColumn
+            }
+        }
     }
 }
 
@@ -93,11 +108,38 @@ fun CalendarApp(userId : Int){
                 selectedDate = if (currentMonth == YearMonth.now()) LocalDate.now() else currentMonth.atDay(1)
 
             })
+            CalendarTaskScreen(userId = userId, selectedDate.format(dateFormatter))
+        }
+        if (isDialogOpen) {
+            AddTaskDialog(
+                userId,
+                date = selectedDate.format(dateFormatter),
+                time = getCurrentTime(),
+                onDismiss = { isDialogOpen = false },
+                onSaveTask = {
+                    isDialogOpen = false
+                }
+            )
+        }
 
-
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(20.dp),
+            onClick = {isDialogOpen = true},
+            containerColor = Color(0xFFE5FF7F)
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add Task", tint = Color.Black)
         }
 
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun getCurrentTime(): String {
+    val currentTime = LocalTime.now()
+    val formatter = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
+    return currentTime.format(formatter)
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -232,39 +274,10 @@ fun MonthNavigation(currentMonth: YearMonth, onPrevMonth: () -> Unit, onNextMont
     }
 }
 
-@Composable
-fun TopBar(){
-    val context = LocalContext.current
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(4.dp)
-            .background(androidx.compose.material.MaterialTheme.colors.background)
-            .height(60.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ){
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "My Calender",
-                fontSize = 18.sp,
-                color = androidx.compose.material.MaterialTheme.colors.onBackground
-            )
-        }
-    }
-
-}
 
 @Preview(showBackground = true)
 @Composable
-fun CManagementScreenPreview(){
+fun ManagementScreenPreview(){
     val navController = rememberNavController()
-    val btmBarViewModel: BtmBarViewModel = viewModel()
-    ManagementScreen(navController = navController, btmBarViewModel = btmBarViewModel)
+    ManagementScreen(navController = navController)
 }
