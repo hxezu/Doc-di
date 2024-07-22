@@ -62,12 +62,6 @@ fun CalendarTaskScreen(userId: Int, date: String? = null,  viewModel: TaskViewMo
     }
 
     Column{
-        Text(
-            text = "Tasks on selected date ( ${tasks?.size} )",
-            fontSize = 14.sp,
-            color = MaterialTheme.colors.onBackground,
-            modifier = Modifier.padding(vertical = 10.dp, horizontal = 16.dp)
-        )
         when {
             tasks == null -> {
                 Box(
@@ -83,21 +77,7 @@ fun CalendarTaskScreen(userId: Int, date: String? = null,  viewModel: TaskViewMo
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.no_task),
-                            contentDescription = "No Tasks",
-                            modifier = Modifier.size(100.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "No tasks available for selected date",
-                            color = MaterialTheme.colors.onBackground,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+
                 }
 
             }
@@ -130,7 +110,7 @@ fun TaskCard(task: Task, onDelete : (Task) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .padding(vertical = 2.dp, horizontal = 16.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable { /* Handle click if needed */ } ,
         backgroundColor = Color(0xFF4DF6E9),
