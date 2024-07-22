@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -34,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -61,14 +62,12 @@ fun ManagementScreen(navController: NavController) {
     val userId = remember { SettingsPreferences.getInstance(context).getUserId() } // UserId 가져오기
 
     Scaffold(bottomBar = { BottomNavigationBar(navController = navController) }) { paddingValues ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Padding to avoid overlapping with the bottom bar
+                .padding(paddingValues)
         ) {
-            item {
-                CalendarApp(userId) // Content inside the LazyColumn
-            }
+            CalendarApp(userId)
         }
     }
 }
@@ -82,9 +81,11 @@ fun CalendarApp(userId : Int){
     var isDialogOpen by remember { mutableStateOf(false)}
 
     Box(modifier = Modifier.fillMaxSize()){
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .background(androidx.compose.material.MaterialTheme.colors.background)){
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(androidx.compose.material.MaterialTheme.colors.background)
+        ){
             Spacer(modifier = Modifier.height(16.dp))
             MonthNavigation(currentMonth, onPrevMonth = {
                 currentMonth = currentMonth.minusMonths(1)
@@ -93,6 +94,7 @@ fun CalendarApp(userId : Int){
                 currentMonth = currentMonth.plusMonths(1)
                 selectedDate = if (currentMonth == YearMonth.now()) LocalDate.now() else currentMonth.atDay(1)
             })
+            Spacer(modifier = Modifier.height(16.dp))
             CalendarView(currentMonth, selectedDate, onDateSelected = { date ->
                 selectedDate = date
             }, onSwipeRight = {
