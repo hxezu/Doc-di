@@ -17,11 +17,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -34,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -48,10 +52,11 @@ import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.home.BtmBarViewModel
 import com.example.doc_di.util.SettingsPreferences
+import com.example.doc_di.ui.theme.MainBlue
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.LocalTime
 import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -64,7 +69,7 @@ fun ManagementScreen(navController: NavController, btmBarViewModel : BtmBarViewM
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Padding to avoid overlapping with the bottom bar
+                .padding(paddingValues)
         ) {
             item {
                 CalendarApp(userId) // Content inside the LazyColumn
@@ -81,11 +86,14 @@ fun CalendarApp(userId : Int){
     var dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     var isDialogOpen by remember { mutableStateOf(false)}
 
+    val totalWeeks = calculateWeeksInMonth(currentMonth)
+
     Box(modifier = Modifier.fillMaxSize()){
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .background(androidx.compose.material.MaterialTheme.colors.background)){
-            //TopBar()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(androidx.compose.material.MaterialTheme.colors.background)
+        ){
             Spacer(modifier = Modifier.height(16.dp))
             MonthNavigation(currentMonth, onPrevMonth = {
                 currentMonth = currentMonth.minusMonths(1)
@@ -106,6 +114,11 @@ fun CalendarApp(userId : Int){
                 selectedDate = if (currentMonth == YearMonth.now()) LocalDate.now() else currentMonth.atDay(1)
 
             })
+            // 주 수가 4주인 경우에 CalendarTaskScreen을 위로 이동
+            if (totalWeeks == 4) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
             CalendarTaskScreen(userId = userId, selectedDate.format(dateFormatter))
         }
         if (isDialogOpen) {
@@ -119,17 +132,60 @@ fun CalendarApp(userId : Int){
                 }
             )
         }
-
-        FloatingActionButton(
+        Row (
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(20.dp),
-            onClick = {isDialogOpen = true},
-            containerColor = Color(0xFFE5FF7F)
-        ) {
-            Icon(Icons.Default.Add, contentDescription = "Add Task", tint = Color.Black)
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 40.dp, vertical = 20.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            CustomButton(
+                onClick = { /* 첫 번째 버튼 클릭 시 처리할 코드 */ },
+                text = "진료 일정"
+            )
+
+            // 버튼 사이에 간격 추가
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // 오른쪽 버튼
+            CustomButton(
+                onClick = { isDialogOpen = true },
+                text = "복용 약"
+            )
         }
 
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun calculateWeeksInMonth(yearMonth: YearMonth): Int {
+    val firstDayOfMonth = yearMonth.atDay(1)
+    val lastDayOfMonth = yearMonth.atEndOfMonth()
+    val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
+    val totalDays = lastDayOfMonth.dayOfMonth
+
+    // 총 주 수 계산
+    val daysInMonth = totalDays + firstDayOfWeek
+    return (daysInMonth + 6) / 7
+}
+
+
+@Composable
+fun CustomButton(onClick: () -> Unit, text: String) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp)) // 그림자 적용
+            .background(MainBlue, RoundedCornerShape(40.dp)), // 버튼 배경색과 모서리 둥글기 설정
+        shape = RoundedCornerShape(40.dp), // 버튼 모양 설정
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent, // 버튼 배경색을 투명으로 설정
+            contentColor = Color.White // 버튼의 텍스트 색상 설정
+        )
+    ) {
+        Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(text =text)
     }
 }
 
