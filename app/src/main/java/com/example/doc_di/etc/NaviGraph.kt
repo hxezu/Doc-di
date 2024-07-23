@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.home.AppointmentSchedule
-import com.example.doc_di.home.BtmBarViewModel
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.Profile
 import com.example.doc_di.management.ManagementScreen
@@ -25,7 +24,7 @@ import com.example.doc_di.searchresult.SearchResult
 fun NaviGraph(navController: NavHostController) {
     val searchViewModel : SearchViewModel = viewModel()
     val pillViewModel : PillInformationViewModel = viewModel()
-    val btmBarViewModel :BtmBarViewModel = viewModel()
+    val btmBarViewModel : BtmBarViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = Routes.home.route){
         composable(route = Routes.home.route){

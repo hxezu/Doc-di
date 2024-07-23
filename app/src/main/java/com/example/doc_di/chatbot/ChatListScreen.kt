@@ -48,7 +48,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.data.Person
 import com.example.doc_di.data.personList
 import com.example.doc_di.etc.BottomNavigationBar
-import com.example.doc_di.home.BtmBarViewModel
+import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.ui.theme.Line
 import com.example.doc_di.ui.theme.MainBlue
 

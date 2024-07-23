@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +43,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
+import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,8 +62,33 @@ fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
     val starColor = Color(0xFFFFC462)
     val cardTextColor = Color(0xFF72777A)
 
-
     Scaffold(bottomBar = {BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)}) {
+
+        fun updateBtmBarItem(route: String){
+            btmBarViewModel.btmNavBarItems.forEach{
+                it.selected = route == it.route
+            }
+        }
+
+        LaunchedEffect(navController) {
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                when (destination.route) {
+                    Routes.home.route -> {
+                        updateBtmBarItem(Routes.home.route)
+                    }
+                    Routes.search.route -> {
+                        updateBtmBarItem(Routes.search.route)
+                    }
+                    Routes.chatListScreen.route -> {
+                        updateBtmBarItem(Routes.chatListScreen.route)
+                    }
+                    Routes.managementScreen.route -> {
+                        updateBtmBarItem(Routes.managementScreen.route)
+                    }
+                }
+            }
+        }
+
         Column (
             verticalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier

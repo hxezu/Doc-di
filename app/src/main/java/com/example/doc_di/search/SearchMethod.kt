@@ -14,7 +14,6 @@ import androidx.activity.result.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,19 +29,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,9 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -71,7 +64,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.home.BtmBarViewModel
+import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.home.ImagePickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -137,13 +130,13 @@ fun SearchMethod(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 48.dp)
+                .padding(top = 48.dp, bottom = 106.dp)
         ){
             Image(
                 painter = painterResource(id = R.drawable.back),
                 contentDescription = "뒤로가기",
                 modifier = Modifier
-                    .padding(start =  40.dp)
+                    .padding(start = 40.dp)
                     .size(30.dp)
                     .align(Alignment.Start)
                     .clickable { navController.popBackStack() }
@@ -231,6 +224,7 @@ fun SearchMethod(
                 }
             }
 
+            /* TODO Spacer, fillmaxwidth contentpadding 사용해서 버튼 조정 */
             if(searchViewModel.showSearch[1]){
                 val textColor = Color(0xFF191D30)
                 Column (
@@ -239,9 +233,6 @@ fun SearchMethod(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(bottom = 114.dp)
-                        .clickable { 
-                            TODO("Spacer, fillmaxwidth contentpadding 사용해서 버튼 조정")
-                        }
                 ) {
                     Row(
                         modifier = Modifier
@@ -472,10 +463,12 @@ fun SearchMethod(
             }
 
             if(searchViewModel.showSearch[2]){
+                Spacer(modifier = Modifier.weight(1f))
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 32.dp, vertical = 60.dp)
+                        .padding(horizontal = 32.dp)
                         .height(286.dp)
                         .clip(RoundedCornerShape(25.dp))
                 ){
@@ -499,13 +492,17 @@ fun SearchMethod(
                     }
                 }
 
+                Spacer(modifier = Modifier.weight(1f))
+
                 androidx.compose.material.Button(
                     onClick = {
                         showImagePickerDialog = true
                     },
                     colors = androidx.compose.material.ButtonDefaults.textButtonColors(mainSearchColor),
                     modifier = Modifier
-                        .size(328.dp, 60.dp)
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp)
+                        .height(60.dp)
                         .clip(RoundedCornerShape(16.dp))
                 ) {
                     Text(
@@ -515,6 +512,32 @@ fun SearchMethod(
                         color = Color.White,
                     )
                 }
+
+                if(imageBitmap != null){
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    androidx.compose.material.Button(
+                        onClick = {
+                            navController.navigate(Routes.searchResult.route)
+                        },
+                        colors = androidx.compose.material.ButtonDefaults.textButtonColors(mainSearchColor),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 40.dp)
+                            .height(60.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                    ) {
+                        Text(
+                            text = "검색",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
 
                 if (showImagePickerDialog){
                     ImagePickerDialog(
