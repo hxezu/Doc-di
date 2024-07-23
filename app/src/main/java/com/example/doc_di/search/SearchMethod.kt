@@ -232,7 +232,6 @@ fun SearchMethod(
                     verticalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(bottom = 114.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -555,14 +554,4 @@ fun SearchMethod(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SearchMethodPreview() {
-    val navController = rememberNavController()
-    val searchViewModel: SearchViewModel = viewModel()
-    val btmBarViewModel: BtmBarViewModel = viewModel()
-    searchViewModel.showSearch[0] = true
-    SearchMethod(navController = navController, searchViewModel = searchViewModel, btmBarViewModel = btmBarViewModel)
 }
