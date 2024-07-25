@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.LoginPage
 import com.example.doc_di.RegisterPage
+import com.example.doc_di.ResetPage
 import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.BtmBarViewModel
@@ -36,6 +37,10 @@ fun NaviGraph(navController: NavHostController) {
 
         composable(Routes.register.route) {
             RegisterPage(navController = navController)
+        }
+
+        composable(Routes.register.route) {
+            ResetPage(navController = navController)
         }
 
         composable(route = Routes.home.route){

@@ -1,6 +1,9 @@
 package com.example.doc_di.etc
 
 sealed class Routes(val route: String) {
+    object login : Routes("LoginPage")
+    object register : Routes("RegisterPage")
+    object reset : Routes("ResetPage")
     object home: Routes("Home")
     object appointmentSchedule: Routes("AppointmentSchedule")
     object search: Routes("Search")
