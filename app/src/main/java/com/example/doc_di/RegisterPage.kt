@@ -147,7 +147,7 @@ fun RegisterPassword(){
         keyboardActions = KeyboardActions(
             onDone = {
                 keyboardController?.hide()
-                //TODO
+                //TO DO
             }
         )
     )
@@ -195,7 +195,7 @@ fun RegisterPasswordConfirm(){
         keyboardActions = KeyboardActions(
             onDone = {
                 keyboardController?.hide()
-                //TODO
+                //TO DO
             }
         )
     )
@@ -233,7 +233,7 @@ fun RegisterEmail(){
         keyboardActions = KeyboardActions(
             onDone = {
                 keyboardController?.hide()
-                //TODO
+                //TO DO
             }
         )
     )
@@ -271,7 +271,7 @@ fun RegisterPhone(){
         keyboardActions = KeyboardActions(
             onDone = {
                 keyboardController?.hide()
-                //TODO
+                //TO DO
             }
         )
     )
@@ -309,7 +309,7 @@ fun RegisterName(){
         keyboardActions = KeyboardActions(
             onDone = {
                 keyboardController?.hide()
-                //TODO
+                //TO DO
             }
         )
     )
