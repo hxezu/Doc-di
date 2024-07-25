@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Doc_di</string>
+    <string name="chatbot">DDoc-di</string>
+    <string name="type_message">Type Message</string>
+</resources>
