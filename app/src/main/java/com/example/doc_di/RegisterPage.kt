@@ -38,7 +38,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.doc_di.chatbot.ChatListScreen
+import com.example.doc_di.home.BtmBarViewModel
 
 @Composable
 fun RegisterPage(navController: NavController) {
@@ -313,4 +318,11 @@ fun RegisterName(){
             }
         )
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterPagePreview(){
+    val navController = rememberNavController()
+    RegisterPage(navController = navController)
 }
