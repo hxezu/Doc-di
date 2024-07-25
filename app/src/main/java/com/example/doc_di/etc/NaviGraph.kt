@@ -39,7 +39,7 @@ fun NaviGraph(navController: NavHostController) {
             RegisterPage(navController = navController)
         }
 
-        composable(Routes.register.route) {
+        composable(Routes.reset.route) {
             ResetPage(navController = navController)
         }
 

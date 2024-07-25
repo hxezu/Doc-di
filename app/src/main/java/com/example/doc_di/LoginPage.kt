@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.doc_di.etc.Routes
 
 @Composable
 fun LoginPage(navController: NavController) {
@@ -126,14 +127,13 @@ fun LoginPage(navController: NavController) {
 
                 Spacer(modifier = Modifier.padding(10.dp))
                 androidx.compose.material3.TextButton(onClick = {
-
-                    navController.navigate("RegisterPage"){
+                    navController.navigate(Routes.register.route){
                         popUpTo(navController.graph.startDestinationId)
                         launchSingleTop = true
                     }
 
                 }) {
-                    androidx.compose.material3.Text(
+                    Text(
                         text = "Create An Account",
                         letterSpacing = 1.sp,
                         style = MaterialTheme.typography.labelLarge
