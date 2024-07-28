@@ -69,7 +69,7 @@ fun LoginPage(navController: NavController) {
         ) {
 
             Image(
-                painter = painterResource(id = R.drawable.user_sign_in),
+                painter = painterResource(id = R.drawable.nameicon),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
@@ -86,12 +86,10 @@ fun LoginPage(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                //.........................Spacer
                 Spacer(modifier = Modifier.height(50.dp))
 
-                //.........................Text: title
-                androidx.compose.material3.Text(
-                    text = "Sign In",
+                Text(
+                    text = "로그인",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(top = 130.dp)
@@ -105,7 +103,7 @@ fun LoginPage(navController: NavController) {
                 Spacer(modifier = Modifier.padding(3.dp))
                 SimpleOutlinedPasswordTextField()
 
-                val gradientColor = listOf(Color(0xFF484BF1), Color(0xFF673AB7))
+                val gradientColor = listOf(Color(0xFF0052D4), Color(0xFF4364F7), Color(0xFF6FB1FC))
                 val cornerRadius = 16.dp
 
 
@@ -121,8 +119,9 @@ fun LoginPage(navController: NavController) {
                 GradientButton(
                     gradientColors = gradientColor,
                     cornerRadius = cornerRadius,
-                    nameButton = "Login",
-                    roundedCornerShape = RoundedCornerShape(topStart = 30.dp,bottomEnd = 30.dp)
+                    nameButton = "로그인",
+                    roundedCornerShape = RoundedCornerShape(topStart = 30.dp,bottomEnd = 30.dp),
+                    navController = navController
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
@@ -134,7 +133,7 @@ fun LoginPage(navController: NavController) {
 
                 }) {
                     Text(
-                        text = "Create An Account",
+                        text = "회원가입",
                         letterSpacing = 1.sp,
                         style = MaterialTheme.typography.labelLarge
                     )
@@ -150,8 +149,8 @@ fun LoginPage(navController: NavController) {
                     }
 
                 }) {
-                    androidx.compose.material3.Text(
-                        text = "Reset Password",
+                    Text(
+                        text = "아이디/비밀번호 찾기",
                         letterSpacing = 1.sp,
                         style = MaterialTheme.typography.labelLarge,
                     )
@@ -173,7 +172,8 @@ private fun GradientButton(
     gradientColors: List<Color>,
     cornerRadius: Dp,
     nameButton: String,
-    roundedCornerShape: RoundedCornerShape
+    roundedCornerShape: RoundedCornerShape,
+    navController: NavController
 ) {
 
     androidx.compose.material3.Button(
@@ -181,7 +181,10 @@ private fun GradientButton(
             .fillMaxWidth()
             .padding(start = 32.dp, end = 32.dp),
         onClick = {
-            //your code
+            navController.navigate(Routes.home.route){
+                popUpTo(navController.graph.startDestinationId)
+                launchSingleTop = true
+            }
         },
 
         contentPadding = PaddingValues(),
@@ -206,7 +209,7 @@ private fun GradientButton(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = nameButton,
                 fontSize = 20.sp,
                 color = Color.White
@@ -228,11 +231,11 @@ fun SimpleOutlinedTextFieldSample() {
         onValueChange = { text = it },
         shape = RoundedCornerShape(topEnd =12.dp, bottomStart =12.dp),
         label = {
-            Text("Name or Email Address",
+            Text("ID 입력",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium,
             ) },
-        placeholder = { Text(text = "Name or Email Address") },
+        placeholder = { Text(text = "ID 입력") },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Email
@@ -265,7 +268,7 @@ fun SimpleOutlinedPasswordTextField() {
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                "Enter Password",
+                "비밀번호 입력",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium,
             )

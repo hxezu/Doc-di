@@ -39,11 +39,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.doc_di.chatbot.ChatListScreen
-import com.example.doc_di.home.BtmBarViewModel
 
 @Composable
 fun RegisterPage(navController: NavController) {
@@ -79,7 +76,7 @@ fun RegisterPage(navController: NavController) {
                 Spacer(modifier = Modifier.height(30.dp))
 
                 Text(
-                    text = "Create An Account",
+                    text = "계정 만들기",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(top = 130.dp)
@@ -122,7 +119,7 @@ fun RegisterPassword(){
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                "Enter Password",
+                "비밀번호 입력",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium,
             )
@@ -172,7 +169,7 @@ fun RegisterPasswordConfirm(){
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                "Confirm Password",
+                "비밀번호 확인",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium,
             )
@@ -219,12 +216,12 @@ fun RegisterEmail(){
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                "Email Address",
+                "이메일 입력",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
-        placeholder = {Text(text="Email Address")},
+        placeholder = {Text(text="이메일 입력")},
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Email
@@ -257,12 +254,12 @@ fun RegisterPhone(){
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                "Phone",
+                "전화번호",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
-        placeholder = {Text(text="Phone")},
+        placeholder = {Text(text="전화번호")},
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Phone
@@ -295,12 +292,12 @@ fun RegisterName(){
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                "Name",
+                "이름",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
-        placeholder = {Text(text="Name")},
+        placeholder = {Text(text="이름")},
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text
