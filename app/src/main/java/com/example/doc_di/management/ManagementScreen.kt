@@ -71,14 +71,14 @@ import java.util.Locale
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            CalendarApp(userId)
+            CalendarApp(navController, userId)
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CalendarApp(userId : Int){
+fun CalendarApp(navController: NavController, userId : Int){
     var currentMonth by remember { mutableStateOf(YearMonth.now())}
     var selectedDate by remember { mutableStateOf(LocalDate.now())}
     var dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -90,7 +90,7 @@ fun CalendarApp(userId : Int){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(androidx.compose.material.MaterialTheme.colors.background)
+                .background(colors.background)
         ){
             Spacer(modifier = Modifier.height(16.dp))
             MonthNavigation(currentMonth, onPrevMonth = {
@@ -119,17 +119,6 @@ fun CalendarApp(userId : Int){
 
             CalendarTaskScreen(userId = userId, selectedDate.format(dateFormatter))
         }
-        if (isDialogOpen) {
-            AddTaskDialog(
-                userId,
-                date = selectedDate.format(dateFormatter),
-                time = getCurrentTime(),
-                onDismiss = { isDialogOpen = false },
-                onSaveTask = {
-                    isDialogOpen = false
-                }
-            )
-        }
         Row (
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -147,7 +136,10 @@ fun CalendarApp(userId : Int){
 
             // 오른쪽 버튼
             CustomButton(
-                onClick = { isDialogOpen = true },
+                onClick = {
+                    val formattedDate = selectedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                    val formattedTime = getCurrentTime()
+                    navController.navigate("AddPillScreen/$userId/$formattedDate/$formattedTime") },
                 text = "복용 약"
             )
         }
@@ -253,7 +245,7 @@ fun DaysGrid(
                                 .aspectRatio(1f)
                                 .padding(4.dp)
                                 .background(
-                                    color = if (isSelected) Color.Black else Color.Transparent,
+                                    color = if (isSelected) MainBlue else Color.Transparent,
                                     shape = RoundedCornerShape(10.dp)
                                 )
                                 .clickable {
@@ -285,7 +277,7 @@ fun WeekDayHeader(){
                 modifier = Modifier.weight(1f),
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
-                color = androidx.compose.material.MaterialTheme.colors.onBackground
+                color = colors.onBackground
             )
         }
     }
@@ -301,7 +293,7 @@ fun MonthNavigation(currentMonth: YearMonth, onPrevMonth: () -> Unit, onNextMont
     ){
         Icon(painter = painterResource(id = R.drawable.previous),
             contentDescription = "PrevMonth",
-            tint = androidx.compose.material.MaterialTheme.colors.onBackground,
+            tint = MainBlue,
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
@@ -309,14 +301,14 @@ fun MonthNavigation(currentMonth: YearMonth, onPrevMonth: () -> Unit, onNextMont
                 .clickable { onPrevMonth() }
         )
         Text(
-            text = currentMonth.month.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.getDefault()) + " " + currentMonth.year,
+            text = currentMonth.month.getDisplayName(java.time.format.TextStyle.FULL, Locale.getDefault()) + " " + currentMonth.year,
             fontSize = 16.sp,
-            color = androidx.compose.material.MaterialTheme.colors.onBackground
+            color = colors.onBackground
         )
         Icon(
             painter = painterResource(id = R.drawable.next),
             contentDescription = "NextMonth",
-            tint = androidx.compose.material.MaterialTheme.colors.onBackground,
+            tint = MainBlue,
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
