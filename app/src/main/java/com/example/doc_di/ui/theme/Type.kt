@@ -67,8 +67,8 @@ val Typography = Typography(
     ),
     titleLarge = TextStyle(
         fontFamily = pretendardFontFamily,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 22.sp,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 30.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),

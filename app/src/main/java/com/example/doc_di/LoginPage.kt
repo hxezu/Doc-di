@@ -69,16 +69,6 @@ fun LoginPage(navController: NavController) {
                 )*/
                 .align(Alignment.BottomCenter),
         ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.nameicon),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .height(180.dp)
-                    .fillMaxWidth(),
-
-                )
             Column(
                 modifier = Modifier.padding(16.dp)
                     .fillMaxWidth()
@@ -88,18 +78,19 @@ fun LoginPage(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Spacer(modifier = Modifier.height(50.dp))
-
-                Text(
-                    text = "로그인",
-                    textAlign = TextAlign.Center,
+                Image(
+                    painter = painterResource(id = R.drawable.nameicon),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .padding(top = 130.dp)
+                        .padding(top = 100.dp)
+                        .height(180.dp)
                         .fillMaxWidth(),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+
+                    )
+
+
+                Spacer(modifier = Modifier.padding(20.dp))
                 SimpleOutlinedTextFieldSample()
 
                 Spacer(modifier = Modifier.padding(3.dp))

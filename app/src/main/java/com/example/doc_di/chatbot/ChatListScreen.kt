@@ -24,6 +24,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +50,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.data.Person
 import com.example.doc_di.data.personList
 import com.example.doc_di.etc.BottomNavigationBar
+import com.example.doc_di.etc.Routes
 import com.example.doc_di.home.BtmBarViewModel
 import com.example.doc_di.ui.theme.Line
 import com.example.doc_di.ui.theme.MainBlue
@@ -64,7 +67,16 @@ fun ChatListScreen(navController: NavController, btmBarViewModel: BtmBarViewMode
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                Header()
+                Text(
+                    text = "DDoc-Di 와 대화하기",
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier
+                        .padding(start = 20.dp, top = 60.dp, bottom = 30.dp)
+                        .fillMaxWidth(),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MainBlue,
+                )
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -76,7 +88,7 @@ fun ChatListScreen(navController: NavController, btmBarViewModel: BtmBarViewMode
                         items(personList, key = { it.id }) {
                             UserEachRow(person = it){
                                 navController.currentBackStackEntry?.savedStateHandle?.set("data",it)
-                                //navController.navigate(CHAT_SCREEN)
+                                navController.navigate(Routes.chatScreen.route)
                             }
                         }
                     }
@@ -112,20 +124,21 @@ fun UserEachRow(
             .fillMaxWidth()
             .background(Color.White)
             .noRippleEffect { onClick() }
-            .padding(horizontal = 20.dp, vertical = 5.dp),
+            .padding(horizontal = 20.dp, vertical = 10.dp),
     ) {
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row {
+                    Spacer(modifier = Modifier.width(10.dp))
                     Icon(
                         painter = painterResource(id = person.icon),
                         contentDescription = "",
-                        modifier = Modifier.size(60.dp),
+                        modifier = Modifier.size(40.dp),
                         tint = Color.Unspecified
                     )
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(20.dp))
                     Column(
                     ) {
                         Text(
@@ -133,7 +146,7 @@ fun UserEachRow(
                                 color = Color.Black, fontSize = 15.sp
                             )
                         )
-                        Spacer(modifier = Modifier.height(5.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         androidx.compose.material.Text(
                             text = "Okay", style = TextStyle(
                                 color = Gray, fontSize = 14.sp
@@ -155,30 +168,6 @@ fun UserEachRow(
 
 }
 
-
-@Composable
-fun Header() {
-    val annotatedString = buildAnnotatedString {
-        withStyle(
-            style = SpanStyle(
-                color = Color.Black,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.W300
-            )
-        ) {
-            append("DDoc-Di 와 대화하기")
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 20.dp, top = 60.dp, bottom = 30.dp)
-    ) {
-        androidx.compose.material.Text(text = annotatedString)
-    }
-
-}
 
 fun Modifier.noRippleEffect(onClick: () -> Unit) = composed {
     val interactionSource = remember { MutableInteractionSource() }

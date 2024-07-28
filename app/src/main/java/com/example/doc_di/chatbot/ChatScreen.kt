@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -79,12 +80,11 @@ fun ChatScreen(navController: NavController, btmBarViewModel: BtmBarViewModel) {
             ) {
                 UserNameRow(
                     person = data,
-                    modifier = Modifier.padding(top = 60.dp, start = 20.dp, end = 20.dp)
+                    modifier = Modifier.padding(top = 30.dp, start = 20.dp, end = 20.dp)
                 )
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 25.dp)
                         .clip(
                             RoundedCornerShape(
                                 topStart = 30.dp, topEnd = 30.dp
@@ -92,7 +92,7 @@ fun ChatScreen(navController: NavController, btmBarViewModel: BtmBarViewModel) {
                         )
                         .background(Color.White)
                 ) {
-                    LazyColumn(modifier = Modifier.padding(start = 15.dp, top = 25.dp, end = 15.dp)){
+                    LazyColumn(modifier = Modifier.padding(start = 20.dp, top = 15.dp, end = 20.dp)){
                         items(chatList,key={it.id}){
                             ChatRow(chat = it)
                         }
@@ -225,14 +225,16 @@ fun UserNameRow(
                 modifier = Modifier.size(42.dp),
                 tint = Color.Unspecified
             )
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(20.dp))
             Column {
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = person.name, style = TextStyle(
                         color = MainBlue,
                         fontSize = 16.sp
                     )
                 )
+                Spacer(modifier = Modifier.height(5.dp))
                 androidx.compose.material.Text(
                     text = stringResource(R.string.chatbot), style = TextStyle(
                         color = MainBlue,

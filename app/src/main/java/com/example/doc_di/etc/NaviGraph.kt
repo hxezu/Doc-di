@@ -9,6 +9,7 @@ import com.example.doc_di.LoginPage
 import com.example.doc_di.RegisterPage
 import com.example.doc_di.ResetPage
 import com.example.doc_di.chatbot.ChatListScreen
+import com.example.doc_di.chatbot.ChatScreen
 import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.BtmBarViewModel
 import com.example.doc_di.home.Home
@@ -85,6 +86,10 @@ fun NaviGraph(navController: NavHostController) {
 
         composable(route = Routes.chatListScreen.route){
             ChatListScreen(navController = navController, btmBarViewModel = btmBarViewModel)
+        }
+
+        composable(route = Routes.chatScreen.route){
+            ChatScreen(navController = navController, btmBarViewModel = btmBarViewModel)
         }
 
         composable(route = Routes.managementScreen.route){

@@ -13,7 +13,8 @@ sealed class Routes(val route: String) {
     object medicalAppointmentRecord: Routes("MedicalAppointmentRecord")
     object prescriptionRecord: Routes("PrescriptionRecord")
     object prescribedMedicineList: Routes("PrescribedMedicineList")
-    object chatListScreen: Routes("chatListScreen")
+    object chatListScreen: Routes("ChatListScreen")
+    object chatScreen: Routes("ChatScreen")
     object managementScreen: Routes("managementScreen")
     object profile: Routes("profile")
 }

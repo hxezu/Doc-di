@@ -80,7 +80,7 @@ fun ResetPage(navController: NavController) {
                 ResetEmailID()
                 Spacer(modifier = Modifier.padding(3.dp))
 
-                val gradientColor = listOf(Color(0xFF484BF1), Color(0xFF673AB7))
+                val gradientColor = listOf(Color(0xFF0052D4), Color(0xFF4364F7), Color(0xFF6FB1FC))
                 val cornerRadius = 16.dp
 
                 Spacer(modifier = Modifier.padding(10.dp))
