@@ -32,6 +32,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.ui.theme.MainBlue
 
 @Composable
 fun LoginPage(navController: NavController) {
@@ -225,6 +227,7 @@ private fun GradientButton(
 fun SimpleOutlinedTextFieldSample() {
     val keyboardController = LocalSoftwareKeyboardController.current
     var text by rememberSaveable { mutableStateOf("") }
+    var isFocused by rememberSaveable { mutableStateOf(false) }
 
     OutlinedTextField(
         value = text,
@@ -241,10 +244,15 @@ fun SimpleOutlinedTextFieldSample() {
             keyboardType = KeyboardType.Email
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary),
+            focusedBorderColor = if (isFocused) MainBlue else MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = if (isFocused) MainBlue else MaterialTheme.colorScheme.primary
+        ),
         singleLine = true,
-        modifier = Modifier.fillMaxWidth(0.8f),
+        modifier = Modifier
+            .fillMaxWidth(0.8f)
+            .onFocusChanged { focusState ->
+        isFocused = focusState.isFocused
+        },
         keyboardActions = KeyboardActions(
             onDone = {
                 keyboardController?.hide()
@@ -262,6 +270,8 @@ fun SimpleOutlinedPasswordTextField() {
     val keyboardController = LocalSoftwareKeyboardController.current
     var password by rememberSaveable { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
+    var isFocused by rememberSaveable { mutableStateOf(false) }
+
     OutlinedTextField(
         value = password,
         onValueChange = { password = it },
@@ -281,8 +291,8 @@ fun SimpleOutlinedPasswordTextField() {
             keyboardType = KeyboardType.Password
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+            focusedBorderColor = if (isFocused) MainBlue else MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = if (isFocused) MainBlue else MaterialTheme.colorScheme.primary
         ),
         trailingIcon = {
             IconButton(onClick = { passwordHidden = !passwordHidden }) {
@@ -293,7 +303,11 @@ fun SimpleOutlinedPasswordTextField() {
                 Icon(imageVector = visibilityIcon, contentDescription = description)
             }
         },
-        modifier = Modifier.fillMaxWidth(0.8f),
+        modifier = Modifier
+            .fillMaxWidth(0.8f)
+            .onFocusChanged { focusState ->
+                isFocused = focusState.isFocused
+            },
         keyboardActions = KeyboardActions(
             onDone = {
                 keyboardController?.hide()

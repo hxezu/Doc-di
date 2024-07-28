@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.doc_di.etc.Routes
 
 @Composable
 fun ResetPage(navController: NavController) {
@@ -54,15 +55,8 @@ fun ResetPage(navController: NavController) {
         Box(
             modifier = Modifier
                 .background(color = Color.Transparent)
+                .align(Alignment.Center)
         ){
-            Image(
-                painter = painterResource(id = R.drawable.user_forgot),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .height(180.dp)
-                    .fillMaxWidth()
-            )
             Column(
                 modifier = Modifier
                     .padding(16.dp)
@@ -73,7 +67,7 @@ fun ResetPage(navController: NavController) {
                 Spacer(modifier = Modifier.height(50.dp))
 
                 Text(
-                    text= "Reset Password",
+                    text= "비밀번호 재설정",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(top = 130.dp)
@@ -81,7 +75,7 @@ fun ResetPage(navController: NavController) {
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 ResetEmailID()
                 Spacer(modifier = Modifier.padding(3.dp))
@@ -94,21 +88,21 @@ fun ResetPage(navController: NavController) {
                 GradientButtonReset(
                     gradientColors = gradientColor,
                     cornerRadius = cornerRadius,
-                    nameButton = "Submit",
-                    roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp)
+                    nameButton = "제출",
+                    roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
+                    navController = navController
                 )
 
                 Spacer(modifier = Modifier.padding(10.dp))
                 androidx.compose.material3.TextButton(onClick = {
-
-                    navController.navigate("register_page"){
+                    navController.navigate("RegisterPage"){
                         popUpTo(navController.graph.startDestinationId)
                         launchSingleTop = true
                     }
 
                 }) {
-                    androidx.compose.material3.Text(
-                        text = "Sign Up?",
+                    Text(
+                        text = "회원가입하러 가기",
                         letterSpacing = 1.sp,
                         style = MaterialTheme.typography.labelLarge
                     )
@@ -125,14 +119,18 @@ private fun GradientButtonReset(
     gradientColors: List<Color>,
     cornerRadius : Dp,
     nameButton : String,
-    roundedCornerShape: RoundedCornerShape
+    roundedCornerShape: RoundedCornerShape,
+    navController: NavController
 ) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 32.dp, end = 32.dp),
         onClick = {
-            //TO DO
+            navController.navigate(Routes.login.route){
+                popUpTo(navController.graph.startDestinationId)
+                launchSingleTop = true
+            }
         },
         contentPadding = PaddingValues(),
         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
