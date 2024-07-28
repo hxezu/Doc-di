@@ -1,11 +1,10 @@
 package com.example.doc_di.domain.model
 
 import com.google.gson.annotations.SerializedName
-import com.example.doc_di.domain.model.TaskModel
 
-data class TaskRequest(
+data class PillTaskRequest(
     @SerializedName("user_id")
     val userId: Int,
     @SerializedName("task")
-    val task: TaskModel
+    val task: PillTaskModel
 )

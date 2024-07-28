@@ -6,15 +6,15 @@ import com.example.doc_di.data.model.ApiGetTaskReq
 import com.example.doc_di.data.model.ApiSuccess
 import com.example.doc_di.data.model.Task
 import com.example.doc_di.data.remote.ApiService
-import com.example.doc_di.domain.model.TaskRequest
+import com.example.doc_di.domain.model.PillTaskRequest
 import com.example.doc_di.domain.repository.TaskRepository
 import javax.inject.Inject
 
 class TaskRepositoryImpl @Inject constructor(private val apiService: ApiService) : TaskRepository {
 
-    override suspend fun storeTask(taskRequest: TaskRequest): ApiSuccess {
+    override suspend fun storeTask(pillTaskRequest: PillTaskRequest): ApiSuccess {
         return try {
-            apiService.storeCalendarTask(taskRequest)
+            apiService.storeCalendarTask(pillTaskRequest)
         } catch (e: Exception) {
             Log.i("--Repository--", "AddTaskAPI >> ${e.message}" )
             ApiSuccess(e.message.toString())

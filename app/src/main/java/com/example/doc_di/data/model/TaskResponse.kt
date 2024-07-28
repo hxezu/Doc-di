@@ -6,5 +6,5 @@ data class TaskResponse(
 
 data class Task(
     val task_id: Int,
-    val task_detail: TaskModel
+    val task_detail: PillTaskModel
 )

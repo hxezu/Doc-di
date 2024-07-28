@@ -2,7 +2,6 @@ package com.example.doc_di.management
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,18 +31,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontVariation.weight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.data.model.Task
-import com.example.doc_di.data.model.TaskModel
+import com.example.doc_di.data.model.PillTaskModel
+import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.viewmodel.TaskViewModel
 import java.time.LocalDate
 import java.time.LocalTime
@@ -113,7 +109,7 @@ fun TaskCard(task: Task, onDelete : (Task) -> Unit) {
             .padding(vertical = 2.dp, horizontal = 16.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable { /* Handle click if needed */ } ,
-        backgroundColor = Color(0xFF4DF6E9),
+        backgroundColor = MainBlue,
         elevation = 4.dp
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -123,15 +119,15 @@ fun TaskCard(task: Task, onDelete : (Task) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = task.task_detail.title ?: "",
+                    text = task.task_detail.pillName ?: "",
                     fontSize = 14.sp,
                     color = MaterialTheme.colors.onBackground,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = formatDateTime(task.task_detail.date, task.task_detail.time) ?: "",
+                    text = formatDateTime(task.task_detail.startDate, task.task_detail.takeTime) ?: "",
                     modifier = Modifier
-                        .background(Color.White, shape = RoundedCornerShape(6.dp)).padding(4.dp),
+                        .background(Color.Transparent, shape = RoundedCornerShape(6.dp)).padding(4.dp),
                     color = Color.Black,
                     fontSize = 12.sp,
                 )
@@ -145,7 +141,7 @@ fun TaskCard(task: Task, onDelete : (Task) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 Text(
-                    text = task.task_detail.description ?: "",
+                    text = task.task_detail.pillUnit ?: "",
                     style = MaterialTheme.typography.body2,
                     color = MaterialTheme.colors.onBackground,
                     fontSize = 12.sp,
@@ -157,7 +153,7 @@ fun TaskCard(task: Task, onDelete : (Task) -> Unit) {
                     modifier = Modifier
                         .size(24.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFE5FF7F))
+                        .background(Color.Transparent)
                         .padding(4.dp)
                         .clickable { onDelete(task) }
                 )
@@ -200,11 +196,13 @@ fun TaskCardPreview() {
     // Task 객체를 생성
     val task = Task(
         task_id = 1,
-        task_detail = TaskModel(
-            title = "Sample Task",
-            description = "This is a sample description",
-            date = "22/07/2024",
-            time = "10:00 AM"
+        task_detail = PillTaskModel(
+            pillName = "Sample Task",
+            pillUnit = "This is a sample description",
+            pillAmount = "",
+            pillCycle = "",
+            startDate = "22/07/2024",
+            takeTime = "10:00 AM"
         )
     )
     TaskCard(

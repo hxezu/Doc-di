@@ -113,8 +113,8 @@ fun NaviGraph(navController: NavHostController) {
             AddPillScreen(
                 navController = navController,
                 userId = userId,
-                date = date,
-                time = time,
+                startDate = date,
+                takeTime = time,
                 onSaveTask = { /* Implement onSaveTask logic here */ }
             )
         }

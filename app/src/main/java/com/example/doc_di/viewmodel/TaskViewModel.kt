@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
 import com.example.doc_di.data.model.Task
-import com.example.doc_di.domain.model.TaskRequest
+import com.example.doc_di.domain.model.PillTaskRequest
 import com.example.doc_di.domain.usecases.DeleteTaskUseCase
 import com.example.doc_di.domain.usecases.GetTaskListUseCase
 import com.example.doc_di.domain.usecases.StoreTaskUseCase
@@ -25,10 +25,10 @@ class TaskViewModel @Inject constructor(
     private val _task = MutableStateFlow<List<Task>?>(null)
     val taskList: StateFlow<List<Task>?> = _task
 
-    fun storeTask(taskRequest: TaskRequest, onSuccess: () -> Unit, onError: () -> Unit)  {
+    fun storeTask(pillTaskRequest: PillTaskRequest, onSuccess: () -> Unit, onError: () -> Unit)  {
         viewModelScope.launch {
             try {
-                storeTaskUseCase.invoke(taskRequest)
+                storeTaskUseCase.invoke(pillTaskRequest)
                 onSuccess()
             }catch (e : Exception){
                 onError()
@@ -81,7 +81,7 @@ class TaskViewModel @Inject constructor(
             tasks
         } else {
             Log.i("--ViewModel--", "filter task >> $date  ${tasks.size}")
-            tasks.filter { it.task_detail.date == date }
+            tasks.filter { it.task_detail.startDate == date }
         }
     }
 }
