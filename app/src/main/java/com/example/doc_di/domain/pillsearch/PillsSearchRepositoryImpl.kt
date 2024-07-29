@@ -10,11 +10,11 @@ import retrofit2.HttpException
 class PillsSearchRepositoryImpl(
     private val api : Api
 ): PillsSearchRepository {
-    override suspend fun getPillSearchListByName(name: String): Flow<Result<List<Pill>>> {
+    override suspend fun getPillSearchList(queryParams: Map<String,String>): Flow<Result<List<Pill>>> {
         return flow{
             val pillsFromApi = try{
-                Log.d("pillsFromApi", "Result.Success: ${api.getPillSearchListByName(name)}")
-                api.getPillSearchListByName(name)
+                Log.d("pillsFromApi", "Result.Success: ${api.getPillSearchList(queryParams)}")
+                api.getPillSearchList(queryParams)
             }
             catch (e: IOException){
                 e.printStackTrace()

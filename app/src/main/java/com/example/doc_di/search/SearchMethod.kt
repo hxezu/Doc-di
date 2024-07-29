@@ -177,6 +177,7 @@ fun SearchMethod(
             }
 
             if(searchViewModel.showSearch[0]){
+                val option = mutableMapOf<String, String>()
                 OutlinedTextField(
                     value = nameSearch,
                     onValueChange = {nameSearch = it},
@@ -210,7 +211,8 @@ fun SearchMethod(
 
                 androidx.compose.material.Button(
                     onClick = {
-                        searchViewModel.searchPillsByName(nameSearch)
+                        option["name"] = nameSearch
+                        searchViewModel.searchPillsByOptions(option)
                         navController.navigate(Routes.searchResult.route)
                     },
                     colors = androidx.compose.material.ButtonDefaults.textButtonColors(mainSearchColor),

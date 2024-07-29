@@ -24,6 +24,8 @@ class SearchViewModel(
 
     private val selectedPill = mutableStateOf<Pill?>(null)
 
+    private var options = mapOf<String, String>()
+
     private val _pills = MutableStateFlow<List<Pill>>(emptyList())
     val pills = _pills.asStateFlow()
 
@@ -31,12 +33,12 @@ class SearchViewModel(
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {
-        searchPillsByName("")
+        searchPillsByOptions(options)
     }
 
-    fun searchPillsByName(name: String){
+    fun searchPillsByOptions(queryParams: Map<String, String>){
         viewModelScope.launch {
-            pillsSearchRepository.getPillSearchListByName(name).collectLatest { result ->
+            pillsSearchRepository.getPillSearchList(queryParams).collectLatest { result ->
                 when(result){
                     is Result.Error -> {
                         _showErrorToastChannel.send(true)
@@ -58,5 +60,9 @@ class SearchViewModel(
 
     fun getSelectedPill (): Pill{
         return selectedPill.value!!
+    }
+
+    fun setOptions (queryParams: Map<String,String>){
+        options = queryParams
     }
 }
