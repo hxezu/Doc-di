@@ -16,8 +16,8 @@ import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.BtmBarViewModel
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.Profile
-import com.example.doc_di.management.AddPillScreen
-import com.example.doc_di.management.ManagementScreen
+import com.example.doc_di.management.home.ManagementRoute
+import com.example.doc_di.management.home.ManagementScreen
 import com.example.doc_di.search.MedicalAppointmentRecord
 import com.example.doc_di.search.PrescribedMedicineList
 import com.example.doc_di.search.PrescriptionRecord
@@ -95,28 +95,14 @@ fun NaviGraph(navController: NavHostController) {
             ChatScreen(navController = navController, btmBarViewModel = btmBarViewModel)
         }
 
-        composable(route = Routes.managementScreen.route){
-            ManagementScreen(navController = navController, btmBarViewModel = btmBarViewModel)
+        composable(route = Routes.managementScreen.route) {
+            ManagementRoute(
+                navController = navController,
+                askNotificationPermission = true, // Pass actual logic for permission request
+                askAlarmPermission = true, // Pass actual logic for permission request
+                navigateToMedicationDetail = { /* Handle navigation */ }
+            )
         }
 
-        composable(
-            route = "${Routes.addPillScreen.route}/{userId}/{date}/{time}",
-            arguments = listOf(
-                navArgument("userId") { type = NavType.IntType },
-                navArgument("date") { type = NavType.StringType },
-                navArgument("time") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val userId = backStackEntry.arguments?.getInt("userId") ?: 0
-            val date = backStackEntry.arguments?.getString("date") ?: ""
-            val time = backStackEntry.arguments?.getString("time") ?: ""
-            AddPillScreen(
-                navController = navController,
-                userId = userId,
-                startDate = date,
-                takeTime = time,
-                onSaveTask = { /* Implement onSaveTask logic here */ }
-            )
-        }
     }
 }

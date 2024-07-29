@@ -16,6 +16,5 @@ sealed class Routes(val route: String) {
     object chatListScreen: Routes("ChatListScreen")
     object chatScreen: Routes("ChatScreen")
     object managementScreen: Routes("ManagementScreen")
-    object addPillScreen: Routes("AddPillScreen")
     object profile: Routes("profile")
 }
