@@ -1,11 +1,15 @@
 package com.example.doc_di.etc
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.chatbot.ChatListScreen
+import com.example.doc_di.domain.pillsearch.PillsSearchRepositoryImpl
+import com.example.doc_di.domain.pillsearch.RetrofitInstance
 import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.Profile
@@ -22,56 +26,82 @@ import com.example.doc_di.searchresult.SearchResult
 
 @Composable
 fun NaviGraph(navController: NavHostController) {
-    val searchViewModel : SearchViewModel = viewModel()
-    val pillViewModel : PillInformationViewModel = viewModel()
-    val btmBarViewModel : BtmBarViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = Routes.home.route){
-        composable(route = Routes.home.route){
+    val searchViewModel: SearchViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return SearchViewModel(PillsSearchRepositoryImpl(RetrofitInstance.api)) as T
+        }
+    })
+
+    val pillViewModel: PillInformationViewModel = viewModel()
+    val btmBarViewModel: BtmBarViewModel = viewModel()
+
+    NavHost(navController = navController, startDestination = Routes.home.route) {
+        composable(route = Routes.home.route) {
             Home(navController = navController, btmBarViewModel = btmBarViewModel)
         }
-        
-        composable(route = Routes.appointmentSchedule.route){
+
+        composable(route = Routes.appointmentSchedule.route) {
             AppointmentSchedule(navController = navController, btmBarViewModel = btmBarViewModel)
         }
-        
-        composable(route = Routes.profile.route){
-            Profile(navController= navController)
+
+        composable(route = Routes.profile.route) {
+            Profile(navController = navController)
         }
 
-        composable(route = Routes.search.route){
-            Search(navController = navController ,searchViewModel = searchViewModel, btmBarViewModel = btmBarViewModel)
+        composable(route = Routes.search.route) {
+            Search(
+                navController = navController,
+                searchViewModel = searchViewModel,
+                btmBarViewModel = btmBarViewModel
+            )
         }
 
-        composable(route = Routes.searchMethod.route){
-            SearchMethod(navController = navController, searchViewModel = searchViewModel, btmBarViewModel = btmBarViewModel)
+        composable(route = Routes.searchMethod.route) {
+            SearchMethod(
+                navController = navController,
+                searchViewModel = searchViewModel,
+                btmBarViewModel = btmBarViewModel
+            )
         }
 
-        composable(route = Routes.searchResult.route){
-            SearchResult(navController = navController, btmBarViewModel = btmBarViewModel)
+        composable(route = Routes.searchResult.route) {
+            SearchResult(
+                navController = navController,
+                btmBarViewModel = btmBarViewModel,
+                searchViewModel = searchViewModel
+            )
         }
 
-        composable(route = Routes.pillInformation.route){
-            PillInformation(navController = navController, pillViewModel = pillViewModel, btmBarViewModel = btmBarViewModel)
+        composable(route = Routes.pillInformation.route) {
+            PillInformation(
+                navController = navController,
+                pillViewModel = pillViewModel,
+                btmBarViewModel = btmBarViewModel,
+                searchViewModel = searchViewModel
+            )
         }
 
-        composable(route = Routes.medicalAppointmentRecord.route){
-            MedicalAppointmentRecord(navController = navController, btmBarViewModel = btmBarViewModel)
+        composable(route = Routes.medicalAppointmentRecord.route) {
+            MedicalAppointmentRecord(
+                navController = navController,
+                btmBarViewModel = btmBarViewModel
+            )
         }
 
-        composable(route = Routes.prescriptionRecord.route){
+        composable(route = Routes.prescriptionRecord.route) {
             PrescriptionRecord(navController = navController, btmBarViewModel = btmBarViewModel)
         }
-        
-        composable(route = Routes.prescribedMedicineList.route){
+
+        composable(route = Routes.prescribedMedicineList.route) {
             PrescribedMedicineList(navController = navController, btmBarViewModel = btmBarViewModel)
         }
 
-        composable(route = Routes.chatListScreen.route){
+        composable(route = Routes.chatListScreen.route) {
             ChatListScreen(navController = navController, btmBarViewModel = btmBarViewModel)
         }
 
-        composable(route = Routes.managementScreen.route){
+        composable(route = Routes.managementScreen.route) {
             ManagementScreen(navController = navController, btmBarViewModel = btmBarViewModel)
         }
     }

@@ -209,7 +209,10 @@ fun SearchMethod(
                 )
 
                 androidx.compose.material.Button(
-                    onClick = { navController.navigate(Routes.searchResult.route) },
+                    onClick = {
+                        searchViewModel.searchPillsByName(nameSearch)
+                        navController.navigate(Routes.searchResult.route)
+                    },
                     colors = androidx.compose.material.ButtonDefaults.textButtonColors(mainSearchColor),
                     modifier = Modifier
                         .size(328.dp, 60.dp)

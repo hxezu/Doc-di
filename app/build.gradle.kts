@@ -83,10 +83,14 @@ dependencies {
 
     // Gson 및 Retrofit 종속성
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
 
     // OkHttp dependencies
-    implementation("com.squareup.okhttp3:okhttp:4.10.0") // Use the latest stable version
-    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0") // Use the latest stable version
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.14")
+
+    //coil
+    implementation("io.coil-kt:coil-compose:2.7.0")
 }
