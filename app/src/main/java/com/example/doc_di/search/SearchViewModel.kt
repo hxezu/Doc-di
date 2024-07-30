@@ -33,12 +33,12 @@ class SearchViewModel(
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     init {
-        searchPillsByOptions(options)
+        searchPillsByOptions()
     }
 
-    fun searchPillsByOptions(queryParams: Map<String, String>){
+    fun searchPillsByOptions(){
         viewModelScope.launch {
-            pillsSearchRepository.getPillSearchList(queryParams).collectLatest { result ->
+            pillsSearchRepository.getPillSearchList(options).collectLatest { result ->
                 when(result){
                     is Result.Error -> {
                         _showErrorToastChannel.send(true)

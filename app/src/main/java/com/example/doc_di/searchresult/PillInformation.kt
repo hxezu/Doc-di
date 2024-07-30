@@ -113,7 +113,7 @@ fun PillInformation(
                 fontWeight = FontWeight.Bold,
                 color = titleColor,
                 modifier = Modifier
-                    .padding(vertical = 40.dp)
+                    .padding(vertical = 16.dp)
                     .align(Alignment.Start)
             )
             if (imageState is AsyncImagePainter.State.Error) {
@@ -134,13 +134,11 @@ fun PillInformation(
                         .size(246.dp, 132.dp)
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(vertical = 16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 24.dp)
             ) {
                 items(4) { index ->
                     Button(
@@ -421,68 +419,68 @@ fun PillInformation(
             }
 
             if (pillViewModel.showSearch[3]) {
-                Row() {
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(top = 8.dp)
-                        ) {
-                            Text(text = "4.4", fontSize = 36.sp, fontWeight = FontWeight.SemiBold)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Icon(
-                                imageVector = Icons.Sharp.Star,
-                                contentDescription = "전체 평점 별",
-                                tint = starColor,
-                                modifier = Modifier
-                                    .size(28.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Text(text = "평점 923 개", fontSize = 15.sp, color = statisticTextColor)
-                        Text(text = "리뷰 257 개", fontSize = 15.sp, color = statisticTextColor)
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 12.dp)
-                            .padding(start = 12.dp, top = 4.dp)
-                            .width(1.dp)
-                            .height(120.dp)
-                            .background(Color.LightGray)
-
-                    )
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                    ) {
-                        reviewPercentage.forEach { (stars, percentage) ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(text = "$stars", color = statisticTextColor, fontSize = 14.sp)
-                                Spacer(modifier = Modifier.width(1.dp))
-                                Icon(
-                                    imageVector = Icons.Rounded.Star,
-                                    contentDescription = "통계 별",
-                                    tint = starColor
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                LinearProgressIndicator(
-                                    progress = percentage / 100f,
-                                    color = barGraphColor,
-                                    trackColor = barBackgroundColor,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = if (percentage / 10 == 0) "$percentage%  "
-                                    else "$percentage%",
-                                    fontSize = 14.sp,
-                                    color = statisticTextColor
-                                )
-                            }
-                        }
-                    }
-                }
+//                Row() {
+//                    Column {
+//                        Row(
+//                            verticalAlignment = Alignment.CenterVertically,
+//                            modifier = Modifier.padding(top = 8.dp)
+//                        ) {
+//                            Text(text = "4.4", fontSize = 36.sp, fontWeight = FontWeight.SemiBold)
+//                            Spacer(modifier = Modifier.width(8.dp))
+//                            Icon(
+//                                imageVector = Icons.Sharp.Star,
+//                                contentDescription = "전체 평점 별",
+//                                tint = starColor,
+//                                modifier = Modifier
+//                                    .size(28.dp)
+//                            )
+//                        }
+//                        Spacer(modifier = Modifier.height(24.dp))
+//                        Text(text = "평점 923 개", fontSize = 15.sp, color = statisticTextColor)
+//                        Text(text = "리뷰 257 개", fontSize = 15.sp, color = statisticTextColor)
+//                    }
+//                    Spacer(modifier = Modifier.weight(1f))
+//                    Box(
+//                        modifier = Modifier
+//                            .padding(horizontal = 12.dp)
+//                            .padding(start = 12.dp, top = 4.dp)
+//                            .width(1.dp)
+//                            .height(120.dp)
+//                            .background(Color.LightGray)
+//
+//                    )
+//                    Column(
+//                        verticalArrangement = Arrangement.spacedBy(2.dp)
+//                    ) {
+//                        reviewPercentage.forEach { (stars, percentage) ->
+//                            Row(
+//                                verticalAlignment = Alignment.CenterVertically,
+//                            ) {
+//                                Text(text = "$stars", color = statisticTextColor, fontSize = 14.sp)
+//                                Spacer(modifier = Modifier.width(1.dp))
+//                                Icon(
+//                                    imageVector = Icons.Rounded.Star,
+//                                    contentDescription = "통계 별",
+//                                    tint = starColor
+//                                )
+//                                Spacer(modifier = Modifier.width(8.dp))
+//                                LinearProgressIndicator(
+//                                    progress = percentage / 100f,
+//                                    color = barGraphColor,
+//                                    trackColor = barBackgroundColor,
+//                                    modifier = Modifier.weight(1f)
+//                                )
+//                                Spacer(modifier = Modifier.width(8.dp))
+//                                Text(
+//                                    text = if (percentage / 10 == 0) "$percentage%  "
+//                                    else "$percentage%",
+//                                    fontSize = 14.sp,
+//                                    color = statisticTextColor
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
 
                 LazyColumn(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -490,6 +488,72 @@ fun PillInformation(
                         .fillMaxSize()
                         .padding(bottom = 106.dp)
                 ) {
+                    item {
+                        Row() {
+                            Column {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                ) {
+                                    Text(text = "4.4", fontSize = 36.sp, fontWeight = FontWeight.SemiBold)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Icon(
+                                        imageVector = Icons.Sharp.Star,
+                                        contentDescription = "전체 평점 별",
+                                        tint = starColor,
+                                        modifier = Modifier
+                                            .size(28.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(24.dp))
+                                Text(text = "평점 923 개", fontSize = 15.sp, color = statisticTextColor)
+                                Text(text = "리뷰 257 개", fontSize = 15.sp, color = statisticTextColor)
+                            }
+                            Spacer(modifier = Modifier.weight(1f))
+                            Box(
+                                modifier = Modifier
+                                    .padding(horizontal = 12.dp)
+                                    .padding(start = 12.dp, top = 4.dp)
+                                    .width(1.dp)
+                                    .height(120.dp)
+                                    .background(Color.LightGray)
+
+                            )
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                reviewPercentage.forEach { (stars, percentage) ->
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(text = "$stars", color = statisticTextColor, fontSize = 14.sp)
+                                        Spacer(modifier = Modifier.width(1.dp))
+                                        Icon(
+                                            imageVector = Icons.Rounded.Star,
+                                            contentDescription = "통계 별",
+                                            tint = starColor
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        LinearProgressIndicator(
+                                            progress = percentage / 100f,
+                                            color = barGraphColor,
+                                            trackColor = barBackgroundColor,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = if (percentage / 10 == 0) "$percentage%  "
+                                            else "$percentage%",
+                                            fontSize = 14.sp,
+                                            color = statisticTextColor
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
                     item {
                         Card(
                             shape = MaterialTheme.shapes.small,
