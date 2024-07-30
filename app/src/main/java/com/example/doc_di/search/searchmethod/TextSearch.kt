@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.navOptions
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.search.SearchViewModel
@@ -72,7 +73,8 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
     androidx.compose.material.Button(
         onClick = {
             option["name"] = nameSearch
-            searchViewModel.searchPillsByOptions(option)
+            searchViewModel.setOptions(option)
+            searchViewModel.searchPillsByOptions()
             navController.navigate(Routes.searchResult.route)
         },
         colors = androidx.compose.material.ButtonDefaults.textButtonColors(mainSearchColor),
