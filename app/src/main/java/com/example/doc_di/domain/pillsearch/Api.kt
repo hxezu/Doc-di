@@ -13,9 +13,8 @@ interface Api {
 
     @GET("medicine/info")
     suspend fun getPillInfo(
-        @Query ("name"): name
+        @Query("name") name:String
     )
-
 
     companion object {
         const val BASE_URL = "http://43.201.93.103:8080/"

@@ -1,6 +1,7 @@
 package com.example.doc_di.domain.pillsearch
 
 import android.util.Log
+import com.example.doc_di.domain.model.PillInfo
 import com.example.practice.data.model.Pill
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -33,6 +34,30 @@ class PillsSearchRepositoryImpl(
             }
             Log.d("pillsFromApi", "Result.Success: ${pillsFromApi.data}")
             emit(Result.Success(pillsFromApi.data))
+        }
+    }
+
+    override suspend fun getPillInfo(name: String): Flow<Result<PillInfo>> {
+        return flow{
+            val pillsFromApi = try{
+                api.getPillInfo(name)
+            }
+            catch (e: IOException){
+                e.printStackTrace()
+                emit(Result.Error(message = "IO error loading pills by name"))
+                return@flow
+            }
+            catch (e: HttpException){
+                e.printStackTrace()
+                emit(Result.Error(message = "HTTP error loading pills by name "))
+                return@flow
+            }
+            catch (e: Exception){
+                e.printStackTrace()
+                emit(Result.Error(message = "Error loading pills by name"))
+                return@flow
+            }
+            emit(Result.Success(pillsFromApi))
         }
     }
 }
