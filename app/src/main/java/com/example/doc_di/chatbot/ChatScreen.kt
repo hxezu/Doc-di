@@ -56,7 +56,7 @@ import com.example.doc_di.data.Chat
 import com.example.doc_di.data.Person
 import com.example.doc_di.data.chatList
 import com.example.doc_di.etc.BottomNavigationBar
-import com.example.doc_di.home.BtmBarViewModel
+import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.ui.theme.*
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

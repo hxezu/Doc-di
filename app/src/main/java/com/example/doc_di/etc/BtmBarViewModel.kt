@@ -1,10 +1,8 @@
-package com.example.doc_di.home
+package com.example.doc_di.etc
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.example.doc_di.R
-import com.example.doc_di.etc.BtmBarItem
-import com.example.doc_di.etc.Routes
 
 class BtmBarViewModel : ViewModel(){
     var btmNavBarItems = mutableStateListOf<BtmBarItem>(

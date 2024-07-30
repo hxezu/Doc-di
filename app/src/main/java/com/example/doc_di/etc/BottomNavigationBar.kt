@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.doc_di.home.BtmBarViewModel
+import com.example.doc_di.etc.BtmBarViewModel
 
 @Composable
 fun BottomNavigationBar(navController: NavController, btmBarViewModel: BtmBarViewModel) {

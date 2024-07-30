@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.doc_di.domain.model.Medication
-import com.example.doc_di.home.BtmBarViewModel
+import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.management.home.ManagementRoute
 import com.example.doc_di.management.home.viewmodel.ManagementViewModel
 import com.example.doc_di.navigation.DoseNavigationDestination

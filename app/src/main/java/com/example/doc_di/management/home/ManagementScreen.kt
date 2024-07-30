@@ -62,7 +62,7 @@ import com.example.doc_di.extension.toFormattedDateShortString
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.extension.toFormattedMonthDateString
 import com.example.doc_di.management.addmedication.navigation.AddMedicationDestination
-import com.example.doc_di.home.BtmBarViewModel
+import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.management.home.data.CalendarDataSource
 import com.example.doc_di.management.home.model.CalendarModel
 import com.example.doc_di.management.home.viewmodel.ManagementState
