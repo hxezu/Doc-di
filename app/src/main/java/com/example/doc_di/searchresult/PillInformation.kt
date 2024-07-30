@@ -419,68 +419,8 @@ fun PillInformation(
             }
 
             if (pillViewModel.showSearch[3]) {
-//                Row() {
-//                    Column {
-//                        Row(
-//                            verticalAlignment = Alignment.CenterVertically,
-//                            modifier = Modifier.padding(top = 8.dp)
-//                        ) {
-//                            Text(text = "4.4", fontSize = 36.sp, fontWeight = FontWeight.SemiBold)
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            Icon(
-//                                imageVector = Icons.Sharp.Star,
-//                                contentDescription = "전체 평점 별",
-//                                tint = starColor,
-//                                modifier = Modifier
-//                                    .size(28.dp)
-//                            )
-//                        }
-//                        Spacer(modifier = Modifier.height(24.dp))
-//                        Text(text = "평점 923 개", fontSize = 15.sp, color = statisticTextColor)
-//                        Text(text = "리뷰 257 개", fontSize = 15.sp, color = statisticTextColor)
-//                    }
-//                    Spacer(modifier = Modifier.weight(1f))
-//                    Box(
-//                        modifier = Modifier
-//                            .padding(horizontal = 12.dp)
-//                            .padding(start = 12.dp, top = 4.dp)
-//                            .width(1.dp)
-//                            .height(120.dp)
-//                            .background(Color.LightGray)
-//
-//                    )
-//                    Column(
-//                        verticalArrangement = Arrangement.spacedBy(2.dp)
-//                    ) {
-//                        reviewPercentage.forEach { (stars, percentage) ->
-//                            Row(
-//                                verticalAlignment = Alignment.CenterVertically,
-//                            ) {
-//                                Text(text = "$stars", color = statisticTextColor, fontSize = 14.sp)
-//                                Spacer(modifier = Modifier.width(1.dp))
-//                                Icon(
-//                                    imageVector = Icons.Rounded.Star,
-//                                    contentDescription = "통계 별",
-//                                    tint = starColor
-//                                )
-//                                Spacer(modifier = Modifier.width(8.dp))
-//                                LinearProgressIndicator(
-//                                    progress = percentage / 100f,
-//                                    color = barGraphColor,
-//                                    trackColor = barBackgroundColor,
-//                                    modifier = Modifier.weight(1f)
-//                                )
-//                                Spacer(modifier = Modifier.width(8.dp))
-//                                Text(
-//                                    text = if (percentage / 10 == 0) "$percentage%  "
-//                                    else "$percentage%",
-//                                    fontSize = 14.sp,
-//                                    color = statisticTextColor
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
+                /* TODO 사용자가 복용중인 약 리스트안에 search result의 약이 있다면 효능통계 갔을 시 + Floating Button */
+                /* TODO 이 버튼을 통해 후기 작성 화면? 으로 넘어가서 별점, 후기, 내용, 전송 구현 */
 
                 LazyColumn(
                     horizontalAlignment = Alignment.CenterHorizontally,

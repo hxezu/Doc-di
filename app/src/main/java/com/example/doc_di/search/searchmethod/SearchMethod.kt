@@ -309,8 +309,8 @@ fun SearchMethod(
 
                     androidx.compose.material.Button(
                         onClick = {
-                            options["text1"] = preIdentifier
-                            options["text2"] = sufIdentifier
+                            options["txt1"] = preIdentifier
+                            options["txt2"] = sufIdentifier
                             options["shape"] = selectedShape.value
                             options["color"] = selectedColor.value
                             searchViewModel.setOptions(options)
