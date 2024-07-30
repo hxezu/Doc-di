@@ -1,4 +1,4 @@
-package com.example.doc_di.domain.pillsearch;
+package com.example.doc_di.domain.pillsearch
 
 import com.example.doc_di.domain.model.PillInfos
 import com.example.doc_di.domain.model.Pills

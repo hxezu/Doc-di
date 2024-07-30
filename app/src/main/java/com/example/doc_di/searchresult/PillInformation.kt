@@ -63,7 +63,7 @@ fun PillInformation(
     searchViewModel: SearchViewModel,
 ) {
     val selectedPill = searchViewModel.getSelectedPill()
-    val selectedPillInfo = searchViewModel.pillInfo.collectAsState().value!!
+    val selectedPillInfo = searchViewModel.pillInfo.collectAsState().value
     val imageState = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
             .data(selectedPill.itemImage)

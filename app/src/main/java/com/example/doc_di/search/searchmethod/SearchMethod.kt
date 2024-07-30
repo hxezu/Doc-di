@@ -85,8 +85,8 @@ fun SearchMethod(
     var prefixTextColor = Color(0xFFC4CACF)
     var suffixTextColor = Color(0xFFC4CACF)
 
-    var selectedShape = remember { mutableStateOf("타원형")}
-    var selectedColor = remember { mutableStateOf("하양")}
+    val selectedShape = remember { mutableStateOf("타원형")}
+    val selectedColor = remember { mutableStateOf("하양")}
 
 
     var imageUri by remember { mutableStateOf<Uri?>(null)}
