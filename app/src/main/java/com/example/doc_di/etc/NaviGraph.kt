@@ -18,7 +18,7 @@ import com.example.doc_di.search.MedicalAppointmentRecord
 import com.example.doc_di.search.PrescribedMedicineList
 import com.example.doc_di.search.PrescriptionRecord
 import com.example.doc_di.search.Search
-import com.example.doc_di.search.SearchMethod
+import com.example.doc_di.search.searchmethod.SearchMethod
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.searchresult.PillInformation
 import com.example.doc_di.searchresult.PillInformationViewModel
