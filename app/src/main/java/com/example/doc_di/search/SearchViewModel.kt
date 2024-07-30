@@ -86,4 +86,8 @@ class SearchViewModel(
     fun setOptions (queryParams: Map<String,String>){
         options = queryParams
     }
+
+    fun resetPillInfo() {
+        _pillInfo.value = PillInfo()
+    }
 }
