@@ -3,10 +3,9 @@ package com.example.doc_di.analytics
 import android.content.Context
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import com.example.doc_di.di.AnalyticsEvents
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.example.doc_di.domain.model.Medication
 import com.example.doc_di.extension.toFormattedDateString
+import com.google.firebase.analytics.FirebaseAnalytics
 import java.util.Date
 
 private const val MEDICATION_TIME = "medication_time"

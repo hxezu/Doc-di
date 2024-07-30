@@ -28,22 +28,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.search.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -61,8 +60,33 @@ fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
     val starColor = Color(0xFFFFC462)
     val cardTextColor = Color(0xFF72777A)
 
-
     Scaffold(bottomBar = {BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)}) {
+
+        fun updateBtmBarItem(route: String){
+            btmBarViewModel.btmNavBarItems.forEach{
+                it.selected = route == it.route
+            }
+        }
+
+        LaunchedEffect(navController) {
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                when (destination.route) {
+                    Routes.home.route -> {
+                        updateBtmBarItem(Routes.home.route)
+                    }
+                    Routes.search.route -> {
+                        updateBtmBarItem(Routes.search.route)
+                    }
+                    Routes.chatListScreen.route -> {
+                        updateBtmBarItem(Routes.chatListScreen.route)
+                    }
+                    Routes.managementScreen.route -> {
+                        updateBtmBarItem(Routes.managementScreen.route)
+                    }
+                }
+            }
+        }
+
         Column (
             verticalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
@@ -272,6 +296,7 @@ fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
                             onClick = {
                                 btmBarViewModel.btmNavBarItems[0].selected = false
                                 btmBarViewModel.btmNavBarItems[1].selected = true
+                                /* TODO 혜주가 나중에 복용알림 리스트 뷰모델에 받으면 연결*/
                                 navController.navigate(Routes.pillInformation.route)
                             },
                             colors = CardDefaults.cardColors(Color.White),
@@ -422,12 +447,4 @@ fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomePreview() {
-    val navController = rememberNavController()
-    val btmBarViewModel: BtmBarViewModel = viewModel()
-    Home(navController = navController, btmBarViewModel = btmBarViewModel)
 }

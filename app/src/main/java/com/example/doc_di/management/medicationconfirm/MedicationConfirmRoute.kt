@@ -20,12 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.doc_di.R
-import com.example.doc_di.di.AnalyticsEvents
+import com.example.doc_di.analytics.AnalyticsEvents
 import com.example.doc_di.domain.model.Medication
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.management.medicationconfirm.viewmodel.MedicationConfirmState

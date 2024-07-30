@@ -1,4 +1,4 @@
-package com.example.doc_di.di
+package com.example.doc_di.analytics
 
 object AnalyticsEvents {
 
