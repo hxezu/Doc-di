@@ -129,7 +129,7 @@ fun SearchMethod(
                 painter = painterResource(id = R.drawable.back),
                 contentDescription = "뒤로가기",
                 modifier = Modifier
-                    .padding(start = 40.dp)
+                    .padding(start = 36.dp)
                     .size(30.dp)
                     .align(Alignment.Start)
                     .clickable { navController.popBackStack() }

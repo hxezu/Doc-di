@@ -57,7 +57,7 @@ class PillsSearchRepositoryImpl(
                 emit(Result.Error(message = "Error loading pills by name"))
                 return@flow
             }
-            emit(Result.Success(pillsFromApi))
+            emit(Result.Success(pillsFromApi.data))
         }
     }
 }

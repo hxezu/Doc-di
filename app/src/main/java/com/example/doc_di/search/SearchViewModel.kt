@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.doc_di.domain.model.PillInfo
 import com.example.doc_di.domain.pillsearch.PillsSearchRepository
 import com.example.doc_di.domain.pillsearch.Result
 import com.example.practice.data.model.Pill
@@ -29,6 +30,9 @@ class SearchViewModel(
     private val _pills = MutableStateFlow<List<Pill>>(emptyList())
     val pills = _pills.asStateFlow()
 
+    private val _pillInfo = MutableStateFlow<PillInfo>(PillInfo())
+    val pillInfo = _pillInfo.asStateFlow()
+
     private val _showErrorToastChannel = Channel<Boolean>()
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
@@ -47,6 +51,23 @@ class SearchViewModel(
                         Log.d("PillsViewModel", "Result.Success: ${result.data}")
                         result.data?.let { pillsList ->
                             _pills.update { pillsList }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun setPillInfo(name: String){
+        viewModelScope.launch {
+            pillsSearchRepository.getPillInfo(name).collectLatest { result ->
+                when(result){
+                    is Result.Error -> {
+                        _showErrorToastChannel.send(true)
+                    }
+                    is Result.Success -> {
+                        result.data?.let { pillInfo ->
+                            _pillInfo.update { pillInfo }
                         }
                     }
                 }

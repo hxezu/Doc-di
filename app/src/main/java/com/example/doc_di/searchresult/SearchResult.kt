@@ -1,6 +1,7 @@
 package com.example.doc_di.searchresult
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -57,7 +58,7 @@ fun SearchResult(navController: NavController, btmBarViewModel: BtmBarViewModel,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 40.dp)
+                .padding(horizontal = 36.dp)
                 .padding(top = 48.dp,)
         ) {
             Image(
@@ -89,6 +90,8 @@ fun SearchResult(navController: NavController, btmBarViewModel: BtmBarViewModel,
                             .padding(bottom = 16.dp)
                             .clickable {
                                 searchViewModel.setSelectedPill(pill)
+                                searchViewModel.setPillInfo(pill.itemName)
+                                Log.d("SearchResult", "찾아라 찾아  ${pill.itemName}")
                                 navController.navigate(Routes.pillInformation.route)
                             }
                     ) {

@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,6 +63,7 @@ fun PillInformation(
     searchViewModel: SearchViewModel,
 ) {
     val selectedPill = searchViewModel.getSelectedPill()
+    val selectedPillInfo = searchViewModel.pillInfo.collectAsState().value!!
     val imageState = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
             .data(selectedPill.itemImage)
@@ -96,7 +98,7 @@ fun PillInformation(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 40.dp)
+                .padding(horizontal = 36.dp)
                 .padding(top = 48.dp)
         ) {
             Image(
@@ -251,11 +253,12 @@ fun PillInformation(
                                 modifier = Modifier
                                     .padding(16.dp)
                             ) {
-                                Text(text = "성분 정보", color = cardTitleColor, fontSize = 15.sp)
+                                Text(text = "효능", color = cardTitleColor, fontSize = 15.sp)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "제피아세트아미노펜 177.78mg",
+                                    text = if (selectedPillInfo.efcyQesitm != "") selectedPillInfo.efcyQesitm else "- 정보 미제공 -",
                                     color = cardDetailTextColor,
+                                    lineHeight = 14.sp,
                                     fontSize = 10.sp
                                 )
                             }
@@ -279,8 +282,9 @@ fun PillInformation(
                                 Text(text = "보관 방법", color = cardTitleColor, fontSize = 15.sp)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "밀폐 용기 실온 보관",
+                                    text = if (selectedPillInfo.depositMethodQesitm != "") selectedPillInfo.depositMethodQesitm else "- 정보 미제공 -",
                                     color = cardDetailTextColor,
+                                    lineHeight = 14.sp,
                                     fontSize = 10.sp
                                 )
                             }
@@ -311,28 +315,16 @@ fun PillInformation(
                                     .padding(16.dp)
                             ) {
                                 Text(
-                                    text = "만 12세 이하의 소아",
+                                    text = "복용법",
                                     color = cardTitleColor,
                                     fontSize = 15.sp
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "다음 1회 권장 용량을 4-6시간 마다 필요시 복용한다. 이 약은 가능한 최단기간동안 최소 유효 용량으로 복용하며, 1일 5회(75mg/kg)를 초과하여 복용하지 않는다.",
+                                    text = if (selectedPillInfo.useMethodQesitm != "") selectedPillInfo.useMethodQesitm else "- 정보 미제공 -",
                                     color = cardDetailTextColor,
                                     fontSize = 10.sp,
                                     lineHeight = 14.sp
-                                )
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Text(
-                                    text = "몸무게를 아는 경우 몸무게에 따른 용량(10~15mg/kg)으로 복용하는 것이 더 적절하다. ",
-                                    color = cardDetailTextColor,
-                                    fontSize = 10.sp,
-                                    lineHeight = 14.sp
-                                )
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Image(
-                                    painter = painterResource(id = R.drawable.usage_example),
-                                    contentDescription = "용법 이미지"
                                 )
                             }
                         }
@@ -364,21 +356,33 @@ fun PillInformation(
                                 Text(text = "경고", color = cardTitleColor, fontSize = 15.sp)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "1) 매일  세 잔 이상 정기적으로 술을 마시는 사람이 이 약이나 다른 해열 진통제를 복용해야 할 경우 반드시 의사 또는 약사와 상의해야 한다. 이러한 사람이 이 약을 복용하면 간손상이 유발될 수 있다.",
+                                    text = if (selectedPillInfo.atpnWarnQesitm != "") selectedPillInfo.atpnWarnQesitm else "- 정보 미제공 -",
                                     color = cardDetailTextColor,
                                     fontSize = 10.sp,
                                     lineHeight = 14.sp
                                 )
-                                Spacer(modifier = Modifier.height(12.dp))
+                            }
+                        }
+                    }
+
+                    item {
+                        Card(
+                            shape = MaterialTheme.shapes.small,
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.SpaceEvenly,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                            ) {
+                                Text(text = "주의", color = cardTitleColor, fontSize = 15.sp)
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "2) 아세트아미노펜을 복용한 환자에서 매우 드물게 급성 전신성 발진성 농포증(급성 전신성 발진성 고름물집증)(AGEP), 스티븐스  - 존슨 증후군(SJS), 독성 표피 괴사용해(TEN)와 같은 중대한 피부 반응이 보고되었고, 이러한 중대한 피부반응은 치명적일 수 있다. 따라서 이러한 중대한 피부반응의 징후에 대하여 환자들에게 충분히 알리고, 이 약 투여 후 피부발진이나 다른 과민반응의 징후가 나타나면 즉시 복용을 중단하도록 하여야 한다.",
-                                    color = cardDetailTextColor,
-                                    fontSize = 10.sp,
-                                    lineHeight = 14.sp
-                                )
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Text(
-                                    text = "3) 이 약은 아세트아미노펜을 함유하고 있다. 아세트아미노펜으로 일일 최대 용량(4,000mg)을 초과할 경우 간손상을 일으킬 수 있으므로 이 약을 일일 최대 용량(4,000mg)을 초과하여 복용하여서는 아니되며, 아세트아미노펜을 포함하는 다른 제품과 함께 복용하여서는 안 된다.",
+                                    text = if(selectedPillInfo.atpnQesitm != "") selectedPillInfo.atpnQesitm else "- 정보 미제공 -",
                                     color = cardDetailTextColor,
                                     fontSize = 10.sp,
                                     lineHeight = 14.sp
@@ -402,14 +406,45 @@ fun PillInformation(
                                     .padding(16.dp)
                             ) {
                                 Text(
-                                    text = "다음과 같은 사람은 이 약을 복용하지 말 것",
+                                    text = "부작용",
                                     color = cardTitleColor,
                                     fontSize = 15.sp
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "1) 이 약에 과민증 환자",
+                                    text =if (selectedPillInfo.seQesitm != "") selectedPillInfo.seQesitm else "- 정보 미제공 -",
                                     color = cardDetailTextColor,
+                                    lineHeight = 14.sp,
+                                    fontSize = 10.sp
+                                )
+                            }
+                        }
+                    }
+
+                    item {
+                        Card(
+                            shape = MaterialTheme.shapes.small,
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.SpaceEvenly,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                            ) {
+                                Text(
+                                    text = "약물 병용 주의",
+                                    color = cardTitleColor,
+                                    fontSize = 15.sp
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = if(selectedPillInfo.intrcQesitm != "") selectedPillInfo.intrcQesitm  else "- 정보 미제공 -",
+                                    color = cardDetailTextColor,
+                                    lineHeight = 14.sp,
                                     fontSize = 10.sp
                                 )
                             }
