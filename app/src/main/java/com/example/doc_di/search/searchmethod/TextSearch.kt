@@ -72,8 +72,7 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
     androidx.compose.material.Button(
         onClick = {
             option["name"] = nameSearch
-            searchViewModel.setOptions(option)
-            searchViewModel.searchPillsByOptions()
+            searchViewModel.searchPillsByOptions(option)
             navController.navigate(Routes.searchResult.route)
         },
         colors = androidx.compose.material.ButtonDefaults.textButtonColors(mainSearchColor),

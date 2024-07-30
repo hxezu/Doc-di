@@ -313,8 +313,7 @@ fun SearchMethod(
                             options["text2"] = sufIdentifier
                             options["shape"] = selectedShape.value
                             options["color"] = selectedColor.value
-                            searchViewModel.setOptions(options)
-                            searchViewModel.searchPillsByOptions()
+                            searchViewModel.searchPillsByOptions(options)
                             navController.navigate(Routes.searchResult.route)
                         },
                         colors = androidx.compose.material.ButtonDefaults.textButtonColors(
