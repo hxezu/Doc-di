@@ -36,13 +36,18 @@ class SearchViewModel(
     private val _showErrorToastChannel = Channel<Boolean>()
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
     init {
         searchPillsByOptions()
     }
 
     fun searchPillsByOptions(){
         viewModelScope.launch {
+            _isLoading.value = true
             pillsSearchRepository.getPillSearchList(options).collectLatest { result ->
+                _isLoading.value = false
                 when(result){
                     is Result.Error -> {
                         _showErrorToastChannel.send(true)
@@ -60,7 +65,9 @@ class SearchViewModel(
 
     fun setPillInfo(name: String){
         viewModelScope.launch {
+            _isLoading.value = true
             pillsSearchRepository.getPillInfo(name).collectLatest { result ->
+                _isLoading.value = false
                 when(result){
                     is Result.Error -> {
                         _showErrorToastChannel.send(true)

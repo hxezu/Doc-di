@@ -1,7 +1,6 @@
 package com.example.doc_di.searchresult
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -18,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -52,6 +52,7 @@ fun SearchResult(
     val starColor = Color(0xFFFFC107)
 
     val pillList = searchViewModel.pills.collectAsState().value
+    val isLoading = searchViewModel.isLoading.collectAsState().value
 
     LaunchedEffect(navController.currentBackStackEntry) {
         searchViewModel.resetPillInfo()
@@ -89,57 +90,61 @@ fun SearchResult(
                     .align(Alignment.Start)
             )
 
-            LazyColumn() {
-                if (pillList.isEmpty()) {
-                    item {
-                        Text(text = "조회되는 경구약제가 없습니다.")
-                    }
-                } else {
-                    items(pillList) { pill ->
-                        Card(
-                            shape = MaterialTheme.shapes.medium,
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp)
-                                .clickable {
-                                    searchViewModel.setSelectedPill(pill)
-                                    searchViewModel.setPillInfo(pill.itemName)
-                                    Log.d("SearchResult", "찾아라 찾아  ${pill.itemName}")
-                                    navController.navigate(Routes.pillInformation.route)
-                                }
-                        ) {
-                            Column(
+            if (isLoading){
+                CircularProgressIndicator()
+            }
+            else {
+                LazyColumn() {
+                    if (pillList.isEmpty()) {
+                        item {
+                            Text(text = "조회되는 경구약제가 없습니다.")
+                        }
+                    } else {
+                        items(pillList) { pill ->
+                            Card(
+                                shape = MaterialTheme.shapes.medium,
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                                 modifier = Modifier
-                                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp)
+                                    .clickable {
+                                        searchViewModel.setSelectedPill(pill)
+                                        searchViewModel.setPillInfo(pill.itemName)
+                                        navController.navigate(Routes.pillInformation.route)
+                                    }
                             ) {
-                                Text(
-                                    text = pill.itemName,
-                                    color = cardPillTextColor,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
+                                Column(
                                     modifier = Modifier
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxSize()
+                                        .padding(horizontal = 16.dp, vertical = 16.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Star,
-                                        tint = starColor,
-                                        contentDescription = "별점",
-                                    )
                                     Text(
-                                        text = "4.5(834)",
-                                        color = reviewTextColor,
-                                        fontSize = 12.sp,
+                                        text = pill.itemName,
+                                        color = cardPillTextColor,
+                                        fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier
-                                            .padding(start = 4.dp, end = 16.dp)
                                     )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Star,
+                                            tint = starColor,
+                                            contentDescription = "별점",
+                                        )
+                                        Text(
+                                            text = "4.5(834)",
+                                            color = reviewTextColor,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier
+                                                .padding(start = 4.dp, end = 16.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
