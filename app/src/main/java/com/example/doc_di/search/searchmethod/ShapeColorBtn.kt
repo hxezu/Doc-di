@@ -14,20 +14,21 @@ fun ShapeColorBtn(
     selectedShapeOrColor : MutableState<String>,
     modifier: Modifier = Modifier
 ) {
+    val needNull = if (shapeOrColor == "기타") "" else shapeOrColor
     val selectedButtonColor = Color.White
     val unselectedButtonColor = Color(0xFFF2F6F7)
     val selectedButtonTextColor = Color.Black
     val unselectedButtonTextColor = Color(0xFF616161)
     Button(
-        onClick = { selectedShapeOrColor.value = shapeOrColor },
+        onClick = { selectedShapeOrColor.value = needNull },
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (selectedShapeOrColor.value == shapeOrColor) selectedButtonColor else unselectedButtonColor
+            containerColor = if (selectedShapeOrColor.value == needNull) selectedButtonColor else unselectedButtonColor
         ),
         modifier = modifier
     ) {
         Text(
             text = shapeOrColor,
-            color = if (selectedShapeOrColor.value == shapeOrColor) selectedButtonTextColor else unselectedButtonTextColor
+            color = if (selectedShapeOrColor.value == needNull) selectedButtonTextColor else unselectedButtonTextColor
         )
     }
 }

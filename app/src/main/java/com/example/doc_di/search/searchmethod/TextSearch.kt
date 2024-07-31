@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -21,10 +23,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.navOptions
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.search.SearchViewModel
@@ -37,6 +40,14 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
 
     var nameSearch by remember{ mutableStateOf("")}
     val option = mutableMapOf<String, String>()
+
+    fun doSearch(){
+        option["name"] = nameSearch
+        searchViewModel.setOptions(option)
+        searchViewModel.searchPillsByOptions()
+        navController.navigate(Routes.searchResult.route)
+    }
+
 
     OutlinedTextField(
         value = nameSearch,
@@ -64,6 +75,11 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
             unfocusedBorderColor = howSearchButtonColor
         ),
         shape = RoundedCornerShape(12.dp),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Search,
+            keyboardType = KeyboardType.Text
+        ),
+        keyboardActions = KeyboardActions(onSearch = { doSearch() }),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 60.dp, horizontal = 50.dp)
@@ -71,12 +87,7 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
     )
 
     androidx.compose.material.Button(
-        onClick = {
-            option["name"] = nameSearch
-            searchViewModel.setOptions(option)
-            searchViewModel.searchPillsByOptions()
-            navController.navigate(Routes.searchResult.route)
-        },
+        onClick = { doSearch() },
         colors = androidx.compose.material.ButtonDefaults.textButtonColors(mainSearchColor),
         modifier = Modifier
             .fillMaxWidth()

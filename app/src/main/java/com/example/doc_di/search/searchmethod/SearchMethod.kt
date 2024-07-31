@@ -309,10 +309,10 @@ fun SearchMethod(
 
                     androidx.compose.material.Button(
                         onClick = {
-                            options["txt1"] = preIdentifier
-                            options["txt2"] = sufIdentifier
+                            options["txt1"] = if (preIdentifier == "ex) TYER") "" else preIdentifier
+                            options["txt2"] = if (sufIdentifier == "ex) 325") "" else sufIdentifier
                             options["shape"] = selectedShape.value
-                            options["color"] = selectedColor.value
+                            options["color1"] = selectedColor.value
                             searchViewModel.setOptions(options)
                             searchViewModel.searchPillsByOptions()
                             navController.navigate(Routes.searchResult.route)
