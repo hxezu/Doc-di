@@ -90,4 +90,8 @@ class SearchViewModel(
     fun resetPillInfo() {
         _pillInfo.value = PillInfo()
     }
+
+    fun resetPills(){
+        _pills.value = emptyList()
+    }
 }
