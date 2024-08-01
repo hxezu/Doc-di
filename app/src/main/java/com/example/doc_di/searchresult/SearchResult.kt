@@ -90,10 +90,9 @@ fun SearchResult(
                     .align(Alignment.Start)
             )
 
-            if (isLoading){
+            if (isLoading) {
                 CircularProgressIndicator()
-            }
-            else {
+            } else {
                 LazyColumn() {
                     if (pillList.isEmpty()) {
                         item {
@@ -111,7 +110,9 @@ fun SearchResult(
                                     .clickable {
                                         searchViewModel.setSelectedPill(pill)
                                         searchViewModel.setPillInfo(pill.itemName)
-                                        navController.navigate(Routes.pillInformation.route)
+                                        navController.navigate(Routes.pillInformation.route) {
+                                            popUpTo(Routes.searchMethod.route) { inclusive = false }
+                                        }
                                     }
                             ) {
                                 Column(
