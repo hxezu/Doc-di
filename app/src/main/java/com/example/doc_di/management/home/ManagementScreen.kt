@@ -6,9 +6,11 @@ import android.app.AlarmManager
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,6 +45,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,6 +54,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.doc_di.R
 import com.example.doc_di.analytics.AnalyticsEvents
 import com.example.doc_di.domain.model.Medication
 import com.example.doc_di.etc.BottomNavigationBar
@@ -66,66 +72,105 @@ import com.example.doc_di.ui.theme.MainBlue
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
 
-@Composable
-fun ManagementRoute(
-    navController: NavController,
-    askNotificationPermission: Boolean,
-    askAlarmPermission: Boolean,
-    navigateToMedicationDetail: (Medication) -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: ManagementViewModel = hiltViewModel()
-) {
-    val state by viewModel.homeUiState.collectAsState()
-    PermissionAlarmDialog(
-        askAlarmPermission = askAlarmPermission,
-        logEvent = viewModel::logEvent
-    )
-    PermissionDialog(
-        askNotificationPermission = askNotificationPermission,
-        logEvent = viewModel::logEvent
-    )
-    ManagementScreen(
-        modifier = modifier,
-        navController = navController,
-        state = state,
-        navigateToMedicationDetail = navigateToMedicationDetail,
-        onDateSelected = viewModel::selectDate,
-        onSelectedDate = { viewModel.updateSelectedDate(it) },
-        logEvent = viewModel::logEvent,
-        btmBarViewModel = BtmBarViewModel()
-    )
-}
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ManagementScreen(
-    modifier: Modifier,
-    navController: NavController,
-    state: ManagementState,
-    navigateToMedicationDetail: (Medication) -> Unit,
-    onDateSelected: (CalendarModel.DateModel) -> Unit,
-    onSelectedDate: (Date) -> Unit,
-    logEvent: (String) -> Unit,
+    navController: NavController, 
     btmBarViewModel: BtmBarViewModel
 ) {
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) { paddingValues ->
+    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
+            paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            DailyMedications(
-                navController = navController,
-                state = state,
-                navigateToMedicationDetail = navigateToMedicationDetail,
-                onSelectedDate = onSelectedDate,
-                onDateSelected = onDateSelected,
-                logEvent = {
-                    logEvent.invoke(it)
+//            DailyMedications(
+//                navController = navController,
+//                state = state,
+//                navigateToMedicationDetail = navigateToMedicationDetail,
+//                onSelectedDate = onSelectedDate,
+//                onDateSelected = onDateSelected,
+//                logEvent = {
+//                    logEvent.invoke(it)
+//                },
+//            )
+            val calendar = Calendar.getInstance().apply {
+                set(2024, Calendar.AUGUST, 5, 0, 0, 0) // Year, Month (0-based), Day, Hour, Minute, Second
+                set(Calendar.MILLISECOND, 0)
+            }
+            val sampleDate = calendar.time
+            val sampleDateString = SimpleDateFormat("yyyy-MM-dd").format(sampleDate)
+
+            // Sample Data
+            val sampleCalendarModel = CalendarModel(
+                selectedDate = CalendarModel.DateModel(
+                    date = sampleDate,
+                    isSelected = true,
+                    isToday = true
+                ),
+                visibleDates = List(7) { i ->
+                    CalendarModel.DateModel(
+                        date = calendar.apply { add(Calendar.DAY_OF_YEAR, i) }.time,
+                        isSelected = i == 0, // Select the first date
+                        isToday = i == 0 // Mark the first date as today
+                    )
                 }
             )
+
+            val sampleMedications = listOf(
+                Medication(
+                    id = 1L,
+                    name = "Aspirin",
+                    dosage = 500,
+                    recurrence = "Daily",
+                    endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 10) }.time,
+                    medicationTaken = false,
+                    medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 8); set(Calendar.MINUTE, 0) }.time
+                ),
+                Medication(
+                    id = 2L,
+                    name = "Ibuprofen",
+                    dosage = 200,
+                    recurrence = "Twice a day",
+                    endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 15) }.time,
+                    medicationTaken = true,
+                    medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 12); set(Calendar.MINUTE, 0) }.time
+                )
+            )
+
+            val sampleState = ManagementState(
+                medications = sampleMedications,
+                lastSelectedDate = sampleDateString
+            )
+
+            // Mock ViewModel
+            val mockViewModel = remember { BtmBarViewModel() }
+
+            // Mock functions
+            val navigateToMedicationDetail: (Medication) -> Unit = {}
+            val onDateSelected: (CalendarModel.DateModel) -> Unit = {}
+            val onSelectedDate: (Date) -> Unit = {}
+            val logEvent: (String) -> Unit = {}
+
+            // Render the DailyMedications with sample data
+            Surface(color = MaterialTheme.colorScheme.background) {
+                DailyMedications(
+                    navController = rememberNavController(), // Use a rememberNavController for previews
+                    state = sampleState,
+                    navigateToMedicationDetail = navigateToMedicationDetail,
+                    onDateSelected = onDateSelected,
+                    onSelectedDate = onSelectedDate,
+                    logEvent = logEvent
+                )
+            }
+            Text(text = "hxezu")
         }
     }
 }
@@ -139,43 +184,51 @@ fun DailyMedications(
     onDateSelected: (CalendarModel.DateModel) -> Unit,
     logEvent: (String) -> Unit
 ) {
-
-    DatesHeader(
-        lastSelectedDate = state.lastSelectedDate,
-        logEvent = {
-            logEvent.invoke(it)
-        },
-        onDateSelected = { selectedDate ->
-            onSelectedDate(selectedDate.date)
-            logEvent.invoke(AnalyticsEvents.HOME_NEW_DATE_SELECTED)
-        }
-    )
-
-    if (state.medications.isEmpty()) {
-        EmptyCard(
-            navController = navController,
-            logEvent = {
-                logEvent.invoke(it)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp), // Padding around the entire column
+        verticalArrangement = Arrangement.spacedBy(16.dp) // Space between children
+    ) {
+        // DatesHeader should be at the top
+        DatesHeader(
+            lastSelectedDate = state.lastSelectedDate,
+            logEvent = { logEvent.invoke(it) },
+            onDateSelected = { selectedDate ->
+                onSelectedDate(selectedDate.date)
+                logEvent.invoke(AnalyticsEvents.HOME_NEW_DATE_SELECTED)
             }
         )
-    } else {
-        LazyColumn(
-            modifier = Modifier,
-        ) {
-            items(
-                items = state.medications,
-                itemContent = {
-                    MedicationCard(
-                        medication = it,
-                        navigateToMedicationDetail = { medication ->
-                            navigateToMedicationDetail(medication)
-                        }
-                    )
-                }
+
+        // Ensure there is spacing between DatesHeader and the rest of the content
+        Spacer(modifier = Modifier.height(16.dp)) // Adjust the height as needed
+
+        // Conditional content for medications
+        if (state.medications.isEmpty()) {
+            EmptyCard(
+                navController = navController,
+                logEvent = { logEvent.invoke(it) }
             )
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(
+                    items = state.medications,
+                    itemContent = {
+                        MedicationCard(
+                            medication = it,
+                            navigateToMedicationDetail = { medication ->
+                                navigateToMedicationDetail(medication)
+                            }
+                        )
+                    }
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun EmptyCard(
@@ -190,12 +243,11 @@ fun EmptyCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(156.dp)
-            .padding(vertical = 10.dp, horizontal = 20.dp),
+            .height(156.dp),
         shape = RoundedCornerShape(36.dp),
         colors = cardColors(
-            containerColor = LightBlue,
-            contentColor = MainBlue
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.tertiary
         ),
         onClick = {
             logEvent.invoke(AnalyticsEvents.ADD_MEDICATION_CLICKED_EMPTY_CARD)
@@ -212,20 +264,30 @@ fun EmptyCard(
             ) {
 
                 Text(
-                    text = "Medication Break",
+                    text = "R.string.medication_break",
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleLarge,
                 )
 
                 Text(
-                    text = "No medications scheduled for this date. Take a break and relax.",
+                    text = "home_screen_empty_card_message",
                     style = MaterialTheme.typography.titleSmall,
                 )
             }
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.icon), contentDescription = ""
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun DatesHeader(
@@ -288,6 +350,64 @@ fun DatesHeader(
     }
 }
 
+@Composable
+fun DateHeader(
+    data: CalendarModel,
+    onPrevClickListener: (Date) -> Unit,
+    onNextClickListener: (Date) -> Unit
+) {
+    Row(
+        modifier = Modifier.padding(vertical = 16.dp),
+    ) {
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically),
+            text = if (data.selectedDate.isToday) {
+                "Today"
+            } else {
+                data.selectedDate.date.toFormattedMonthDateString()
+            },
+            style = MaterialTheme.typography.displaySmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.tertiary
+        )
+        IconButton(onClick = {
+            onPrevClickListener(data.startDate.date)
+        }) {
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowLeft,
+                tint = MaterialTheme.colorScheme.tertiary,
+                contentDescription = "Back"
+            )
+        }
+        IconButton(onClick = {
+            onNextClickListener(data.endDate.date)
+        }) {
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowRight,
+                tint = MaterialTheme.colorScheme.tertiary,
+                contentDescription = "Next"
+            )
+        }
+    }
+}
+
+@Composable
+fun DateList(
+    data: CalendarModel,
+    onDateClickListener: (CalendarModel.DateModel) -> Unit
+) {
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        items(items = data.visibleDates) { date ->
+            DateItem(date, onDateClickListener)
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateItem(
@@ -339,301 +459,84 @@ fun DateItem(
     }
 }
 
-@Composable
-fun DateList(
-    data: CalendarModel,
-    onDateClickListener: (CalendarModel.DateModel) -> Unit
-) {
-    LazyRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        items(items = data.visibleDates) { date ->
-            DateItem(date, onDateClickListener)
-        }
-    }
-}
-
-@Composable
-fun DateHeader(
-    data: CalendarModel,
-    onPrevClickListener: (Date) -> Unit,
-    onNextClickListener: (Date) -> Unit
-) {
-    Row(
-        modifier = Modifier.padding(vertical = 16.dp),
-    ) {
-        Text(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
-            text = if (data.selectedDate.isToday) {
-                "TODAY"
-            } else {
-                data.selectedDate.date.toFormattedMonthDateString()
-            },
-            style = MaterialTheme.typography.displaySmall,
-            fontWeight = FontWeight.Bold,
-            color = MainBlue
-        )
-        IconButton(onClick = {
-            onPrevClickListener(data.startDate.date)
-        }) {
-            Icon(
-                imageVector = Icons.Filled.KeyboardArrowLeft,
-                tint = MaterialTheme.colorScheme.tertiary,
-                contentDescription = "Back"
-            )
-        }
-        IconButton(onClick = {
-            onNextClickListener(data.endDate.date)
-        }) {
-            Icon(
-                imageVector = Icons.Filled.KeyboardArrowRight,
-                tint = MaterialTheme.colorScheme.tertiary,
-                contentDescription = "Next"
-            )
-        }
-    }
-}
-
 sealed class MedicationListItem {
     data class OverviewItem(val medicationsToday: List<Medication>, val isMedicationListEmpty: Boolean) : MedicationListItem()
     data class MedicationItem(val medication: Medication) : MedicationListItem()
     data class HeaderItem(val headerText: String) : MedicationListItem()
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-fun PermissionDialog(
-    askNotificationPermission: Boolean,
-    logEvent: (String) -> Unit
-) {
-    if (askNotificationPermission && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)) {
-        val notificationPermissionState = rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) { isGranted ->
-            when (isGranted) {
-                true -> logEvent.invoke(AnalyticsEvents.NOTIFICATION_PERMISSION_GRANTED)
-                false -> logEvent.invoke(AnalyticsEvents.NOTIFICATION_PERMISSION_REFUSED)
-            }
-        }
-        if (!notificationPermissionState.status.isGranted) {
-            val openAlertDialog = remember { mutableStateOf(true) }
 
-            when {
-                openAlertDialog.value -> {
-                    logEvent.invoke(AnalyticsEvents.NOTIFICATION_PERMISSION_DIALOG_SHOWN)
-                    AlertDialog(
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications"
-                            )
-                        },
-                        title = {
-                            Text(text = "Notification Permission Required")
-                        },
-                        text = {
-                            Text(text = "To ensure you never miss your medication, please grant the notification permission.")
-                        },
-                        onDismissRequest = {
-                            openAlertDialog.value = false
-                            logEvent.invoke(AnalyticsEvents.NOTIFICATION_PERMISSION_DIALOG_DISMISSED)
-                        },
-                        confirmButton = {
-                            Button(
-                                onClick = {
-                                    notificationPermissionState.launchPermissionRequest()
-                                    openAlertDialog.value = false
-                                    logEvent.invoke(AnalyticsEvents.NOTIFICATION_PERMISSION_DIALOG_ALLOW_CLICKED)
-                                }
-                            ) {
-                                Text(text="Allow")
-                            }
-                        }
-                    )
-                }
-            }
-        }
+@Preview(showBackground = true)
+@Composable
+fun PreviewDailyMedications() {
+    // Hardcoded date for preview: August 5, 2024
+    val calendar = Calendar.getInstance().apply {
+        set(2024, Calendar.AUGUST, 5, 0, 0, 0) // Year, Month (0-based), Day, Hour, Minute, Second
+        set(Calendar.MILLISECOND, 0)
     }
-}
+    val sampleDate = calendar.time
+    val sampleDateString = SimpleDateFormat("yyyy-MM-dd").format(sampleDate)
 
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-fun PermissionAlarmDialog(
-    askAlarmPermission: Boolean,
-    logEvent: (String) -> Unit
-) {
-    val context = LocalContext.current
-    val alarmManager = ContextCompat.getSystemService(context, AlarmManager::class.java)
-    if (askAlarmPermission && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)) {
-        val alarmPermissionState = rememberPermissionState(Manifest.permission.SCHEDULE_EXACT_ALARM) { isGranted ->
-            when (isGranted) {
-                true -> logEvent.invoke(AnalyticsEvents.ALARM_PERMISSION_GRANTED)
-                false -> logEvent.invoke(AnalyticsEvents.ALARM_PERMISSION_REFUSED)
-            }
-        }
-        if (alarmManager?.canScheduleExactAlarms() == false) {
-            val openAlertDialog = remember { mutableStateOf(true) }
-
-            when {
-                openAlertDialog.value -> {
-
-                    logEvent.invoke(AnalyticsEvents.ALARM_PERMISSION_DIALOG_SHOWN)
-
-                    AlertDialog(
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications"
-                            )
-                        },
-                        title = {
-                            Text(text = "Alarms Permission Required")
-                        },
-                        text = {
-                            Text(text = "To ensure you never miss your medication, please grant the alarms permission.")
-                        },
-                        onDismissRequest = {
-                            openAlertDialog.value = false
-                            logEvent.invoke(AnalyticsEvents.ALARM_PERMISSION_DIALOG_DISMISSED)
-                        },
-                        confirmButton = {
-                            Button(
-                                onClick = {
-                                    Intent().also { intent ->
-                                        intent.action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
-                                        context.startActivity(intent)
-                                    }
-
-                                    openAlertDialog.value = false
-                                    logEvent.invoke(AnalyticsEvents.ALARM_PERMISSION_DIALOG_ALLOW_CLICKED)
-                                }
-                            ) {
-                                Text(text="Allow")
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview(name = "Management Screen Preview", showBackground = true)
-@Composable
-fun ManagementScreenPreview() {
-    val navController = rememberNavController()
-    val dummyMedications = listOf(
-        Medication(
-            id = 1L,
-            name = "Aspirin",
-            dosage = 100,
-            recurrence = "Daily",
-            endDate = Date(),
-            medicationTaken = false,
-            medicationTime = Date()
-        ),
-        Medication(
-            id = 2L,
-            name = "Ibuprofen",
-            dosage = 200,
-            recurrence = "Twice a day",
-            endDate = Date(),
-            medicationTaken = true,
-            medicationTime = Date()
-        )
-    )
-    val dummyState = ManagementState(
-        lastSelectedDate = "2024-07-28",
-        medications = dummyMedications
-    )
-    ManagementScreen(
-        modifier = Modifier.fillMaxSize(),
-        navController = navController,
-        state = dummyState,
-        navigateToMedicationDetail = {},
-        onDateSelected = {},
-        onSelectedDate = {},
-        logEvent = {},
-        btmBarViewModel = BtmBarViewModel() // Provide a dummy instance or mock if needed
-    )
-}
-
-@Preview(name = "Daily Medications Preview", showBackground = true)
-@Composable
-fun DailyMedicationsPreview() {
-    val navController = rememberNavController()
-    val dummyMedications = listOf(
-        Medication(
-            id = 1L,
-            name = "Aspirin",
-            dosage = 100,
-            recurrence = "Daily",
-            endDate = Date(),
-            medicationTaken = false,
-            medicationTime = Date()
-        ),
-        Medication(
-            id = 2L,
-            name = "Ibuprofen",
-            dosage = 200,
-            recurrence = "Twice a day",
-            endDate = Date(),
-            medicationTaken = true,
-            medicationTime = Date()
-        )
-    )
-    val dummyState = ManagementState(
-        lastSelectedDate = "2024-07-28",
-        medications = dummyMedications
-    )
-    DailyMedications(
-        navController = navController,
-        state = dummyState,
-        navigateToMedicationDetail = {},
-        onSelectedDate = {},
-        onDateSelected = {},
-        logEvent = {}
-    )
-}
-
-
-@Preview(name = "Empty Card Preview", showBackground = true)
-@Composable
-fun EmptyCardPreview() {
-    val navController = rememberNavController()
-    EmptyCard(
-        navController = navController,
-        logEvent = {}
-    )
-}
-
-@Preview(name = "Dates Header Preview", showBackground = true)
-@Composable
-fun DatesHeaderPreview() {
-    val calendarModel = CalendarModel(
+    // Sample Data
+    val sampleCalendarModel = CalendarModel(
         selectedDate = CalendarModel.DateModel(
-            date = Date(),
+            date = sampleDate,
             isSelected = true,
             isToday = true
         ),
-        visibleDates = listOf(
+        visibleDates = List(7) { i ->
             CalendarModel.DateModel(
-                date = Date(),
-                isSelected = true,
-                isToday = true
-            ),
-            CalendarModel.DateModel(
-                date = Date(System.currentTimeMillis() + 86400000), // Tomorrow
-                isSelected = false,
-                isToday = false
+                date = calendar.apply { add(Calendar.DAY_OF_YEAR, i) }.time,
+                isSelected = i == 0, // Select the first date
+                isToday = i == 0 // Mark the first date as today
             )
+        }
+    )
+
+    val sampleMedications = listOf(
+        Medication(
+            id = 1L,
+            name = "Aspirin",
+            dosage = 500,
+            recurrence = "Daily",
+            endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 10) }.time,
+            medicationTaken = false,
+            medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 8); set(Calendar.MINUTE, 0) }.time
+        ),
+        Medication(
+            id = 2L,
+            name = "Ibuprofen",
+            dosage = 200,
+            recurrence = "Twice a day",
+            endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 15) }.time,
+            medicationTaken = true,
+            medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 12); set(Calendar.MINUTE, 0) }.time
         )
     )
-    DatesHeader(
-        lastSelectedDate = "2024-07-28",
-        onDateSelected = {},
-        logEvent = {}
-    )
-}
 
+    val sampleState = ManagementState(
+        medications = sampleMedications,
+        lastSelectedDate = sampleDateString
+    )
+
+    // Mock ViewModel
+    val mockViewModel = remember { BtmBarViewModel() }
+
+    // Mock functions
+    val navigateToMedicationDetail: (Medication) -> Unit = {}
+    val onDateSelected: (CalendarModel.DateModel) -> Unit = {}
+    val onSelectedDate: (Date) -> Unit = {}
+    val logEvent: (String) -> Unit = {}
+
+    // Render the DailyMedications with sample data
+    Surface(color = MaterialTheme.colorScheme.background) {
+        DailyMedications(
+            navController = rememberNavController(), // Use a rememberNavController for previews
+            state = sampleState,
+            navigateToMedicationDetail = navigateToMedicationDetail,
+            onDateSelected = onDateSelected,
+            onSelectedDate = onSelectedDate,
+            logEvent = logEvent
+        )
+    }
+}

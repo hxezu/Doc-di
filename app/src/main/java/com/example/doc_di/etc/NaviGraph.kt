@@ -1,19 +1,28 @@
 package com.example.doc_di.etc
 
+import android.util.StatsLog.logEvent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.doc_di.LoginPage
+import com.example.doc_di.RegisterPage
+import com.example.doc_di.ResetPage
 import com.example.doc_di.chatbot.ChatListScreen
+import com.example.doc_di.domain.model.Medication
 import com.example.doc_di.domain.pillsearch.PillsSearchRepositoryImpl
 import com.example.doc_di.domain.pillsearch.RetrofitInstance
 import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.Profile
-import com.example.doc_di.management.ManagementScreen
+import com.example.doc_di.management.home.ManagementScreen
+import com.example.doc_di.management.home.viewmodel.ManagementViewModel
 import com.example.doc_di.search.MedicalAppointmentRecord
 import com.example.doc_di.search.PrescribedMedicineList
 import com.example.doc_di.search.PrescriptionRecord
@@ -36,7 +45,20 @@ fun NaviGraph(navController: NavHostController) {
     val pillViewModel: PillInformationViewModel = viewModel()
     val btmBarViewModel: BtmBarViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = Routes.home.route) {
+    NavHost(navController = navController, startDestination = Routes.login.route) {
+
+        composable(Routes.login.route) {
+            LoginPage(navController = navController)
+        }
+
+        composable(Routes.register.route) {
+            RegisterPage(navController = navController)
+        }
+
+        composable(Routes.reset.route) {
+            ResetPage(navController = navController)
+        }
+
         composable(route = Routes.home.route) {
             Home(navController = navController, btmBarViewModel = btmBarViewModel)
         }
@@ -102,7 +124,10 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.managementScreen.route) {
-            ManagementScreen(navController = navController, btmBarViewModel = btmBarViewModel)
+            ManagementScreen(
+                navController = navController,
+                btmBarViewModel = btmBarViewModel
+            )
         }
     }
 }

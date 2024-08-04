@@ -8,7 +8,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.doc_di.domain.model.Medication
 import com.example.doc_di.etc.BtmBarViewModel
-import com.example.doc_di.management.home.ManagementRoute
 import com.example.doc_di.management.home.viewmodel.ManagementViewModel
 import com.example.doc_di.navigation.DoseNavigationDestination
 
@@ -37,13 +36,13 @@ fun NavGraphBuilder.homeGraph(
         // Obtain the viewModel for ManagementRoute
         val viewModel: ManagementViewModel = hiltViewModel()
 
-        // Pass the viewModel parameter to ManagementRoute
-        ManagementRoute(
-            navController = navController,
-            askNotificationPermission = askNotificationPermission,
-            askAlarmPermission = askAlarmPermission,
-            navigateToMedicationDetail = navigateToMedicationDetail,
-            viewModel = viewModel // Pass the ManagementViewModel here
-        )
+//        // Pass the viewModel parameter to ManagementRoute
+//        ManagementRoute(
+//            navController = navController,
+//            askNotificationPermission = askNotificationPermission,
+//            askAlarmPermission = askAlarmPermission,
+//            navigateToMedicationDetail = navigateToMedicationDetail,
+//            viewModel = viewModel // Pass the ManagementViewModel here
+//        )
     }
 }
