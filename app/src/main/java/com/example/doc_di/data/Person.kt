@@ -9,23 +9,23 @@ import kotlinx.parcelize.Parcelize
 data class Person(
     val id: Int = 0,
     val name: String = "",
-    @DrawableRes val icon: Int = R.drawable.img_chatbot
+    @DrawableRes val icon: Int = R.drawable.icon
 ):Parcelable
 
 val personList = listOf(
     Person(
         1,
         "사랑니 진통제 추천",
-        R.drawable.img_chatbot
+        R.drawable.icon
     ),
     Person(
         2,
         "빨간색 흰색 캡슐 알약",
-        R.drawable.img_chatbot
+        R.drawable.icon
     ),
     Person(
         3,
         "편의점 감기약",
-        R.drawable.img_chatbot
+        R.drawable.icon
     )
 )

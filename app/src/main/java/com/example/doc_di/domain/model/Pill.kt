@@ -1,4 +1,4 @@
-package com.example.practice.data.model
+package com.example.doc_di.domain.model
 
 data class Pill(
     val bizrno: String,

@@ -2,4 +2,25 @@
     <string name="app_name">Doc_di</string>
     <string name="chatbot">DDoc-di</string>
     <string name="type_message">Type Message</string>
+    <string name="medication_taken_at">Taken at %s</string>
+    <string name="medication_skipped_at">Skipped at %s</string>
+    <string name="medication_scheduled_at">Scheduled at %s</string>
+    <plurals name="all_set">
+        <item quantity="one">Your %1$s reminders are ready, with %2$s alert %3$s until %4$s.</item>
+        <item quantity="many">Your %1$s reminders are ready, with %2$s alerts %3$s until %4$s.</item>
+        <item quantity="other">Your %1$s reminders are ready, with %2$s alerts %3$s until %4$s.</item>
+    </plurals>
+    <string name="home">Home</string>
+    <string name="history">History</string>
+    <string name="medication_timely_reminders_setup_message">%s is now set up for timely reminders.</string>
+    <string name="time_remaining">Next dose in %1$s %2$s</string>
+    <string name="medication_dose_details">%d dose at %s</string>
+    <string name="value_is_empty">Please enter a valid value for %s</string>
+    <string name="medication_name">Medication Name</string>
+    <string name="dose_per_day">Dosage</string>
+    <string name="recurrence">Recurrence</string>
+    <string name="end_date">End Date</string>
+    <string name="times_of_day">Times of Day</string>
+    <string name="times_for_medication">Time(s) for Medication</string>
+    <string name="dosage_and_frequency_mismatch_error_message">You\'re selecting %s time(s) of days which is more than the number of dosage.</string>
 </resources>
