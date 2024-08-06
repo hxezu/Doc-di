@@ -10,7 +10,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -60,6 +62,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
@@ -103,14 +106,22 @@ fun ManagementScreen(
             BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
         },
         floatingActionButton = {
-            AnimatedVisibility(
-                visible = fabVisibility.value,
-                enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it }),
-                content = {
-                    DoseFAB(navController)
+            if (fabVisibility.value) {
+                Box(
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ){
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp), // Space between buttons
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        DoseFAB(navController)
+                        DoseFAB(navController)
+                    }
                 }
-            )
+            }
         }
     ) {
             paddingValues ->
@@ -197,7 +208,6 @@ fun ManagementScreen(
                     logEvent = logEvent
                 )
             }
-            Text(text = "hxezu")
         }
     }
 }
@@ -474,7 +484,7 @@ fun DateItem(
                 // background colors of the selected date
                 // and the non-selected date are different
                 containerColor = if (date.isSelected) {
-                    Color.Black
+                    MainBlue
                 } else {
                     MaterialTheme.colorScheme.surface
                 }
@@ -517,98 +527,8 @@ sealed class MedicationListItem {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewDailyMedications() {
-    // Hardcoded date for preview: August 5, 2024
-    val calendar = Calendar.getInstance().apply {
-        set(2024, Calendar.AUGUST, 5, 0, 0, 0) // Year, Month (0-based), Day, Hour, Minute, Second
-        set(Calendar.MILLISECOND, 0)
-    }
-    val sampleDate = calendar.time
-    val sampleDateString = SimpleDateFormat("yyyy-MM-dd").format(sampleDate)
-
-    // Sample Data
-    val sampleCalendarModel = CalendarModel(
-        selectedDate = CalendarModel.DateModel(
-            date = sampleDate,
-            isSelected = true,
-            isToday = true
-        ),
-        visibleDates = List(7) { i ->
-            CalendarModel.DateModel(
-                date = calendar.apply { add(Calendar.DAY_OF_YEAR, i) }.time,
-                isSelected = i == 0, // Select the first date
-                isToday = i == 0 // Mark the first date as today
-            )
-        }
-    )
-
-    val sampleMedications = listOf(
-        Medication(
-            id = 1L,
-            name = "아스피린",
-            dosage = 2,
-            recurrence = "7",
-            endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 10) }.time,
-            medicationTaken = false,
-            medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 8); set(Calendar.MINUTE, 0) }.time
-        ),
-        Medication(
-            id = 2L,
-            name = "이부프로펜",
-            dosage = 1,
-            recurrence = "2",
-            endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 15) }.time,
-            medicationTaken = true,
-            medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 12); set(Calendar.MINUTE, 0) }.time
-        )
-    )
-
-    val sampleState = ManagementState(
-        medications = sampleMedications,
-        lastSelectedDate = sampleDateString
-    )
-
-    // Mock ViewModel
-    val mockViewModel = remember { BtmBarViewModel() }
-
-    // Mock functions
-    val navigateToMedicationDetail: (Medication) -> Unit = {}
-    val onDateSelected: (CalendarModel.DateModel) -> Unit = {}
-    val onSelectedDate: (Date) -> Unit = {}
-    val logEvent: (String) -> Unit = {}
-
-    Scaffold(
-        floatingActionButton = {
-            val fabVisibility = rememberSaveable { (mutableStateOf(true)) }
-
-            AnimatedVisibility(
-                visible = fabVisibility.value,
-                enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it }),
-                content = {
-                    DoseFAB(rememberNavController())
-                }
-            )
-        }
-    ) { paddingValues ->
-
-        Column(
-            modifier = Modifier.padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-
-            Surface(
-                color = MaterialTheme.colorScheme.background,
-            ) {
-                DailyMedications(
-                    navController = rememberNavController(), // Use a rememberNavController for previews
-                    state = sampleState,
-                    navigateToMedicationDetail = navigateToMedicationDetail,
-                    onDateSelected = onDateSelected,
-                    onSelectedDate = onSelectedDate,
-                    logEvent = logEvent
-                )
-            }
-        }
-    }
+fun ManagementScreenPreview() {
+    val navController = rememberNavController()
+    val btmBarViewModel: BtmBarViewModel = viewModel()
+    ManagementScreen(navController = navController, btmBarViewModel = btmBarViewModel)
 }
