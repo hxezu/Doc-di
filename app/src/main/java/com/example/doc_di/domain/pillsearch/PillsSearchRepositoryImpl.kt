@@ -2,7 +2,7 @@ package com.example.doc_di.domain.pillsearch
 
 import android.util.Log
 import com.example.doc_di.domain.model.PillInfo
-import com.example.practice.data.model.Pill
+import com.example.doc_di.domain.model.Pill
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okio.IOException

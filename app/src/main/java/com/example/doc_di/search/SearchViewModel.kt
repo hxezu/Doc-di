@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.doc_di.domain.model.PillInfo
 import com.example.doc_di.domain.pillsearch.PillsSearchRepository
 import com.example.doc_di.domain.pillsearch.Result
-import com.example.practice.data.model.Pill
+import com.example.doc_di.domain.model.Pill
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

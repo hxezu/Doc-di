@@ -66,29 +66,34 @@ fun PillInfo(searchViewModel:SearchViewModel) {
                             }
                         }",
                         color = cardDetailTextColor,
+                        lineHeight = 14.sp,
                         fontSize = 10.sp
                     )
                     Text(
                         text = "모양 : ${if (selectedPill.drugShape != "") selectedPill.drugShape else "-"}",
                         color = cardDetailTextColor,
+                        lineHeight = 14.sp,
                         fontSize = 10.sp
                     )
                     Text(
                         text = "색상 : ${if (selectedPill.colorClass1 != "") selectedPill.colorClass1 else "-"}, " +
                                 if (selectedPill.colorClass2 != "") selectedPill.colorClass2 else "-",
                         color = cardDetailTextColor,
+                        lineHeight = 14.sp,
                         fontSize = 10.sp
                     )
                     Text(
                         text = "분할선 : (앞) ${if (selectedPill.lineFront != "") "있음" else "없음"}, " +
                                 "(뒤) ${if (selectedPill.lineBack != "") "있음" else "없음"}",
                         color = cardDetailTextColor,
+                        lineHeight = 14.sp,
                         fontSize = 10.sp
                     )
                     Text(
                         text = "식별표기 : (앞) ${if (selectedPill.printFront != "") selectedPill.printFront else "-"}, " +
                                 "(뒤) ${if (selectedPill.printBack !="") selectedPill.printBack else "-"}",
                         color = cardDetailTextColor,
+                        lineHeight = 14.sp,
                         fontSize = 10.sp
                     )
                 }

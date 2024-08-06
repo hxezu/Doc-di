@@ -1,6 +1,6 @@
 package com.example.doc_di.domain.model
 
-import com.example.practice.data.model.Pill
+import com.example.doc_di.domain.model.Pill
 
 data class Pills(
     val data: List<Pill>,
