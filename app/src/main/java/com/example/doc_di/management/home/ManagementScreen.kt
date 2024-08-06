@@ -6,6 +6,9 @@ import android.app.AlarmManager
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
@@ -29,6 +33,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,9 +47,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -56,6 +64,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.analytics.AnalyticsEvents
+import com.example.doc_di.analytics.AnalyticsHelper
 import com.example.doc_di.domain.model.Medication
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.extension.toFormattedDateShortString
@@ -63,6 +72,8 @@ import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.extension.toFormattedMonthDateString
 import com.example.doc_di.management.addmedication.navigation.AddMedicationDestination
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.etc.Routes
+import com.example.doc_di.management.addmedication.AddMedicationScreenUI
 import com.example.doc_di.management.home.data.CalendarDataSource
 import com.example.doc_di.management.home.model.CalendarModel
 import com.example.doc_di.management.home.viewmodel.ManagementState
@@ -85,7 +96,23 @@ fun ManagementScreen(
     navController: NavController, 
     btmBarViewModel: BtmBarViewModel
 ) {
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
+    val fabVisibility = rememberSaveable { (mutableStateOf(true)) }
+
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = fabVisibility.value,
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it }),
+                content = {
+                    DoseFAB(navController)
+                }
+            )
+        }
+    ) {
             paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues),
@@ -173,6 +200,26 @@ fun ManagementScreen(
             Text(text = "hxezu")
         }
     }
+}
+
+@Composable
+fun DoseFAB(navController: NavController) {
+    ExtendedFloatingActionButton(
+        text = {
+            Text(text = "복용 약", color = Color.White) },
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Add,
+                tint = Color.White,
+                contentDescription = "Add"
+            )
+        },
+        onClick = {
+            navController.navigate(Routes.addMedicationScreen.route)
+        },
+        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp),
+        containerColor = MainBlue
+    )
 }
 
 @Composable
@@ -367,14 +414,14 @@ fun DateHeader(
             },
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.tertiary
+            color = Color.Black
         )
         IconButton(onClick = {
             onPrevClickListener(data.startDate.date)
         }) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowLeft,
-                tint = MaterialTheme.colorScheme.tertiary,
+                tint = Color.Black,
                 contentDescription = "Back"
             )
         }
@@ -383,7 +430,7 @@ fun DateHeader(
         }) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowRight,
-                tint = MaterialTheme.colorScheme.tertiary,
+                tint = Color.Black,
                 contentDescription = "Next"
             )
         }
@@ -427,7 +474,7 @@ fun DateItem(
                 // background colors of the selected date
                 // and the non-selected date are different
                 containerColor = if (date.isSelected) {
-                    MaterialTheme.colorScheme.tertiary
+                    Color.Black
                 } else {
                     MaterialTheme.colorScheme.surface
                 }
@@ -445,6 +492,11 @@ fun DateItem(
                 Text(
                     text = date.date.toFormattedDateShortString(),
                     style = MaterialTheme.typography.titleMedium,
+                    color = if (date.isSelected) {
+                        Color.White
+                    } else {
+                        Color.Black
+                    },
                     fontWeight = if (date.isSelected) {
                         FontWeight.Medium
                     } else {
@@ -525,15 +577,38 @@ fun PreviewDailyMedications() {
     val onSelectedDate: (Date) -> Unit = {}
     val logEvent: (String) -> Unit = {}
 
-    // Render the DailyMedications with sample data
-    Surface(color = MaterialTheme.colorScheme.background) {
-        DailyMedications(
-            navController = rememberNavController(), // Use a rememberNavController for previews
-            state = sampleState,
-            navigateToMedicationDetail = navigateToMedicationDetail,
-            onDateSelected = onDateSelected,
-            onSelectedDate = onSelectedDate,
-            logEvent = logEvent
-        )
+    Scaffold(
+        floatingActionButton = {
+            val fabVisibility = rememberSaveable { (mutableStateOf(true)) }
+
+            AnimatedVisibility(
+                visible = fabVisibility.value,
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it }),
+                content = {
+                    DoseFAB(rememberNavController())
+                }
+            )
+        }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier.padding(paddingValues),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Surface(
+                color = MaterialTheme.colorScheme.background,
+            ) {
+                DailyMedications(
+                    navController = rememberNavController(), // Use a rememberNavController for previews
+                    state = sampleState,
+                    navigateToMedicationDetail = navigateToMedicationDetail,
+                    onDateSelected = onDateSelected,
+                    onSelectedDate = onSelectedDate,
+                    logEvent = logEvent
+                )
+            }
+        }
     }
 }

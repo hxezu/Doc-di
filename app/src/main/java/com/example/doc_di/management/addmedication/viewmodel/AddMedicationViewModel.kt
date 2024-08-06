@@ -10,11 +10,11 @@ import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
-class AddMedicationViewModel @Inject constructor(
+open class AddMedicationViewModel @Inject constructor(
     private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
 
-    fun createMedications(
+    open fun createMedications(
         name: String,
         dosage: Int,
         recurrence: String,
@@ -66,7 +66,7 @@ class AddMedicationViewModel @Inject constructor(
         return calendar.time
     }
 
-    fun logEvent(eventName: String) {
+    open fun logEvent(eventName: String) {
         analyticsHelper.logEvent(eventName = eventName)
     }
 }
