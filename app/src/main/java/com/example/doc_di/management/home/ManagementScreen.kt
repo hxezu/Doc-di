@@ -6,8 +6,13 @@ import android.app.AlarmManager
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
@@ -29,6 +35,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,9 +49,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -52,10 +62,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.analytics.AnalyticsEvents
+import com.example.doc_di.analytics.AnalyticsHelper
 import com.example.doc_di.domain.model.Medication
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.extension.toFormattedDateShortString
@@ -63,6 +75,8 @@ import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.extension.toFormattedMonthDateString
 import com.example.doc_di.management.addmedication.navigation.AddMedicationDestination
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.etc.Routes
+import com.example.doc_di.management.addmedication.AddMedicationScreenUI
 import com.example.doc_di.management.home.data.CalendarDataSource
 import com.example.doc_di.management.home.model.CalendarModel
 import com.example.doc_di.management.home.viewmodel.ManagementState
@@ -85,7 +99,31 @@ fun ManagementScreen(
     navController: NavController, 
     btmBarViewModel: BtmBarViewModel
 ) {
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
+    val fabVisibility = rememberSaveable { (mutableStateOf(true)) }
+
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
+        },
+        floatingActionButton = {
+            if (fabVisibility.value) {
+                Box(
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ){
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp), // Space between buttons
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        DoseFAB(navController)
+                        DoseFAB(navController)
+                    }
+                }
+            }
+        }
+    ) {
             paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues),
@@ -170,9 +208,28 @@ fun ManagementScreen(
                     logEvent = logEvent
                 )
             }
-            Text(text = "hxezu")
         }
     }
+}
+
+@Composable
+fun DoseFAB(navController: NavController) {
+    ExtendedFloatingActionButton(
+        text = {
+            Text(text = "복용 약", color = Color.White) },
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Add,
+                tint = Color.White,
+                contentDescription = "Add"
+            )
+        },
+        onClick = {
+            navController.navigate(Routes.addMedicationScreen.route)
+        },
+        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp),
+        containerColor = MainBlue
+    )
 }
 
 @Composable
@@ -367,14 +424,14 @@ fun DateHeader(
             },
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.tertiary
+            color = Color.Black
         )
         IconButton(onClick = {
             onPrevClickListener(data.startDate.date)
         }) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowLeft,
-                tint = MaterialTheme.colorScheme.tertiary,
+                tint = Color.Black,
                 contentDescription = "Back"
             )
         }
@@ -383,7 +440,7 @@ fun DateHeader(
         }) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowRight,
-                tint = MaterialTheme.colorScheme.tertiary,
+                tint = Color.Black,
                 contentDescription = "Next"
             )
         }
@@ -427,7 +484,7 @@ fun DateItem(
                 // background colors of the selected date
                 // and the non-selected date are different
                 containerColor = if (date.isSelected) {
-                    MaterialTheme.colorScheme.tertiary
+                    MainBlue
                 } else {
                     MaterialTheme.colorScheme.surface
                 }
@@ -445,6 +502,11 @@ fun DateItem(
                 Text(
                     text = date.date.toFormattedDateShortString(),
                     style = MaterialTheme.typography.titleMedium,
+                    color = if (date.isSelected) {
+                        Color.White
+                    } else {
+                        Color.Black
+                    },
                     fontWeight = if (date.isSelected) {
                         FontWeight.Medium
                     } else {
@@ -465,75 +527,8 @@ sealed class MedicationListItem {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewDailyMedications() {
-    // Hardcoded date for preview: August 5, 2024
-    val calendar = Calendar.getInstance().apply {
-        set(2024, Calendar.AUGUST, 5, 0, 0, 0) // Year, Month (0-based), Day, Hour, Minute, Second
-        set(Calendar.MILLISECOND, 0)
-    }
-    val sampleDate = calendar.time
-    val sampleDateString = SimpleDateFormat("yyyy-MM-dd").format(sampleDate)
-
-    // Sample Data
-    val sampleCalendarModel = CalendarModel(
-        selectedDate = CalendarModel.DateModel(
-            date = sampleDate,
-            isSelected = true,
-            isToday = true
-        ),
-        visibleDates = List(7) { i ->
-            CalendarModel.DateModel(
-                date = calendar.apply { add(Calendar.DAY_OF_YEAR, i) }.time,
-                isSelected = i == 0, // Select the first date
-                isToday = i == 0 // Mark the first date as today
-            )
-        }
-    )
-
-    val sampleMedications = listOf(
-        Medication(
-            id = 1L,
-            name = "아스피린",
-            dosage = 2,
-            recurrence = "7",
-            endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 10) }.time,
-            medicationTaken = false,
-            medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 8); set(Calendar.MINUTE, 0) }.time
-        ),
-        Medication(
-            id = 2L,
-            name = "이부프로펜",
-            dosage = 1,
-            recurrence = "2",
-            endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 15) }.time,
-            medicationTaken = true,
-            medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 12); set(Calendar.MINUTE, 0) }.time
-        )
-    )
-
-    val sampleState = ManagementState(
-        medications = sampleMedications,
-        lastSelectedDate = sampleDateString
-    )
-
-    // Mock ViewModel
-    val mockViewModel = remember { BtmBarViewModel() }
-
-    // Mock functions
-    val navigateToMedicationDetail: (Medication) -> Unit = {}
-    val onDateSelected: (CalendarModel.DateModel) -> Unit = {}
-    val onSelectedDate: (Date) -> Unit = {}
-    val logEvent: (String) -> Unit = {}
-
-    // Render the DailyMedications with sample data
-    Surface(color = MaterialTheme.colorScheme.background) {
-        DailyMedications(
-            navController = rememberNavController(), // Use a rememberNavController for previews
-            state = sampleState,
-            navigateToMedicationDetail = navigateToMedicationDetail,
-            onDateSelected = onDateSelected,
-            onSelectedDate = onSelectedDate,
-            logEvent = logEvent
-        )
-    }
+fun ManagementScreenPreview() {
+    val navController = rememberNavController()
+    val btmBarViewModel: BtmBarViewModel = viewModel()
+    ManagementScreen(navController = navController, btmBarViewModel = btmBarViewModel)
 }

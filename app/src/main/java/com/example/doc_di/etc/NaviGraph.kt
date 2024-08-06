@@ -15,14 +15,13 @@ import com.example.doc_di.LoginPage
 import com.example.doc_di.RegisterPage
 import com.example.doc_di.ResetPage
 import com.example.doc_di.chatbot.ChatListScreen
-import com.example.doc_di.domain.model.Medication
 import com.example.doc_di.domain.pillsearch.PillsSearchRepositoryImpl
 import com.example.doc_di.domain.pillsearch.RetrofitInstance
 import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.Profile
+import com.example.doc_di.management.addmedication.AddMedicationScreenUI
 import com.example.doc_di.management.home.ManagementScreen
-import com.example.doc_di.management.home.viewmodel.ManagementViewModel
 import com.example.doc_di.search.MedicalAppointmentRecord
 import com.example.doc_di.search.PrescribedMedicineList
 import com.example.doc_di.search.PrescriptionRecord
@@ -128,6 +127,10 @@ fun NaviGraph(navController: NavHostController) {
                 navController = navController,
                 btmBarViewModel = btmBarViewModel
             )
+        }
+
+        composable(route = Routes.addMedicationScreen.route) {
+            AddMedicationScreenUI(navController = navController, btmBarViewModel = btmBarViewModel)
         }
     }
 }

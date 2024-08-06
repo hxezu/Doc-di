@@ -1,12 +1,18 @@
 package com.example.doc_di.management.addmedication
 
 import android.content.Context
+import android.content.res.AssetManager
+import android.content.res.Resources
+import android.os.Bundle
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -47,6 +53,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,9 +61,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.analytics.AnalyticsEvents
+import com.example.doc_di.analytics.AnalyticsHelper
 import com.example.doc_di.domain.model.Medication
+import com.example.doc_di.etc.BottomNavigationBar
+import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.management.addmedication.model.CalendarInformation
 import com.example.doc_di.management.addmedication.viewmodel.AddMedicationViewModel
@@ -66,13 +79,6 @@ import com.example.doc_di.util.SnackbarUtil.Companion.showSnackbar
 import com.example.doc_di.util.getRecurrenceList
 import java.util.Calendar
 import java.util.Date
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    AddMedicationRoute(onBackClicked = {}, navigateToMedicationConfirm = {})
-}
-
 
 
 @Composable
@@ -373,11 +379,18 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = stringResource(id = R.string.recurrence),
+            text = "복용 주기",
             style = MaterialTheme.typography.bodyLarge
         )
 
-        val options = getRecurrenceList().map { it.name }
+        // 한국어 텍스트를 위한 맵 생성
+        val recurrenceMap = mapOf(
+            Recurrence.Daily to "매일",
+            Recurrence.Weekly to "매주",
+            Recurrence.Monthly to "매달"
+        )
+
+        val options = getRecurrenceList().map { recurrenceMap[it] ?: "" }
         var expanded by remember { mutableStateOf(false) }
         var selectedOptionText by remember { mutableStateOf(options[0]) }
         ExposedDropdownMenuBox(
@@ -396,12 +409,12 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
             ) {
-                options.forEach { selectionOption ->
+                getRecurrenceList().forEach { recurrenceOption ->
                     DropdownMenuItem(
-                        text = { Text(selectionOption) },
+                        text = { Text(recurrenceMap[recurrenceOption] ?: "") },
                         onClick = {
-                            selectedOptionText = selectionOption
-                            recurrence(selectionOption)
+                            selectedOptionText = recurrenceMap[recurrenceOption] ?: ""
+                            recurrence(selectedOptionText)
                             expanded = false
                         }
                     )
@@ -415,7 +428,7 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
 @Composable
 fun EndDateTextField(endDate: (Long) -> Unit) {
     Text(
-        text = stringResource(id = R.string.end_date),
+        text = "복용 종료일",
         style = MaterialTheme.typography.bodyLarge
     )
 
@@ -517,4 +530,188 @@ fun TimerTextField(
         },
         interactionSource = interactionSource
     )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddMedicationScreenUI(
+    navController: NavController,
+    btmBarViewModel: BtmBarViewModel
+){
+    var text by rememberSaveable { mutableStateOf("") }
+    var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
+    var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
+    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(
+        CalendarInformation(
+            Calendar.getInstance())
+    ) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier
+                    .padding(vertical = 16.dp),
+                navigationIcon = {
+                    FloatingActionButton(
+                        onClick = {
+                        },
+                        containerColor = Color.Transparent,
+                        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                title = {
+                    Text(
+                        modifier = Modifier.padding(16.dp),
+                        text = "복용 약 추가",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.displaySmall
+                    )
+                }
+            )
+        },
+        bottomBar = {
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+                    .height(56.dp),
+                onClick = {
+                },
+                shape = MaterialTheme.shapes.extraLarge
+            ) {
+                Text(
+                    text = "추가",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Text(
+                text = "제품명",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                value = text,
+                onValueChange = { text = it },
+                placeholder = {
+                    Text(
+                        text = "예시) 록프라정"
+                    )
+                },
+            )
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
+            var isMaxDoseError by rememberSaveable { mutableStateOf(false) }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                val maxDose = 3
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "1회 투약량",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    TextField(
+                        modifier = Modifier.width(128.dp),
+                        value = text,
+                        onValueChange = {
+                            if (it.length < maxDose) {
+                                isMaxDoseError = false
+                                text = it
+                            } else {
+                                isMaxDoseError = true
+                            }
+                        },
+                        trailingIcon = {
+                            if (isMaxDoseError) {
+                                Icon(
+                                    imageVector = Icons.Filled.Info,
+                                    contentDescription = "Erroe",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        },
+                        placeholder = {
+                            Text(
+                                text = "예시) 1"
+                            )
+                        },
+                        isError = isMaxDoseError,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
+                RecurrenceDropdownMenu { recurrence = it }
+            }
+
+            if (isMaxDoseError) {
+                Text(
+                    text = "과다복용",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+
+            Spacer(modifier = Modifier.padding(4.dp))
+            EndDateTextField { endDate = it }
+
+            Spacer(modifier = Modifier.padding(4.dp))
+            Text(
+                text = "복용 시간",
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            for (index in selectedTimes.indices) {
+                TimerTextField(
+                    isLastItem = selectedTimes.lastIndex == index,
+                    isOnlyItem = selectedTimes.size == 1,
+                    time = {
+                        selectedTimes[index] = it
+                    },
+                    onDeleteClick = {
+                        //removeTime(selectedTimes[index])
+                    },
+                    logEvent = {
+                        //viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
+                    },
+                )
+            }
+
+            Button(
+                onClick = {
+                    //addTime(CalendarInformation(Calendar.getInstance()))
+                }
+            ) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+                Text("시간 추가")
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddMedicationScreenUIPreview( ){
+    val navController = rememberNavController()
+    val btmBarViewModel: BtmBarViewModel = viewModel()
+    AddMedicationScreenUI(navController = navController, btmBarViewModel = btmBarViewModel)
 }
