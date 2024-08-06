@@ -127,18 +127,18 @@ fun ManagementScreen(
             val sampleMedications = listOf(
                 Medication(
                     id = 1L,
-                    name = "Aspirin",
-                    dosage = 500,
-                    recurrence = "Daily",
+                    name = "아스피린",
+                    dosage = 2,
+                    recurrence = "7",
                     endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 10) }.time,
                     medicationTaken = false,
                     medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 8); set(Calendar.MINUTE, 0) }.time
                 ),
                 Medication(
                     id = 2L,
-                    name = "Ibuprofen",
-                    dosage = 200,
-                    recurrence = "Twice a day",
+                    name = "이부프로펜",
+                    dosage = 1,
+                    recurrence = "2",
                     endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 15) }.time,
                     medicationTaken = true,
                     medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 12); set(Calendar.MINUTE, 0) }.time
@@ -199,9 +199,6 @@ fun DailyMedications(
                 logEvent.invoke(AnalyticsEvents.HOME_NEW_DATE_SELECTED)
             }
         )
-
-        // Ensure there is spacing between DatesHeader and the rest of the content
-        Spacer(modifier = Modifier.height(16.dp)) // Adjust the height as needed
 
         // Conditional content for medications
         if (state.medications.isEmpty()) {
@@ -496,18 +493,18 @@ fun PreviewDailyMedications() {
     val sampleMedications = listOf(
         Medication(
             id = 1L,
-            name = "Aspirin",
-            dosage = 500,
-            recurrence = "Daily",
+            name = "아스피린",
+            dosage = 2,
+            recurrence = "7",
             endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 10) }.time,
             medicationTaken = false,
             medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 8); set(Calendar.MINUTE, 0) }.time
         ),
         Medication(
             id = 2L,
-            name = "Ibuprofen",
-            dosage = 200,
-            recurrence = "Twice a day",
+            name = "이부프로펜",
+            dosage = 1,
+            recurrence = "2",
             endDate = calendar.apply { add(Calendar.DAY_OF_YEAR, 15) }.time,
             medicationTaken = true,
             medicationTime = calendar.apply { set(Calendar.HOUR_OF_DAY, 12); set(Calendar.MINUTE, 0) }.time
