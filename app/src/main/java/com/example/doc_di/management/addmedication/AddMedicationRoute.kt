@@ -4,12 +4,15 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.content.res.Resources
 import android.os.Bundle
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -65,6 +68,7 @@ import com.example.doc_di.R
 import com.example.doc_di.analytics.AnalyticsEvents
 import com.example.doc_di.analytics.AnalyticsHelper
 import com.example.doc_di.domain.model.Medication
+import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.management.addmedication.model.CalendarInformation
