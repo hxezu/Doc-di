@@ -36,6 +36,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -110,8 +111,8 @@ fun ManagementScreen(
                 Box(
                     contentAlignment = Alignment.BottomCenter,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
+//                        .fillMaxWidth()
+//                        .padding(8.dp)
                 ){
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(16.dp), // Space between buttons
@@ -122,7 +123,8 @@ fun ManagementScreen(
                     }
                 }
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) {
             paddingValues ->
         Column(

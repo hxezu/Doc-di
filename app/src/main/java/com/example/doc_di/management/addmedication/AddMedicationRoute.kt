@@ -1,5 +1,6 @@
 package com.example.doc_di.management.addmedication
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.AssetManager
 import android.content.res.Resources
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -41,6 +43,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -73,6 +76,7 @@ import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.management.addmedication.model.CalendarInformation
 import com.example.doc_di.management.addmedication.viewmodel.AddMedicationViewModel
+import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.HOUR_MINUTE_FORMAT
 import com.example.doc_di.util.Recurrence
 import com.example.doc_di.util.SnackbarUtil.Companion.showSnackbar
@@ -532,7 +536,7 @@ fun TimerTextField(
     )
 }
 
-
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMedicationScreenUI(
@@ -579,11 +583,14 @@ fun AddMedicationScreenUI(
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp)
+                    .padding(20.dp)
                     .height(56.dp),
                 onClick = {
                 },
-                shape = MaterialTheme.shapes.extraLarge
+                shape = MaterialTheme.shapes.extraLarge,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MainBlue
+                ),
             ) {
                 Text(
                     text = "추가",
@@ -591,10 +598,12 @@ fun AddMedicationScreenUI(
                 )
             }
         }
-    ) { innerPadding ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(paddingValues)  // Apply paddingValues here to avoid overlapping with the TopAppBar
+                .padding(horizontal = 20.dp)  // Additional padding as needed
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -695,14 +704,23 @@ fun AddMedicationScreenUI(
                 )
             }
 
-            Button(
-                onClick = {
-                    //addTime(CalendarInformation(Calendar.getInstance()))
-                }
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                Text("시간 추가")
+                Button(
+                    onClick = {
+                        //addTime(CalendarInformation(Calendar.getInstance()))
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MainBlue
+                    ),
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+                    Text("시간 추가")
+                }
             }
+
         }
     }
 }
