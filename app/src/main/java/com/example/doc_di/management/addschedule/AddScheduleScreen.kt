@@ -61,6 +61,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.TextFieldDefaults
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -84,8 +86,8 @@ fun AddScheduleScreenUI(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel
 ){
-    var text by rememberSaveable { mutableStateOf("") }
-    var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
+    var isRecurring by rememberSaveable { mutableStateOf(false) }  // Add state for toggle
+    var department by rememberSaveable { mutableStateOf(Department.InternalMedicine.name) }
     var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
     val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(
         CalendarInformation(
@@ -146,11 +148,7 @@ fun AddScheduleScreenUI(
             AddDoctorName()
             Spacer(modifier = Modifier.padding(4.dp))
 
-            DepartmentDropdownMenu { recurrence = it }
-
-            Spacer(modifier = Modifier.padding(4.dp))
-            EndDateTextField { endDate = it }
-
+            DepartmentDropdownMenu { department = it }
             Spacer(modifier = Modifier.padding(4.dp))
 
             Text(
@@ -173,30 +171,34 @@ fun AddScheduleScreenUI(
                     },
                 )
             }
+
+            Spacer(modifier = Modifier.padding(4.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "정기 진료",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Switch(
+                    modifier = Modifier.padding(end = 20.dp),
+                    checked = isRecurring,
+                    onCheckedChange = { checked -> isRecurring = checked },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MainBlue,
+                        checkedTrackColor = MainBlue.copy(alpha = 0.5f)
+                    )
+                )
+            }
             Spacer(modifier = Modifier.padding(4.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    onClick = {
-                        addTime(CalendarInformation(Calendar.getInstance()))
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MainBlue
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(
-                        defaultElevation = 10.dp,
-                        pressedElevation = 0.dp,
-                        disabledElevation = 0.dp
-                    ),
-                ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                    Text("시간 추가")
-                }
+            if (isRecurring) {
+                EndDateTextField { endDate = it }
+                Spacer(modifier = Modifier.padding(4.dp))
             }
+
             Spacer(modifier = Modifier.weight(1f))
 
             Box(

@@ -118,7 +118,7 @@ fun ManagementScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp), // Space between buttons
                         verticalAlignment = Alignment.Bottom
                     ) {
-                        DoseFAB(navController)
+                        ScheduleFAB(navController)
                         DoseFAB(navController)
                     }
                 }
@@ -212,6 +212,26 @@ fun ManagementScreen(
             }
         }
     }
+}
+
+@Composable
+fun ScheduleFAB(navController: NavController) {
+    ExtendedFloatingActionButton(
+        text = {
+            Text(text = "진료 일정", color = Color.White) },
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Add,
+                tint = Color.White,
+                contentDescription = "Add"
+            )
+        },
+        onClick = {
+            navController.navigate(Routes.addScheduleScreen.route)
+        },
+        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp),
+        containerColor = MainBlue
+    )
 }
 
 @Composable
