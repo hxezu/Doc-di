@@ -21,6 +21,7 @@ import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.Profile
 import com.example.doc_di.management.addmedication.AddMedicationScreenUI
+import com.example.doc_di.management.addschedule.AddScheduleScreenUI
 import com.example.doc_di.management.home.ManagementScreen
 import com.example.doc_di.search.MedicalAppointmentRecord
 import com.example.doc_di.search.PrescribedMedicineList
@@ -131,6 +132,10 @@ fun NaviGraph(navController: NavHostController) {
 
         composable(route = Routes.addMedicationScreen.route) {
             AddMedicationScreenUI(navController = navController, btmBarViewModel = btmBarViewModel)
+        }
+
+        composable(route = Routes.addScheduleScreen.route) {
+            AddScheduleScreenUI(navController = navController, btmBarViewModel = btmBarViewModel)
         }
     }
 }
