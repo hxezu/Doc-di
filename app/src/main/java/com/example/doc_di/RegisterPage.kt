@@ -21,8 +21,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -90,7 +93,6 @@ fun RegisterPage(navController: NavController) {
                     text = "회원가입",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .padding(top = 80.dp)
                         .fillMaxWidth(),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.primary,
@@ -115,7 +117,7 @@ fun RegisterPage(navController: NavController) {
                 RegisterBirthday()
 
                 Spacer(modifier = Modifier.height(3.dp))
-                //RegisterSex()
+                RegisterSex()
 
                 Spacer(modifier = Modifier.padding(15.dp))
 
@@ -197,6 +199,68 @@ private fun GradientButton(
                 fontSize = 20.sp,
                 color = Color.White
             )
+        }
+    }
+}
+
+//sex
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun RegisterSex(){
+    var expanded by remember { mutableStateOf(false) }
+    var selectedGender by rememberSaveable { mutableStateOf("") }
+    val genderOptions = listOf("남성", "여성", "기타")
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(0.8f)
+    ) {
+        OutlinedTextField(
+            value = selectedGender,
+            onValueChange = { },
+            shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
+            label = {
+                Text(
+                    "성별",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            },
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { expanded = true }) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Filled.ArrowDropDown,
+                        contentDescription = "성별 선택"
+                    )
+                }
+            },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MainBlue,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused) {
+                        expanded = true
+                    }
+                }
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            genderOptions.forEach { gender ->
+                DropdownMenuItem(onClick = {
+                    selectedGender = gender
+                    expanded = false
+                }) {
+                    Text(text = gender)
+                }
+            }
         }
     }
 }
