@@ -440,9 +440,9 @@ fun DateHeader(
                 .weight(1f)
                 .align(Alignment.CenterVertically),
             text = if (data.selectedDate.isToday) {
-                "Today"
+                "오늘"
             } else {
-                data.selectedDate.date.toFormattedMonthDateString()
+                data.selectedDate.date.toFormattedMonthDateString() + "일"
             },
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
@@ -474,11 +474,13 @@ fun DateList(
     data: CalendarModel,
     onDateClickListener: (CalendarModel.DateModel) -> Unit
 ) {
-    LazyRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween, // 항목 사이의 간격 설정
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        items(items = data.visibleDates) { date ->
+        data.visibleDates.forEach { date ->
             DateItem(date, onDateClickListener)
         }
     }
@@ -500,7 +502,7 @@ fun DateItem(
         )
         Card(
             modifier = Modifier
-                .padding(vertical = 4.dp, horizontal = 4.dp),
+                .padding(vertical = 4.dp),
             onClick = { onClickListener(date) },
             colors = cardColors(
                 // background colors of the selected date
@@ -514,10 +516,10 @@ fun DateItem(
         ) {
             Column(
                 modifier = Modifier
-                    .width(42.dp)
+                    .width(30.dp)
                     .height(42.dp)
-                    .padding(8.dp)
-                    .fillMaxSize(), // Fill the available size in the Column
+                    .fillMaxSize()
+                , // Fill the available size in the Column
                 verticalArrangement = Arrangement.Center, // Center vertically
                 horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
             ) {
