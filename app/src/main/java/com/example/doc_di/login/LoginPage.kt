@@ -1,4 +1,4 @@
-package com.example.doc_di
+package com.example.doc_di.login
 
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.foundation.Image
@@ -29,7 +29,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
@@ -46,6 +45,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.ui.theme.MainBlue
 

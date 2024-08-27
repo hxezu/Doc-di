@@ -6,6 +6,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
+    // 꽁제리너스
+    const val BASE_URL = "http://172.30.1.84:8080/"
+    // 내 핫스팟
 
     private val interceptor: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -17,7 +20,7 @@ object RetrofitInstance {
 
     val api: Api = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl(Api.BASE_URL)
+        .baseUrl(BASE_URL)
         .client(client)
         .build()
         .create(Api::class.java)
