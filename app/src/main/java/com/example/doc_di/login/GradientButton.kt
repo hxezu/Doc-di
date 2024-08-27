@@ -1,4 +1,4 @@
-package com.example.doc_di.login.register
+package com.example.doc_di.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

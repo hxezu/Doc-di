@@ -13,7 +13,7 @@ import com.example.doc_di.domain.pillsearch.RetrofitInstance
 import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.Profile
-import com.example.doc_di.login.LoginPage
+import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.ResetPage
 import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.management.addmedication.AddMedicationScreenUI

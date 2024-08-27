@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.domain.model.JoinDTO
 import com.example.doc_di.domain.pillsearch.RetrofitInstance
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.login.GradientButton
 import com.example.doc_di.login.register.registerinfo.RegisterBirthdate
 import com.example.doc_di.login.register.registerinfo.RegisterBloodType
 import com.example.doc_di.login.register.registerinfo.RegisterEmail

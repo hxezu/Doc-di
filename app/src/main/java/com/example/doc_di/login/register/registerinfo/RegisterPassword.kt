@@ -22,8 +22,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.doc_di.login.Visibility
-import com.example.doc_di.login.VisibilityOff
 import com.example.doc_di.ui.theme.MainBlue
 
 @Composable

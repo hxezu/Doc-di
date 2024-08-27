@@ -1,4 +1,4 @@
-package com.example.doc_di.login
+package com.example.doc_di.login.register.registerinfo
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height

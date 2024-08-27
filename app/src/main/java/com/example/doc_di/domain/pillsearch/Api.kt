@@ -2,6 +2,7 @@ package com.example.doc_di.domain.pillsearch
 
 import com.example.doc_di.domain.model.JoinDTO
 import com.example.doc_di.domain.model.JoinResponse
+import com.example.doc_di.domain.model.LoginReq
 import com.example.doc_di.domain.model.PillInfos
 import com.example.doc_di.domain.model.Pills
 import retrofit2.Response
@@ -21,5 +22,6 @@ interface Api {
     @POST("join")
     suspend fun join(@Body joinDTO: JoinDTO): Response<JoinResponse>
 
-
+    @POST("login")
+    suspend fun login(@Body loginReq: LoginReq): Response<Unit>
 }
