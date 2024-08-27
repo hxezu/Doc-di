@@ -55,8 +55,7 @@ android {
 
 dependencies {
     // Hilt 종속성
-    implementation("com.google.dagger:hilt-android:2.48")
-     // Hilt 라이브러리 버전
+    implementation("com.google.dagger:hilt-android:2.48") // Hilt 라이브러리 버전
     kapt("com.google.dagger:hilt-android-compiler:2.48") // Hilt 컴파일러 버전
 
     // Hilt Navigation Compose 종속성
@@ -119,6 +118,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    implementation ("androidx.core:core-splashscreen:1.0.0-rc01")
     //토큰 암호화 저장
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 }
