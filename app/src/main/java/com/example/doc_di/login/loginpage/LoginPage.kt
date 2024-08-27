@@ -53,7 +53,7 @@ fun LoginPage(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.Transparent)
+            .background(color = Color.White)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

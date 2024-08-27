@@ -1,6 +1,7 @@
 package com.example.doc_di.ui.theme
 
 import android.app.Activity
+import android.graphics.Color.toArgb
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -10,20 +11,23 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import com.example.doc_di.R
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple200,
+    primary = Color.White,
     secondary = Purple700,
     tertiary = Teal200
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple500,
-    secondary = Purple700,
+    primary = Color.Black,
+    secondary = Color.Transparent,
     tertiary = Teal200
 
     /* Other default colors to override
@@ -57,8 +61,8 @@ fun Doc_diTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            window.statusBarColor = Color.Transparent.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 

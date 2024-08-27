@@ -2,8 +2,11 @@ package com.example.doc_di
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.view.animation.AnticipateInterpolator
 import android.widget.ImageView
@@ -29,18 +32,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         splashScreen = installSplashScreen()
 
-        // 스플래시 화면을 1초 동안 유지하기 위한 로직 추가
         var isReady = false
         splashScreen.setKeepOnScreenCondition { !isReady }
-
-        // 1초 딜레이 후 스플래시 화면 종료
-        window.decorView.postDelayed({
-            isReady = true
-        }, 1000)
-
+        window.decorView.postDelayed({ isReady = true }, 1000)
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-
 
         setContent {
             Doc_diTheme {
@@ -53,7 +49,28 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        setupTransparentStatusBar()
 
 
+    }
+    private fun setupTransparentStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false)
+            val controller = window.insetsController
+            if (controller != null) {
+                controller.hide( WindowInsets.Type.navigationBars())
+                controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                            View.SYSTEM_UI_FLAG_FULLSCREEN or
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    )
+            // 상태바 색상을 투명하게 설정
+            window.statusBarColor = android.graphics.Color.TRANSPARENT
+        }
     }
 }
