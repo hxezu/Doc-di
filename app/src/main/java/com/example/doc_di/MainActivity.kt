@@ -50,8 +50,6 @@ class MainActivity : ComponentActivity() {
             }
         }
         setupTransparentStatusBar()
-
-
     }
     private fun setupTransparentStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

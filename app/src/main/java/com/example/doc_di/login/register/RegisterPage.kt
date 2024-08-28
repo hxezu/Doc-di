@@ -2,7 +2,9 @@ package com.example.doc_di.login.register
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,9 +22,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImagePainter.State.Empty.painter
+import com.example.doc_di.R
 import com.example.doc_di.domain.model.JoinDTO
 import com.example.doc_di.domain.pillsearch.RetrofitInstance
 import com.example.doc_di.etc.Routes
@@ -90,78 +96,82 @@ fun RegisterPage(navController: NavController) {
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+        Box(modifier = Modifier.fillMaxSize()) {
+            // 배경 이미지 추가
+            Image(
+                painter = painterResource(id = R.drawable.backgroundimage), // 배경 이미지 리소스를 여기에 넣습니다.
+                contentDescription = null,
+                contentScale = ContentScale.Crop, // 이미지를 화면에 맞게 자릅니다.
+                modifier = Modifier.fillMaxSize()
+            )
+            RegisterTopBar(navController)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                RegisterName(name, isNameAvailable)
+                RegisterEmail(email)
+                RegisterPassword(password, passwordCheck, isPasswordAvailable)
+                RegisterPhone(phoneNumber, isPhoneNumberAvailable)
+                RegisterBirthdate(birthDate)
+                Spacer(modifier = Modifier.weight(1f))
+                GradientButton(
+                    onClick = {
+                        if (isAllWritten) {
+                            if (isAllAvailable) {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    val joinDTO = JoinDTO(
+                                        email = email.value,
+                                        password = password.value,
+                                        name = name.value,
+                                        sex = sex.value,
+                                        birthday = birthDate.value,
+                                        height = height.value.toShort(),
+                                        weight = weight.value.toShort(),
+                                        bloodType = bloodType.value,
+                                        phoneNum = phoneNumber.value
+                                    )
 
-    Scaffold(
-        topBar = { RegisterTopBar(navController) }
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState),
-        ) {
-            Spacer(modifier = Modifier.weight(1f))
-            RegisterName(name, isNameAvailable)
-            RegisterEmail(email)
-            RegisterPassword(password, passwordCheck, isPasswordAvailable)
-            RegisterPhone(phoneNumber, isPhoneNumberAvailable)
-            RegisterBirthdate(birthDate)
-            RegisterSex(sex)
-            RegisterHeightWeight(height, weight, isHeightAvailable, isWeightAvailable)
-            RegisterBloodType(bloodType)
-            Spacer(modifier = Modifier.weight(1f))
-            GradientButton(
-                onClick = {
-                    if (isAllWritten){
-                        if(isAllAvailable){
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val joinDTO = JoinDTO(
-                                    email = email.value,
-                                    password = password.value,
-                                    name = name.value,
-                                    sex = sex.value,
-                                    birthday = birthDate.value,
-                                    height = height.value.toShort(),
-                                    weight = weight.value.toShort(),
-                                    bloodType = bloodType.value,
-                                    phoneNum = phoneNumber.value
-                                )
-
-                                val response = RetrofitInstance.api.join(joinDTO)
-                                if (response.isSuccessful){
-                                    withContext(Dispatchers.Main){
-                                        Toast.makeText(context, "회워가입 성공", Toast.LENGTH_SHORT).show()
-                                        navController.navigate(Routes.login.route) { navController.popBackStack() }
+                                    val response = RetrofitInstance.api.join(joinDTO)
+                                    if (response.isSuccessful) {
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(context, "회워가입 성공", Toast.LENGTH_SHORT)
+                                                .show()
+                                            navController.navigate(Routes.login.route) { navController.popBackStack() }
+                                        }
+                                    } else {
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(context, "가입 실패", Toast.LENGTH_SHORT)
+                                                .show()
+                                        }
                                     }
                                 }
-                                else {
-                                    withContext(Dispatchers.Main){
-                                        Toast.makeText(context, "가입 실패", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
+                            } else {
+                                Toast.makeText(context, "형식에 맞게 다시 입력해주세요.", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        } else {
+                            if (isAllAvailable) {
+                                Toast.makeText(context, "입력란을 모두 입력해주세요.", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                Toast.makeText(context, "회원 정보를 다시 기입해주세요.", Toast.LENGTH_SHORT)
+                                    .show()
                             }
                         }
-                        else{
-                            Toast.makeText(context, "형식에 맞게 다시 입력해주세요.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    else{
-                        if (isAllAvailable){
-                            Toast.makeText(context, "입력란을 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
-                        }
-                        else{
-                            Toast.makeText(context, "회원 정보를 다시 기입해주세요.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
 
-                },
-                gradientColors = gradientColor,
-                cornerRadius = cornerRadius,
-                roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
-                buttonName = "계생 생성"
-            )
-            Spacer(modifier = Modifier.weight(1f))
-        }
+                    },
+                    gradientColors = gradientColor,
+                    cornerRadius = cornerRadius,
+                    roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
+                    buttonName = "계정 생성"
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
     }
 }
