@@ -7,6 +7,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
     // 꽁제리너스
@@ -20,6 +21,9 @@ object RetrofitInstance {
 
     private val client: OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(interceptor)
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .writeTimeout(10, TimeUnit.SECONDS)
         .build()
 
     val api: Api = Retrofit.Builder()

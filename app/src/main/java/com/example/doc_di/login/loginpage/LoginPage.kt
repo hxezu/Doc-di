@@ -1,7 +1,6 @@
 package com.example.doc_di.login.loginpage
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -48,14 +47,8 @@ fun LoginPage(navController: NavController) {
     val scope = rememberCoroutineScope()
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
-        Image(painter = painterResource(id = R.drawable.backgroundimage),
-            contentDescription = "Background Image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier

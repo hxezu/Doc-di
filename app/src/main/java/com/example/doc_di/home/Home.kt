@@ -59,10 +59,18 @@ fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
     val starColor = Color(0xFFFFC462)
     val cardTextColor = Color(0xFF72777A)
 
-    Scaffold(bottomBar = {BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)}) {
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(
+                navController = navController,
+                btmBarViewModel = btmBarViewModel
+            )
+        },
+        containerColor = Color.Transparent,
+    ) {
 
-        fun updateBtmBarItem(route: String){
-            btmBarViewModel.btmNavBarItems.forEach{
+        fun updateBtmBarItem(route: String) {
+            btmBarViewModel.btmNavBarItems.forEach {
                 it.selected = route == it.route
             }
         }
@@ -73,12 +81,15 @@ fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
                     Routes.home.route -> {
                         updateBtmBarItem(Routes.home.route)
                     }
+
                     Routes.search.route -> {
                         updateBtmBarItem(Routes.search.route)
                     }
+
                     Routes.chatListScreen.route -> {
                         updateBtmBarItem(Routes.chatListScreen.route)
                     }
+
                     Routes.managementScreen.route -> {
                         updateBtmBarItem(Routes.managementScreen.route)
                     }
@@ -86,12 +97,12 @@ fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
             }
         }
 
-        Column (
+        Column(
             verticalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(start = 40.dp, bottom = 106.dp)
-        )  {
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.user_image),
                 contentDescription = "프로필",
@@ -129,7 +140,7 @@ fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
                                 .width(280.dp)
                         ) {
                             Card(
-                                onClick = {navController.navigate(Routes.appointmentSchedule.route)},
+                                onClick = { navController.navigate(Routes.appointmentSchedule.route) },
                                 colors = CardDefaults.cardColors(Color(0xFFF0F0FF)),
                                 elevation = CardDefaults.cardElevation(1.dp),
                                 modifier = Modifier

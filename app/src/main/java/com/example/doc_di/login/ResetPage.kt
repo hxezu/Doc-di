@@ -1,13 +1,10 @@
 package com.example.doc_di.login
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,9 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -42,81 +37,66 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
 
 @Composable
 fun ResetPage(navController: NavController) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.background(color = Color.Transparent)
     ){
-        Image(
-            painter = painterResource(id = R.drawable.backgroundimage), // 배경 이미지 리소스를 여기에 넣습니다.
-            contentDescription = null,
-            contentScale = ContentScale.Crop, // 이미지를 화면에 맞게 자릅니다.
-            modifier = Modifier.fillMaxSize()
-        )
-
-        Box(
+        Column(
             modifier = Modifier
-                .background(color = Color.Transparent)
-                .align(Alignment.Center)
+                .padding(16.dp)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Column(
+            Spacer(modifier = Modifier.height(50.dp))
+
+            Text(
+                text= "비밀번호 재설정",
+                textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Spacer(modifier = Modifier.height(50.dp))
+                    .padding(top = 130.dp)
+                    .fillMaxWidth(),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.height(20.dp))
 
-                Text(
-                    text= "비밀번호 재설정",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(top = 130.dp)
-                        .fillMaxWidth(),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Spacer(modifier = Modifier.height(20.dp))
+            ResetEmailID()
+            Spacer(modifier = Modifier.padding(3.dp))
 
-                ResetEmailID()
-                Spacer(modifier = Modifier.padding(3.dp))
+            val gradientColor = listOf(Color(0xFF0052D4), Color(0xFF4364F7), Color(0xFF6FB1FC))
+            val cornerRadius = 16.dp
 
-                val gradientColor = listOf(Color(0xFF0052D4), Color(0xFF4364F7), Color(0xFF6FB1FC))
-                val cornerRadius = 16.dp
+            Spacer(modifier = Modifier.padding(10.dp))
 
-                Spacer(modifier = Modifier.padding(10.dp))
+            GradientButtonReset(
+                gradientColors = gradientColor,
+                cornerRadius = cornerRadius,
+                nameButton = "제출",
+                roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
+                navController = navController
+            )
 
-                GradientButtonReset(
-                    gradientColors = gradientColor,
-                    cornerRadius = cornerRadius,
-                    nameButton = "제출",
-                    roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
-                    navController = navController
-                )
-
-                Spacer(modifier = Modifier.padding(10.dp))
-                androidx.compose.material3.TextButton(onClick = {
-                    navController.navigate("RegisterPage"){
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-
-                }) {
-                    Text(
-                        text = "회원가입하러 가기",
-                        letterSpacing = 1.sp,
-                        style = MaterialTheme.typography.labelLarge
-                    )
+            Spacer(modifier = Modifier.padding(10.dp))
+            androidx.compose.material3.TextButton(onClick = {
+                navController.navigate("RegisterPage"){
+                    popUpTo(navController.graph.startDestinationId)
+                    launchSingleTop = true
                 }
 
-                Spacer(modifier = Modifier.padding(5.dp))
+            }) {
+                Text(
+                    text = "회원가입하러 가기",
+                    letterSpacing = 1.sp,
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
+
+            Spacer(modifier = Modifier.padding(5.dp))
         }
     }
 }

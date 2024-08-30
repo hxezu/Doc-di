@@ -51,9 +51,7 @@ fun RegisterPage(navController: NavController) {
 
     val isAllWritten by remember {
         derivedStateOf {
-            name.value.isNotEmpty() &&
-                    email.value.isNotEmpty() &&
-                    password.value.isNotEmpty()
+            name.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty()
         }
     }
 
@@ -62,8 +60,7 @@ fun RegisterPage(navController: NavController) {
 
     val isAllAvailable by remember {
         derivedStateOf {
-            isNameAvailable.value &&
-                    isPasswordAvailable.value
+            isNameAvailable.value && isPasswordAvailable.value
         }
     }
 
@@ -75,7 +72,8 @@ fun RegisterPage(navController: NavController) {
     val scope = rememberCoroutineScope()
 
     Scaffold(
-        topBar = { RegisterTopBar(navController) }
+        topBar = { RegisterTopBar(navController) },
+        backgroundColor = Color.Transparent
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
