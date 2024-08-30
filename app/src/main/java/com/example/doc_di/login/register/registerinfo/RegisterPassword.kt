@@ -82,7 +82,7 @@ fun RegisterPassword(
         visualTransformation = if (passwordCheckHidden) PasswordVisualTransformation()
         else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Next,
+            imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(

@@ -67,44 +67,12 @@ import com.example.doc_di.home.ImagePickerDialog
 fun PillReviewDialog(
     onDismiss: () -> Unit,
 ) {
-    val context = LocalContext.current
-
     var reviewText by remember { mutableStateOf("") }
     var curStarRating by remember { mutableIntStateOf(0) }
 
     val starYellow = Color(0xFFFFC107)
     val starGray = Color(0xFFE9EBED)
     val buttonColor = Color(0xFF4B7BE5)
-
-    var photoImageBitmapList by remember { mutableStateOf(listOf<ImageBitmap>()) }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            imageUri = it
-            val source = if (Build.VERSION.SDK_INT < 28) {
-                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-            } else {
-                val source = ImageDecoder.createSource(context.contentResolver, uri)
-                ImageDecoder.decodeBitmap(source)
-            }
-            val newImageBitmap = source.asImageBitmap()
-            photoImageBitmapList += newImageBitmap
-        }
-    }
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap: Bitmap? ->
-        bitmap?.let {
-            val newImageBitmap = it.asImageBitmap()
-            photoImageBitmapList += newImageBitmap
-        }
-    }
-
-    var showImagePickerDialog by remember { mutableStateOf(false) }
 
     Dialog(
         onDismissRequest = { onDismiss() },
@@ -192,50 +160,6 @@ fun PillReviewDialog(
                                 .fillMaxWidth()
                                 .height(136.dp)
                                 .padding(horizontal = 20.dp)
-                        )
-                    }
-
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        item {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .size(98.dp, 88.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .clickable { showImagePickerDialog = true }
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.review_add_photo),
-                                    contentDescription = "사진 추가",
-                                    modifier = Modifier.padding(1.dp)
-                                )
-                            }
-                        }
-                        items(photoImageBitmapList) { imageBitmap ->
-                            Image(
-                                bitmap = imageBitmap,
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(96.dp, 86.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                            )
-                        }
-                    }
-                    if (showImagePickerDialog) {
-                        ImagePickerDialog(
-                            onDismiss = { showImagePickerDialog = false },
-                            onGalleryClick = {
-                                showImagePickerDialog = false
-                                galleryLauncher.launch("image/*")
-                            },
-                            onCameraClick = {
-                                showImagePickerDialog = false
-                                cameraLauncher.launch()
-                            }
                         )
                     }
 

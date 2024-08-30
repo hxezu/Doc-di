@@ -1,5 +1,9 @@
 package com.example.doc_di.etc
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -8,13 +12,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.chatbot.ChatListScreen
+import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.pillsearch.PillsSearchRepositoryImpl
-import com.example.doc_di.domain.pillsearch.RetrofitInstance
 import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.Home
+import com.example.doc_di.home.ModifyLogoutAccountDelete
 import com.example.doc_di.home.Profile
-import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.ResetPage
+import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.management.addmedication.AddMedicationScreenUI
 import com.example.doc_di.management.addschedule.AddScheduleScreenUI
@@ -29,6 +34,7 @@ import com.example.doc_di.searchresult.PillInformation
 import com.example.doc_di.searchresult.PillInformationViewModel
 import com.example.doc_di.searchresult.SearchResult
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun NaviGraph(navController: NavHostController) {
 
@@ -61,6 +67,24 @@ fun NaviGraph(navController: NavHostController) {
 
         composable(route = Routes.appointmentSchedule.route) {
             AppointmentSchedule(navController = navController, btmBarViewModel = btmBarViewModel)
+        }
+
+        composable(
+            route = Routes.modifyLogoutAccountDelete.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                )
+            }
+        ) {
+            ModifyLogoutAccountDelete(navController = navController)
         }
 
         composable(route = Routes.profile.route) {

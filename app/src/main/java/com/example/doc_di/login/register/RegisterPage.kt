@@ -1,7 +1,10 @@
 package com.example.doc_di.login.register
 
 import android.annotation.SuppressLint
-import android.widget.Toast
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,79 +12,58 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.doc_di.domain.model.JoinDTO
-import com.example.doc_di.domain.pillsearch.RetrofitInstance
-import com.example.doc_di.etc.Routes
+import com.example.doc_di.domain.RetrofitInstance
+import com.example.doc_di.domain.register.RegisterImpl
 import com.example.doc_di.login.GradientButton
-import com.example.doc_di.login.register.registerinfo.RegisterBirthdate
-import com.example.doc_di.login.register.registerinfo.RegisterBloodType
 import com.example.doc_di.login.register.registerinfo.RegisterEmail
-import com.example.doc_di.login.register.registerinfo.RegisterHeightWeight
 import com.example.doc_di.login.register.registerinfo.RegisterName
 import com.example.doc_di.login.register.registerinfo.RegisterPassword
-import com.example.doc_di.login.register.registerinfo.RegisterPhone
-import com.example.doc_di.login.register.registerinfo.RegisterSex
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
+@RequiresApi(Build.VERSION_CODES.P)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun RegisterPage(navController: NavController) {
+    val registerImpl = RegisterImpl(RetrofitInstance.registerApi)
 
     val name = rememberSaveable { mutableStateOf("") }
     val email = rememberSaveable { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
     val passwordCheck = rememberSaveable { mutableStateOf("") }
-    val phoneNumber = rememberSaveable { mutableStateOf("") }
-    val birthDate = rememberSaveable { mutableStateOf("") }
-    val sex = rememberSaveable { mutableStateOf("") }
-    val height = rememberSaveable { mutableStateOf("") }
-    val weight = rememberSaveable { mutableStateOf("") }
-    val bloodType = rememberSaveable { mutableStateOf("") }
+    val imageUri = remember { mutableStateOf<Uri?>(null) }
+    val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
+    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
 
-    val isAllWritten by remember{
+    val isAllWritten by remember {
         derivedStateOf {
             name.value.isNotEmpty() &&
-            email.value.isNotEmpty()&&
-            password.value.isNotEmpty()&&
-            phoneNumber.value.isNotEmpty()&&
-            birthDate.value.isNotEmpty()&&
-            sex.value.isNotEmpty()&&
-            height.value.isNotEmpty()&&
-            weight.value.isNotEmpty()&&
-            bloodType.value.isNotEmpty()
+                    email.value.isNotEmpty() &&
+                    password.value.isNotEmpty()
         }
     }
 
     val isNameAvailable = rememberSaveable { mutableStateOf(false) }
     val isPasswordAvailable = rememberSaveable { mutableStateOf(false) }
-    val isPhoneNumberAvailable = rememberSaveable { mutableStateOf(false) }
-    val isHeightAvailable = rememberSaveable { mutableStateOf(false) }
-    val isWeightAvailable = rememberSaveable { mutableStateOf(false) }
 
     val isAllAvailable by remember {
         derivedStateOf {
             isNameAvailable.value &&
-            isPasswordAvailable.value &&
-            isPhoneNumberAvailable.value &&
-            isHeightAvailable.value &&
-            isWeightAvailable.value
+                    isPasswordAvailable.value
         }
     }
 
@@ -90,6 +72,7 @@ fun RegisterPage(navController: NavController) {
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = { RegisterTopBar(navController) }
@@ -101,60 +84,27 @@ fun RegisterPage(navController: NavController) {
                 .fillMaxSize()
                 .verticalScroll(scrollState),
         ) {
+            Spacer(modifier = Modifier.weight(2f))
+            ProfileImage(imageUri, imageBitmap, bitmap, context)
             Spacer(modifier = Modifier.weight(1f))
             RegisterName(name, isNameAvailable)
             RegisterEmail(email)
             RegisterPassword(password, passwordCheck, isPasswordAvailable)
-            RegisterPhone(phoneNumber, isPhoneNumberAvailable)
-            RegisterBirthdate(birthDate)
-            RegisterSex(sex)
-            RegisterHeightWeight(height, weight, isHeightAvailable, isWeightAvailable)
-            RegisterBloodType(bloodType)
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(2f))
             GradientButton(
                 onClick = {
-                    if (isAllWritten){
-                        if(isAllAvailable){
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val joinDTO = JoinDTO(
-                                    email = email.value,
-                                    password = password.value,
-                                    name = name.value,
-                                    sex = sex.value,
-                                    birthday = birthDate.value,
-                                    height = height.value.toShort(),
-                                    weight = weight.value.toShort(),
-                                    bloodType = bloodType.value,
-                                    phoneNum = phoneNumber.value
-                                )
-
-                                val response = RetrofitInstance.api.join(joinDTO)
-                                if (response.isSuccessful){
-                                    withContext(Dispatchers.Main){
-                                        Toast.makeText(context, "회워가입 성공", Toast.LENGTH_SHORT).show()
-                                        navController.navigate(Routes.login.route) { navController.popBackStack() }
-                                    }
-                                }
-                                else {
-                                    withContext(Dispatchers.Main){
-                                        Toast.makeText(context, "가입 실패", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            }
-                        }
-                        else{
-                            Toast.makeText(context, "형식에 맞게 다시 입력해주세요.", Toast.LENGTH_SHORT).show()
-                        }
+                    scope.launch {
+                        registerImpl.register(
+                            email.value,
+                            password.value,
+                            name.value,
+                            context,
+                            isAllWritten,
+                            isAllAvailable,
+                            navController,
+                            bitmap
+                        )
                     }
-                    else{
-                        if (isAllAvailable){
-                            Toast.makeText(context, "입력란을 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
-                        }
-                        else{
-                            Toast.makeText(context, "회원 정보를 다시 기입해주세요.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
                 },
                 gradientColors = gradientColor,
                 cornerRadius = cornerRadius,

@@ -42,7 +42,6 @@ import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.search.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -99,7 +98,7 @@ fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
                 modifier = Modifier
                     .size(66.dp)
                     .clickable {
-                        navController.navigate(Routes.profile.route)
+                        navController.navigate(Routes.modifyLogoutAccountDelete.route)
                     }
             )
 
