@@ -5,12 +5,14 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.doc_di.UserViewModel
 import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.pillsearch.PillsSearchRepositoryImpl
@@ -37,6 +39,7 @@ import com.example.doc_di.searchresult.SearchResult
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun NaviGraph(navController: NavHostController) {
+    val context = LocalContext.current
 
     val searchViewModel: SearchViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -46,27 +49,35 @@ fun NaviGraph(navController: NavHostController) {
 
     val pillViewModel: PillInformationViewModel = viewModel()
     val btmBarViewModel: BtmBarViewModel = viewModel()
+    val userViewModel: UserViewModel = viewModel()
+    userViewModel.fetchUser(context) {
+        navController.navigate(Routes.login.route) {
+            popUpTo(Routes.login.route) {
+                inclusive = true
+            }
+        }
+    }
 
     NavHost(navController = navController, startDestination = Routes.login.route) {
 
         composable(Routes.login.route) {
-            LoginPage(navController = navController)
+            LoginPage(navController)
         }
 
         composable(Routes.register.route) {
-            RegisterPage(navController = navController)
+            RegisterPage(navController)
         }
 
         composable(Routes.reset.route) {
-            ResetPage(navController = navController)
+            ResetPage(navController)
         }
 
         composable(route = Routes.home.route) {
-            Home(navController = navController, btmBarViewModel = btmBarViewModel)
+            Home(navController, btmBarViewModel, userViewModel)
         }
 
         composable(route = Routes.appointmentSchedule.route) {
-            AppointmentSchedule(navController = navController, btmBarViewModel = btmBarViewModel)
+            AppointmentSchedule(navController, btmBarViewModel)
         }
 
         composable(
@@ -84,78 +95,55 @@ fun NaviGraph(navController: NavHostController) {
                 )
             }
         ) {
-            ModifyLogoutAccountDelete(navController = navController)
+            ModifyLogoutAccountDelete(navController)
         }
 
         composable(route = Routes.profile.route) {
-            Profile(navController = navController)
+            Profile(navController, userViewModel)
         }
 
         composable(route = Routes.search.route) {
-            Search(
-                navController = navController,
-                searchViewModel = searchViewModel,
-                btmBarViewModel = btmBarViewModel
-            )
+            Search(navController, searchViewModel, btmBarViewModel)
         }
 
         composable(route = Routes.searchMethod.route) {
-            SearchMethod(
-                navController = navController,
-                searchViewModel = searchViewModel,
-                btmBarViewModel = btmBarViewModel
-            )
+            SearchMethod(navController, searchViewModel, btmBarViewModel)
         }
 
         composable(route = Routes.searchResult.route) {
-            SearchResult(
-                navController = navController,
-                btmBarViewModel = btmBarViewModel,
-                searchViewModel = searchViewModel
-            )
+            SearchResult(navController, btmBarViewModel, searchViewModel)
         }
 
         composable(route = Routes.pillInformation.route) {
-            PillInformation(
-                navController = navController,
-                pillViewModel = pillViewModel,
-                btmBarViewModel = btmBarViewModel,
-                searchViewModel = searchViewModel
-            )
+            PillInformation(navController, pillViewModel, btmBarViewModel, searchViewModel)
         }
 
         composable(route = Routes.medicalAppointmentRecord.route) {
-            MedicalAppointmentRecord(
-                navController = navController,
-                btmBarViewModel = btmBarViewModel
-            )
+            MedicalAppointmentRecord(navController, btmBarViewModel)
         }
 
         composable(route = Routes.prescriptionRecord.route) {
-            PrescriptionRecord(navController = navController, btmBarViewModel = btmBarViewModel)
+            PrescriptionRecord(navController, btmBarViewModel)
         }
 
         composable(route = Routes.prescribedMedicineList.route) {
-            PrescribedMedicineList(navController = navController, btmBarViewModel = btmBarViewModel)
+            PrescribedMedicineList(navController, btmBarViewModel)
         }
 
         composable(route = Routes.chatListScreen.route) {
-            ChatListScreen(navController = navController, btmBarViewModel = btmBarViewModel)
+            ChatListScreen(navController, btmBarViewModel)
         }
 
         composable(route = Routes.managementScreen.route) {
-            ManagementScreen(
-                navController = navController,
-                btmBarViewModel = btmBarViewModel
-            )
+            ManagementScreen(navController, btmBarViewModel)
         }
 
         composable(route = Routes.addMedicationScreen.route) {
-            AddMedicationScreenUI(navController = navController, btmBarViewModel = btmBarViewModel)
+            AddMedicationScreenUI(navController, btmBarViewModel)
         }
 
         composable(route = Routes.addScheduleScreen.route) {
-            AddScheduleScreenUI(navController = navController, btmBarViewModel = btmBarViewModel)
+            AddScheduleScreenUI(navController, btmBarViewModel)
         }
     }
 }

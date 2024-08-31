@@ -23,8 +23,8 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,20 +33,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
+import com.example.doc_di.UserViewModel
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.ui.theme.LightBlue
+import com.example.doc_di.ui.theme.Line
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
+fun Home(
+    navController: NavController,
+    btmBarViewModel: BtmBarViewModel,
+    userViewModel: UserViewModel,
+) {
     val greetTextColor = Color(0xFF303437)
     val titleColor = Color(0xFF404446)
     val cardPillColor = Color(0xFF202325)
@@ -59,396 +69,404 @@ fun Home(navController: NavController, btmBarViewModel: BtmBarViewModel) {
     val starColor = Color(0xFFFFC462)
     val cardTextColor = Color(0xFF72777A)
 
+    fun updateBtmBarItem(route: String) {
+        btmBarViewModel.btmNavBarItems.forEach {
+            it.selected = route == it.route
+        }
+    }
+
+    LaunchedEffect(navController) {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.route) {
+                Routes.home.route -> {
+                    updateBtmBarItem(Routes.home.route)
+                }
+
+                Routes.search.route -> {
+                    updateBtmBarItem(Routes.search.route)
+                }
+
+                Routes.chatListScreen.route -> {
+                    updateBtmBarItem(Routes.chatListScreen.route)
+                }
+
+                Routes.managementScreen.route -> {
+                    updateBtmBarItem(Routes.managementScreen.route)
+                }
+            }
+        }
+    }
+
     Scaffold(
-        bottomBar = {
-            BottomNavigationBar(
-                navController = navController,
-                btmBarViewModel = btmBarViewModel
-            )
-        },
+        bottomBar = { BottomNavigationBar(navController, btmBarViewModel) },
         containerColor = Color.Transparent,
     ) {
-
-        fun updateBtmBarItem(route: String) {
-            btmBarViewModel.btmNavBarItems.forEach {
-                it.selected = route == it.route
+        if (userViewModel.userInfo.value == null) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                LinearProgressIndicator(
+                    trackColor = Line,
+                    color = LightBlue,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth(0.8f)
+                )
             }
-        }
-
-        LaunchedEffect(navController) {
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-                when (destination.route) {
-                    Routes.home.route -> {
-                        updateBtmBarItem(Routes.home.route)
-                    }
-
-                    Routes.search.route -> {
-                        updateBtmBarItem(Routes.search.route)
-                    }
-
-                    Routes.chatListScreen.route -> {
-                        updateBtmBarItem(Routes.chatListScreen.route)
-                    }
-
-                    Routes.managementScreen.route -> {
-                        updateBtmBarItem(Routes.managementScreen.route)
-                    }
-                }
-            }
-        }
-
-        Column(
-            verticalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 40.dp, bottom = 106.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.user_image),
-                contentDescription = "프로필",
+        } else {
+            Column(
+                verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
-                    .size(66.dp)
-                    .clickable {
-                        navController.navigate(Routes.modifyLogoutAccountDelete.route)
-                    }
-            )
-
-            Text(
-                text = "안녕하세요,\n김유정님 \uD83D\uDE00",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 32.sp,
-                color = greetTextColor
-            )
-
-            Column {
-                Text(
-                    text = "다가오는 진료 일정",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = titleColor
-                )
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    .fillMaxSize()
+                    .padding(start = 40.dp, bottom = 106.dp, top = 40.dp)
+            ) {
+                Image(
+                    painter = BitmapPainter(userViewModel.userImage.value!!.asImageBitmap()),
+                    contentDescription = "프로필",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                ) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .width(280.dp)
-                        ) {
-                            Card(
-                                onClick = { navController.navigate(Routes.appointmentSchedule.route) },
-                                colors = CardDefaults.cardColors(Color(0xFFF0F0FF)),
-                                elevation = CardDefaults.cardElevation(1.dp),
-                                modifier = Modifier
-                            ) {
-                                Row(
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    modifier = Modifier
-                                        .padding(horizontal = 24.dp, vertical = 20.dp)
-                                ) {
-                                    Column {
-                                        Text(
-                                            text = "조종호 교수",
-                                            color = cardProfessorColor,
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = "오늘 오후 2:45",
-                                            color = treatmentTimeColor,
-                                            fontSize = 12.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(72.dp))
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Default.LocationOn,
-                                                contentDescription = "위치 아이콘",
-                                                tint = locateColor,
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(2.dp))
-                                            Text(
-                                                text = "강남 세브란스 병원",
-                                                color = locateColor,
-                                                fontSize = 12.sp
-                                            )
-                                        }
-                                    }
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Column {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(width = 70.dp, height = 26.dp)
-                                                .clip(shape = RoundedCornerShape(48.dp))
-                                                .background(Color.White)
-                                        ) {
-                                            Text(
-                                                text = "외과",
-                                                color = departmentColor,
-                                                fontSize = 10.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                modifier = Modifier
-                                                    .align(Alignment.Center)
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                            Image(
-                                painter = painterResource(id = R.drawable.doctor_image),
-                                contentDescription = "의사 이미지",
-                                modifier = Modifier
-                                    .size(160.dp)
-                                    .align(Alignment.BottomEnd)
-                                    .offset(x = 4.dp, y = 36.dp)
-                            )
+                        .size(66.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .clickable {
+                            navController.navigate(Routes.modifyLogoutAccountDelete.route)
                         }
-                    }
+                )
 
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .width(280.dp)
-                        ) {
-                            Card(
-                                onClick = { navController.navigate(Routes.appointmentSchedule.route) },
-                                colors = CardDefaults.cardColors(Color(0xFFFFF9F0)),
-                                elevation = CardDefaults.cardElevation(1.dp),
+                Text(
+                    text = "안녕하세요,\n${userViewModel.userInfo.value?.name}님 \uD83D\uDE00",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 32.sp,
+                    color = greetTextColor
+                )
+
+                Column {
+                    Text(
+                        text = "다가오는 진료 일정",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = titleColor
+                    )
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                    ) {
+                        item {
+                            Box(
                                 modifier = Modifier
+                                    .width(280.dp)
                             ) {
-                                Row(
-                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                Card(
+                                    onClick = { navController.navigate(Routes.appointmentSchedule.route) },
+                                    colors = CardDefaults.cardColors(Color(0xFFF0F0FF)),
+                                    elevation = CardDefaults.cardElevation(1.dp),
                                     modifier = Modifier
-                                        .padding(horizontal = 24.dp, vertical = 20.dp)
                                 ) {
-                                    Column {
-                                        Text(
-                                            text = "문일준 교수",
-                                            color = cardProfessorColor,
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = "내일 오전 08:00 AM",
-                                            color = treatmentTimeColor,
-                                            fontSize = 12.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(72.dp))
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Default.LocationOn,
-                                                contentDescription = "위치 아이콘",
-                                                tint = locateColor,
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(2.dp))
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier
+                                            .padding(horizontal = 24.dp, vertical = 20.dp)
+                                    ) {
+                                        Column {
                                             Text(
-                                                text = "강남 세브란스",
-                                                color = locateColor,
+                                                text = "조종호 교수",
+                                                color = cardProfessorColor,
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = "오늘 오후 2:45",
+                                                color = treatmentTimeColor,
                                                 fontSize = 12.sp
                                             )
+                                            Spacer(modifier = Modifier.height(72.dp))
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                    imageVector = Icons.Default.LocationOn,
+                                                    contentDescription = "위치 아이콘",
+                                                    tint = locateColor,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(2.dp))
+                                                Text(
+                                                    text = "강남 세브란스 병원",
+                                                    color = locateColor,
+                                                    fontSize = 12.sp
+                                                )
+                                            }
                                         }
-                                    }
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Column {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(width = 70.dp, height = 26.dp)
-                                                .clip(shape = RoundedCornerShape(48.dp))
-                                                .background(Color.White)
-                                        ) {
-                                            Text(
-                                                text = "WARM-UP",
-                                                color = Color(0xFFA05E03),
-                                                fontSize = 10.sp,
-                                                fontWeight = FontWeight.Bold,
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Column {
+                                            Box(
                                                 modifier = Modifier
-                                                    .align(Alignment.Center)
-                                            )
+                                                    .size(width = 70.dp, height = 26.dp)
+                                                    .clip(shape = RoundedCornerShape(48.dp))
+                                                    .background(Color.White)
+                                            ) {
+                                                Text(
+                                                    text = "외과",
+                                                    color = departmentColor,
+                                                    fontSize = 10.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    modifier = Modifier
+                                                        .align(Alignment.Center)
+                                                )
+                                            }
                                         }
                                     }
                                 }
+                                Image(
+                                    painter = painterResource(id = R.drawable.doctor_image),
+                                    contentDescription = "의사 이미지",
+                                    modifier = Modifier
+                                        .size(160.dp)
+                                        .align(Alignment.BottomEnd)
+                                        .offset(x = 4.dp, y = 36.dp)
+                                )
                             }
-                            Image(
-                                painter = painterResource(id = R.drawable.warm_up_image),
-                                contentDescription = "의사 이미지",
+                        }
+
+                        item {
+                            Box(
                                 modifier = Modifier
-                                    .size(140.dp)
-                                    .align(Alignment.BottomEnd)
-                                    .offset(x = 4.dp, y = 20.dp)
-                            )
+                                    .width(280.dp)
+                            ) {
+                                Card(
+                                    onClick = { navController.navigate(Routes.appointmentSchedule.route) },
+                                    colors = CardDefaults.cardColors(Color(0xFFFFF9F0)),
+                                    elevation = CardDefaults.cardElevation(1.dp),
+                                    modifier = Modifier
+                                ) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier
+                                            .padding(horizontal = 24.dp, vertical = 20.dp)
+                                    ) {
+                                        Column {
+                                            Text(
+                                                text = "문일준 교수",
+                                                color = cardProfessorColor,
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = "내일 오전 08:00 AM",
+                                                color = treatmentTimeColor,
+                                                fontSize = 12.sp
+                                            )
+                                            Spacer(modifier = Modifier.height(72.dp))
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                    imageVector = Icons.Default.LocationOn,
+                                                    contentDescription = "위치 아이콘",
+                                                    tint = locateColor,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(2.dp))
+                                                Text(
+                                                    text = "강남 세브란스",
+                                                    color = locateColor,
+                                                    fontSize = 12.sp
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Column {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(width = 70.dp, height = 26.dp)
+                                                    .clip(shape = RoundedCornerShape(48.dp))
+                                                    .background(Color.White)
+                                            ) {
+                                                Text(
+                                                    text = "WARM-UP",
+                                                    color = Color(0xFFA05E03),
+                                                    fontSize = 10.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    modifier = Modifier
+                                                        .align(Alignment.Center)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                Image(
+                                    painter = painterResource(id = R.drawable.warm_up_image),
+                                    contentDescription = "의사 이미지",
+                                    modifier = Modifier
+                                        .size(140.dp)
+                                        .align(Alignment.BottomEnd)
+                                        .offset(x = 4.dp, y = 20.dp)
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            Column {
-                Text(
-                    text = "복용 알림",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = titleColor
-                )
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                ) {
-                    item {
-                        Card(
-                            onClick = {
-                                btmBarViewModel.btmNavBarItems[0].selected = false
-                                btmBarViewModel.btmNavBarItems[1].selected = true
-                                /* TODO 혜주가 나중에 복용알림 리스트 뷰모델에 받으면 연결*/
-                                navController.navigate(Routes.pillInformation.route)
-                            },
-                            colors = CardDefaults.cardColors(Color.White),
-                            elevation = CardDefaults.cardElevation(1.dp),
-                            modifier = Modifier
-                                .width(180.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(24.dp)
+                Column {
+                    Text(
+                        text = "복용 알림",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = titleColor
+                    )
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                    ) {
+                        item {
+                            Card(
+                                onClick = {
+                                    btmBarViewModel.btmNavBarItems[0].selected = false
+                                    btmBarViewModel.btmNavBarItems[1].selected = true
+                                    /* TODO 혜주가 나중에 복용알림 리스트 뷰모델에 받으면 연결*/
+                                    navController.navigate(Routes.pillInformation.route)
+                                },
+                                colors = CardDefaults.cardColors(Color.White),
+                                elevation = CardDefaults.cardElevation(1.dp),
+                                modifier = Modifier
+                                    .width(180.dp)
                             ) {
-                                Text(
-                                    text = "타이레놀",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = cardPillColor
-                                )
-                                Spacer(modifier = Modifier.size(12.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
+                                Column(
+                                    modifier = Modifier.padding(24.dp)
                                 ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.alarm),
-                                        contentDescription = "복용 알람 아이콘",
-                                        tint = alarmColor,
-                                        modifier = Modifier
-                                            .size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "10:00 AM",
-                                        color = cardTextColor
+                                        text = "타이레놀",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp,
+                                        color = cardPillColor
                                     )
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.pin),
-                                        contentDescription = "핀 아이콘",
-                                        tint = pinColor,
-                                        modifier = Modifier
-                                            .size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "주로 그람양...",
-                                        color = cardTextColor
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Star,
-                                        contentDescription = "평점 아이콘",
-                                        tint = starColor,
-                                        modifier = Modifier
-                                            .size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "5.0",
-                                        color = cardTextColor
-                                    )
+                                    Spacer(modifier = Modifier.size(12.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.alarm),
+                                            contentDescription = "복용 알람 아이콘",
+                                            tint = alarmColor,
+                                            modifier = Modifier
+                                                .size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "10:00 AM",
+                                            color = cardTextColor
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.pin),
+                                            contentDescription = "핀 아이콘",
+                                            tint = pinColor,
+                                            modifier = Modifier
+                                                .size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "주로 그람양...",
+                                            color = cardTextColor
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Star,
+                                            contentDescription = "평점 아이콘",
+                                            tint = starColor,
+                                            modifier = Modifier
+                                                .size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "5.0",
+                                            color = cardTextColor
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    item {
-                        Card(
-                            onClick = {
-                                btmBarViewModel.btmNavBarItems[0].selected = false
-                                btmBarViewModel.btmNavBarItems[1].selected = true
-                                navController.navigate(Routes.pillInformation.route)
-                            },
-                            colors = CardDefaults.cardColors(Color.White),
-                            elevation = CardDefaults.cardElevation(1.dp),
-                            modifier = Modifier
-                                .width(180.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(24.dp)
+                        item {
+                            Card(
+                                onClick = {
+                                    btmBarViewModel.btmNavBarItems[0].selected = false
+                                    btmBarViewModel.btmNavBarItems[1].selected = true
+                                    navController.navigate(Routes.pillInformation.route)
+                                },
+                                colors = CardDefaults.cardColors(Color.White),
+                                elevation = CardDefaults.cardElevation(1.dp),
+                                modifier = Modifier
+                                    .width(180.dp)
                             ) {
-                                Text(
-                                    text = "오메가 3",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
-                                    color = cardPillColor
-                                )
-                                Spacer(modifier = Modifier.size(12.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
+                                Column(
+                                    modifier = Modifier.padding(24.dp)
                                 ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.alarm),
-                                        contentDescription = "복용 알람 아이콘",
-                                        tint = alarmColor,
-                                        modifier = Modifier
-                                            .size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "08:00 PM",
-                                        color = cardTextColor
+                                        text = "오메가 3",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp,
+                                        color = cardPillColor
                                     )
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.pin),
-                                        contentDescription = "핀 아이콘",
-                                        tint = pinColor,
-                                        modifier = Modifier
-                                            .size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "해열제",
-                                        color = cardTextColor
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Star,
-                                        contentDescription = "평점 아이콘",
-                                        tint = starColor,
-                                        modifier = Modifier
-                                            .size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "5.0",
-                                        color = cardTextColor
-                                    )
+                                    Spacer(modifier = Modifier.size(12.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.alarm),
+                                            contentDescription = "복용 알람 아이콘",
+                                            tint = alarmColor,
+                                            modifier = Modifier
+                                                .size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "08:00 PM",
+                                            color = cardTextColor
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.pin),
+                                            contentDescription = "핀 아이콘",
+                                            tint = pinColor,
+                                            modifier = Modifier
+                                                .size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "해열제",
+                                            color = cardTextColor
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Star,
+                                            contentDescription = "평점 아이콘",
+                                            tint = starColor,
+                                            modifier = Modifier
+                                                .size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "5.0",
+                                            color = cardTextColor
+                                        )
+                                    }
                                 }
                             }
                         }
