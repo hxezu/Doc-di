@@ -16,8 +16,8 @@ import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.pillsearch.PillsSearchRepositoryImpl
 import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.Home
-import com.example.doc_di.home.ModifyLogoutAccountDelete
-import com.example.doc_di.home.Profile
+import com.example.doc_di.home.account_manage.ModifyLogoutAccountDelete
+import com.example.doc_di.home.account_manage.modify_profile.Profile
 import com.example.doc_di.login.ResetPage
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage

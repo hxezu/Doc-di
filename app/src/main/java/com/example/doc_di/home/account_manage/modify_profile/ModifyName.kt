@@ -1,12 +1,7 @@
-package com.example.doc_di.login.register.registerinfo
-
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -16,15 +11,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.doc_di.ui.theme.MainBlue
 
 @Composable
-fun RegisterName(name: MutableState<String>, isNameAvailable: MutableState<Boolean>) {
+fun ModifyName(name: MutableState<String>, isNameAvailable: MutableState<Boolean>) {
     var userNameError by rememberSaveable { mutableStateOf<String?>(null) }
     val nameRegex = "^[가-힣a-zA-Z]{1,10}$".toRegex()
+
+    val labelSize = 14.sp
+    val labelColor = Color(0xFF747F9E)
 
     OutlinedTextField(
         value = name.value,
@@ -37,20 +36,19 @@ fun RegisterName(name: MutableState<String>, isNameAvailable: MutableState<Boole
                 }
                 !nameRegex.matches(name.value) -> {
                     isNameAvailable.value = false
-                    "영문, 한글로만 10자 이내로 기재해주세요."
+                    "영문, 한글만 10자 이내로 기재해주세요."
                 }
                 else -> {
                     isNameAvailable.value = true
                     null
                 }
-            }
-        },
-        shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
+            }},
         label = {
             Text(
-                "이름",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelMedium,
+                text = "이름",
+                fontSize = labelSize,
+                fontWeight = FontWeight.Bold,
+                color = labelColor,
             )
         },
         placeholder = { Text(text = "영문, 한글 10자 이내로 기재") },
@@ -58,15 +56,12 @@ fun RegisterName(name: MutableState<String>, isNameAvailable: MutableState<Boole
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text
         ),
+        singleLine = true,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
             cursorColor = MainBlue
         ),
-        singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth(0.8f)
-            .padding(top = 4.dp)
+        modifier = Modifier.fillMaxWidth(0.9f)
     )
     if (!userNameError.isNullOrEmpty()) {
         Text(text = userNameError!!, color = Color.Red)

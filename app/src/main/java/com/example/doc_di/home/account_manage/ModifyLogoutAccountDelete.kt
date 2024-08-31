@@ -1,4 +1,4 @@
-package com.example.doc_di.home
+package com.example.doc_di.home.account_manage
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
