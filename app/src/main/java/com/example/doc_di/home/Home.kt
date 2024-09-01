@@ -1,9 +1,9 @@
 package com.example.doc_di.home
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +24,6 @@ import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,9 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -45,9 +41,8 @@ import com.example.doc_di.R
 import com.example.doc_di.UserViewModel
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.etc.LoadingScreen
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.ui.theme.LightBlue
-import com.example.doc_di.ui.theme.Line
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -57,7 +52,6 @@ fun Home(
     btmBarViewModel: BtmBarViewModel,
     userViewModel: UserViewModel,
 ) {
-    val greetTextColor = Color(0xFF303437)
     val titleColor = Color(0xFF404446)
     val cardPillColor = Color(0xFF202325)
     val cardProfessorColor = Color(0xFF202325)
@@ -78,22 +72,17 @@ fun Home(
     LaunchedEffect(navController) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.route) {
-                Routes.home.route -> {
-                    updateBtmBarItem(Routes.home.route)
-                }
-
-                Routes.search.route -> {
-                    updateBtmBarItem(Routes.search.route)
-                }
-
-                Routes.chatListScreen.route -> {
-                    updateBtmBarItem(Routes.chatListScreen.route)
-                }
-
-                Routes.managementScreen.route -> {
-                    updateBtmBarItem(Routes.managementScreen.route)
-                }
+                Routes.home.route -> { updateBtmBarItem(Routes.home.route) }
+                Routes.search.route -> { updateBtmBarItem(Routes.search.route) }
+                Routes.chatListScreen.route -> { updateBtmBarItem(Routes.chatListScreen.route) }
+                Routes.managementScreen.route -> { updateBtmBarItem(Routes.managementScreen.route) }
             }
+        }
+    }
+
+    BackHandler {
+        if (navController.previousBackStackEntry?.destination?.route == null) {
+            System.exit(0)
         }
     }
 
@@ -102,15 +91,7 @@ fun Home(
         containerColor = Color.Transparent,
     ) {
         if (userViewModel.userInfo.value == null) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                LinearProgressIndicator(
-                    trackColor = Line,
-                    color = LightBlue,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxWidth(0.8f)
-                )
-            }
+            LoadingScreen()
         } else {
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -118,26 +99,7 @@ fun Home(
                     .fillMaxSize()
                     .padding(start = 40.dp, bottom = 106.dp, top = 40.dp)
             ) {
-                Image(
-                    painter = BitmapPainter(userViewModel.userImage.value!!.asImageBitmap()),
-                    contentDescription = "프로필",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(66.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .clickable {
-                            navController.navigate(Routes.modifyLogoutAccountDelete.route)
-                        }
-                )
-
-                Text(
-                    text = "안녕하세요,\n${userViewModel.userInfo.value?.name}님 \uD83D\uDE00",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 32.sp,
-                    color = greetTextColor
-                )
-
+                HomeGreeting(navController, userViewModel)
                 Column {
                     Text(
                         text = "다가오는 진료 일정",

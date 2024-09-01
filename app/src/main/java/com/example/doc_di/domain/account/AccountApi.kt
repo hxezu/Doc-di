@@ -7,11 +7,15 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Query
 
 interface AccountApi {
+    @POST("reissue")
+    suspend fun reissueToken(): Response<ResponseBody>
+
     @GET("user/find")
     suspend fun getUserInfo(
         @Query("email") email: String,

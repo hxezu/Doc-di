@@ -41,7 +41,12 @@ class LoginImpl(private val loginApi: LoginApi) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
             }
-            navController.navigate(Routes.home.route)
+            navController.navigate(Routes.home.route){
+                popUpTo(navController.graph.startDestinationId){
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
             loginCheck.value = false
         } else {
             withContext(Dispatchers.Main) {

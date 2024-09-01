@@ -11,6 +11,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.account.AccountDTO
 import com.example.doc_di.login.loginpage.getEncryptedSharedPreferences
+import com.example.doc_di.login.loginpage.saveAccessToken
+import com.example.doc_di.login.loginpage.saveRefreshToken
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import kotlinx.coroutines.launch
@@ -38,42 +40,39 @@ class UserViewModel : ViewModel() {
                         Log.d("UserViewModelInfo", "access:$accessToken, email:$email")
                         return@launch
                     }
-                    val userInfoResponse = RetrofitInstance.accountApi.getUserInfo(email, accessToken)
 
+                    val userInfoResponse = RetrofitInstance.accountApi.getUserInfo(email, accessToken)
                     if (userInfoResponse.isSuccessful) {
                         _userInfo.postValue(userInfoResponse.body()!!.data)
-                    } else if (userInfoResponse.code() == 401) {
-//                        var refreshToken = sharedPreferences.getString("refresh_token", null)
-//                        if (!refreshToken.isNullOrEmpty()) {
-//                            val refreshResponse =
-//                                RetrofitInstance.accountApi.getAccessRefreshToken()
-//                            if (refreshResponse.isSuccessful) {
-//                                val newAccessToken = refreshResponse.headers()["access"]
-//                                newAccessToken?.let {
-//                                    saveAccessToken(context, it)
-//                                }
-//
-//                                val retryResponse =
-//                                    RetrofitInstance.gsonApi.getUserInfo("Bearer $newAccessToken")
-//                                if (retryResponse.isSuccessful) {
-//                                    _userInfo.postValue(retryResponse.body())
-//                                }
-//
-//                                val cookie = response.headers()["Set-Cookie"]
-//                                cookie?.split(";")?.forEach { cookie ->
-//                                    val cookiePair = cookie.split("=")
-//                                    if (cookiePair[0] == "refresh") {
-//                                        refreshToken = cookiePair[1].trim()
-//                                    }
-//                                }
-//                                saveRefreshToken(context, refreshToken!!)
-//                            } else {
-//                                reLogin()
-//                            }
-//                        }
-
                     }
+                    else if (userInfoResponse.code() == 401) { // 만료된 경우
+                        var refreshToken = sharedPreferences.getString("refresh_token", null)
+                        if (!refreshToken.isNullOrEmpty()) {
+                            val refreshResponse = RetrofitInstance.accountApi.reissueToken()
+                            if (refreshResponse.isSuccessful) {
+                                val newAccessToken = refreshResponse.headers()["access"]
+                                newAccessToken?.let {
+                                    saveAccessToken(context, it)
+                                }
 
+                                val retryResponse = RetrofitInstance.accountApi.getUserInfo(email, newAccessToken!!)
+                                if (retryResponse.isSuccessful) {
+                                    _userInfo.postValue(retryResponse.body()!!.data)
+                                }
+
+                                val cookie = refreshResponse.headers()["Set-Cookie"]
+                                cookie?.split(";")?.forEach { cookie ->
+                                    val cookiePair = cookie.split("=")
+                                    if (cookiePair[0] == "refresh") {
+                                        refreshToken = cookiePair[1].trim()
+                                    }
+                                }
+                                saveRefreshToken(context, refreshToken!!)
+                            } else {
+                                reLogin()
+                            }
+                        }
+                    }
                     else{
                         reLogin()
                     }
@@ -83,34 +82,34 @@ class UserViewModel : ViewModel() {
                         val bitmap = BitmapFactory.decodeStream(imageResponse.body()?.byteStream())
                         _userImage.postValue(bitmap)
                     } else if (imageResponse.code() == 401) {
-                        //                        var refreshToken = sharedPreferences.getString("refresh_token", null)
-//                        if (!refreshToken.isNullOrEmpty()) {
-//                            val refreshResponse =
-//                                RetrofitInstance.accountApi.getAccessRefreshToken()
-//                            if (refreshResponse.isSuccessful) {
-//                                val newAccessToken = refreshResponse.headers()["access"]
-//                                newAccessToken?.let {
-//                                    saveAccessToken(context, it)
-//                                }
-//
-//                                val retryResponse =
-//                                    RetrofitInstance.gsonApi.getUserInfo("Bearer $newAccessToken")
-//                                if (retryResponse.isSuccessful) {
-//                                    _userInfo.postValue(retryResponse.body())
-//                                }
-//
-//                                val cookie = response.headers()["Set-Cookie"]
-//                                cookie?.split(";")?.forEach { cookie ->
-//                                    val cookiePair = cookie.split("=")
-//                                    if (cookiePair[0] == "refresh") {
-//                                        refreshToken = cookiePair[1].trim()
-//                                    }
-//                                }
-//                                saveRefreshToken(context, refreshToken!!)
-//                            } else {
-//                                reLogin()
-//                            }
-//                        }
+                        var refreshToken = sharedPreferences.getString("refresh_token", null)
+                        if (!refreshToken.isNullOrEmpty()) {
+                            val refreshResponse = RetrofitInstance.accountApi.reissueToken()
+                            if (refreshResponse.isSuccessful) {
+                                val newAccessToken = refreshResponse.headers()["access"]
+                                newAccessToken?.let {
+                                    saveAccessToken(context, it)
+                                }
+
+                                val retryResponse = RetrofitInstance.accountApi
+                                    .getUserImage("profile/${email}.jpg", newAccessToken!!)
+                                if (retryResponse.isSuccessful) {
+                                    val bitmap = BitmapFactory.decodeStream(imageResponse.body()?.byteStream())
+                                    _userImage.postValue(bitmap)
+                                }
+
+                                val cookie = refreshResponse.headers()["Set-Cookie"]
+                                cookie?.split(";")?.forEach { cookie ->
+                                    val cookiePair = cookie.split("=")
+                                    if (cookiePair[0] == "refresh") {
+                                        refreshToken = cookiePair[1].trim()
+                                    }
+                                }
+                                saveRefreshToken(context, refreshToken!!)
+                            } else {
+                                reLogin()
+                            }
+                        }
                     }
                     else{
                         reLogin()
