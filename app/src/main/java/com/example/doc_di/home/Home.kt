@@ -43,6 +43,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.LoadingScreen
 import com.example.doc_di.etc.Routes
+import kotlin.system.exitProcess
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -82,7 +83,7 @@ fun Home(
 
     BackHandler {
         if (navController.previousBackStackEntry?.destination?.route == null) {
-            System.exit(0)
+            exitProcess(0)
         }
     }
 

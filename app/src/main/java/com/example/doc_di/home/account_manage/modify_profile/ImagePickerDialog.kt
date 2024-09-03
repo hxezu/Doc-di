@@ -1,4 +1,4 @@
-package com.example.doc_di.home
+package com.example.doc_di.home.account_manage.modify_profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

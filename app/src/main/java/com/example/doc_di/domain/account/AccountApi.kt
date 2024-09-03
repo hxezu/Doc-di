@@ -14,7 +14,12 @@ import retrofit2.http.Query
 
 interface AccountApi {
     @POST("reissue")
-    suspend fun reissueToken(): Response<ResponseBody>
+    suspend fun reissueToken(): Response<Unit>
+
+    @POST("logout")
+    suspend fun logout(
+        @Header("access") accessToken: String
+    ): Response<Unit>
 
     @GET("user/find")
     suspend fun getUserInfo(
@@ -33,5 +38,7 @@ interface AccountApi {
     suspend fun modifyProfile(
         @Part userDto: MultipartBody.Part,
         @Part file: MultipartBody.Part,
+        @Header("access") accessToken: String
     ): Response<ServerResponse<AccountDTO>>
+
 }

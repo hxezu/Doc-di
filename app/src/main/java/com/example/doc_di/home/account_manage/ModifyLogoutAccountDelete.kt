@@ -10,16 +10,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.doc_di.UserViewModel
+import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.etc.GoBack
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.login.loginpage.removeAccessToken
+import com.example.doc_di.login.loginpage.removeRefreshToken
+import kotlinx.coroutines.launch
 
 @Composable
-fun ModifyLogoutAccountDelete(navController: NavController) {
+fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserViewModel) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
@@ -46,8 +55,19 @@ fun ModifyLogoutAccountDelete(navController: NavController) {
                 .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 4.dp)
                 .clickable {
-                    navController.navigate(Routes.login.route)
-                    /* TODO 서버와 연동하여 계정 로그아웃, 유저의 액세스 리프레쉬 없애고 백에는 이메일, 리프레쉬 토큰 전달하여 서버의 리프레쉬 토큰 삭제 */
+                    scope.launch {
+                        val accessToken = userViewModel.checkAccessAndReissue(context, navController)
+                        val logoutResponse = RetrofitInstance.accountApi.logout(accessToken!!)
+                        if (logoutResponse.isSuccessful){
+                            removeAccessToken(context)
+                            removeRefreshToken(context)
+                            navController.navigate(Routes.login.route) {
+                                popUpTo(Routes.login.route) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    }
                 }
         )
         Divider(color = Color.LightGray)

@@ -16,10 +16,10 @@ import com.example.doc_di.UserViewModel
 import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.pillsearch.PillsSearchRepositoryImpl
-import com.example.doc_di.home.AppointmentSchedule
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.account_manage.ModifyLogoutAccountDelete
 import com.example.doc_di.home.account_manage.modify_profile.Profile
+import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
 import com.example.doc_di.login.ResetPage
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
@@ -50,13 +50,7 @@ fun NaviGraph(navController: NavHostController) {
     val pillViewModel: PillInformationViewModel = viewModel()
     val btmBarViewModel: BtmBarViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
-    userViewModel.fetchUser(context) {
-        navController.navigate(Routes.login.route) {
-            popUpTo(Routes.login.route) {
-                inclusive = true
-            }
-        }
-    }
+    userViewModel.fetchUser(context, navController)
 
     NavHost(navController = navController, startDestination = Routes.login.route) {
 
@@ -95,7 +89,7 @@ fun NaviGraph(navController: NavHostController) {
                 )
             }
         ) {
-            ModifyLogoutAccountDelete(navController)
+            ModifyLogoutAccountDelete(navController, userViewModel)
         }
 
         composable(route = Routes.profile.route) {

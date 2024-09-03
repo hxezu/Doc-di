@@ -31,6 +31,7 @@ class AccountImpl(private val accountApi: AccountApi) {
         bitmap: MutableState<Bitmap?>,
         userViewModel: UserViewModel,
     ) {
+        val accessToken = userViewModel.checkAccessAndReissue(context, navController)
         if (isAllWritten && isAllAvailable) {
             CoroutineScope(Dispatchers.IO).launch {
                 val accountDTO = AccountDTO(
@@ -51,13 +52,9 @@ class AccountImpl(private val accountApi: AccountApi) {
                 val requestFile = RequestBody.create("image/jpeg".toMediaTypeOrNull(), file)
                 val filePart = MultipartBody.Part.createFormData("file", file.name, requestFile)
 
-                val modifyResponse = accountApi.modifyProfile(accountPart, filePart)
+                val modifyResponse = accountApi.modifyProfile(accountPart, filePart, accessToken!!)
                 if (modifyResponse.isSuccessful) {
-                    userViewModel.fetchUser(context) {
-                        navController.navigate(Routes.login.route) {
-                            popUpTo(Routes.login.route) { inclusive = true }
-                        }
-                    }
+                    userViewModel.fetchUser(context, navController)
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "프로필 수정 성공", Toast.LENGTH_SHORT).show()
                         navController.navigate(Routes.home.route) {

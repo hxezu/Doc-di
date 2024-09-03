@@ -55,5 +55,4 @@ class LoginImpl(private val loginApi: LoginApi) {
             loginCheck.value = true
         }
     }
-
 }

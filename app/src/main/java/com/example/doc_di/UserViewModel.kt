@@ -3,13 +3,14 @@ package com.example.doc_di
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.account.AccountDTO
+import com.example.doc_di.etc.Routes
 import com.example.doc_di.login.loginpage.getEncryptedSharedPreferences
 import com.example.doc_di.login.loginpage.saveAccessToken
 import com.example.doc_di.login.loginpage.saveRefreshToken
@@ -17,6 +18,7 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import kotlinx.coroutines.launch
 import java.security.SignatureException
+import java.util.Date
 
 class UserViewModel : ViewModel() {
     val secretKey =
@@ -28,50 +30,24 @@ class UserViewModel : ViewModel() {
     private val _userImage = MutableLiveData<Bitmap?>()
     val userImage: LiveData<Bitmap?> get() = _userImage
 
-    fun fetchUser(context: Context, reLogin: () -> Unit) {
+    fun fetchUser(context: Context, navController: NavController) {
         viewModelScope.launch {
-            try {
-                val sharedPreferences = getEncryptedSharedPreferences(context)
-                val accessToken = sharedPreferences.getString("access_token", null)
-
-                if (!accessToken.isNullOrEmpty()) {
-                    val email = getEmailFromToken(accessToken, secretKey)
-                    if (email == null) {
-                        Log.d("UserViewModelInfo", "access:$accessToken, email:$email")
-                        return@launch
+            val reLogin = {
+                navController.navigate(Routes.login.route) {
+                    popUpTo(Routes.login.route) {
+                        inclusive = true
                     }
+                }
+            }
+
+            try {
+                val accessToken = checkAccessAndReissue(context, navController)
+                if (accessToken != null) {
+                    val email = getEmailFromToken(accessToken) ?: return@launch
 
                     val userInfoResponse = RetrofitInstance.accountApi.getUserInfo(email, accessToken)
                     if (userInfoResponse.isSuccessful) {
                         _userInfo.postValue(userInfoResponse.body()!!.data)
-                    }
-                    else if (userInfoResponse.code() == 401) { // 만료된 경우
-                        var refreshToken = sharedPreferences.getString("refresh_token", null)
-                        if (!refreshToken.isNullOrEmpty()) {
-                            val refreshResponse = RetrofitInstance.accountApi.reissueToken()
-                            if (refreshResponse.isSuccessful) {
-                                val newAccessToken = refreshResponse.headers()["access"]
-                                newAccessToken?.let {
-                                    saveAccessToken(context, it)
-                                }
-
-                                val retryResponse = RetrofitInstance.accountApi.getUserInfo(email, newAccessToken!!)
-                                if (retryResponse.isSuccessful) {
-                                    _userInfo.postValue(retryResponse.body()!!.data)
-                                }
-
-                                val cookie = refreshResponse.headers()["Set-Cookie"]
-                                cookie?.split(";")?.forEach { cookie ->
-                                    val cookiePair = cookie.split("=")
-                                    if (cookiePair[0] == "refresh") {
-                                        refreshToken = cookiePair[1].trim()
-                                    }
-                                }
-                                saveRefreshToken(context, refreshToken!!)
-                            } else {
-                                reLogin()
-                            }
-                        }
                     }
                     else{
                         reLogin()
@@ -81,35 +57,6 @@ class UserViewModel : ViewModel() {
                     if (imageResponse.isSuccessful) {
                         val bitmap = BitmapFactory.decodeStream(imageResponse.body()?.byteStream())
                         _userImage.postValue(bitmap)
-                    } else if (imageResponse.code() == 401) {
-                        var refreshToken = sharedPreferences.getString("refresh_token", null)
-                        if (!refreshToken.isNullOrEmpty()) {
-                            val refreshResponse = RetrofitInstance.accountApi.reissueToken()
-                            if (refreshResponse.isSuccessful) {
-                                val newAccessToken = refreshResponse.headers()["access"]
-                                newAccessToken?.let {
-                                    saveAccessToken(context, it)
-                                }
-
-                                val retryResponse = RetrofitInstance.accountApi
-                                    .getUserImage("profile/${email}.jpg", newAccessToken!!)
-                                if (retryResponse.isSuccessful) {
-                                    val bitmap = BitmapFactory.decodeStream(imageResponse.body()?.byteStream())
-                                    _userImage.postValue(bitmap)
-                                }
-
-                                val cookie = refreshResponse.headers()["Set-Cookie"]
-                                cookie?.split(";")?.forEach { cookie ->
-                                    val cookiePair = cookie.split("=")
-                                    if (cookiePair[0] == "refresh") {
-                                        refreshToken = cookiePair[1].trim()
-                                    }
-                                }
-                                saveRefreshToken(context, refreshToken!!)
-                            } else {
-                                reLogin()
-                            }
-                        }
                     }
                     else{
                         reLogin()
@@ -121,7 +68,77 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    private fun getEmailFromToken(token: String, secretKey: String): String? {
+    suspend fun checkAccessAndReissue(context: Context, navController: NavController): String? {
+        val reLogin = {
+            navController.navigate(Routes.login.route) {
+                popUpTo(Routes.login.route) {
+                    inclusive = true
+                }
+            }
+        }
+
+        val sharedPreferences = getEncryptedSharedPreferences(context)
+        var accessToken = sharedPreferences.getString("access_token", null)
+        var refreshToken = sharedPreferences.getString("refresh_token", null)
+        if (accessToken.isNullOrEmpty()) {
+            reLogin()
+            return null
+        }
+
+        val email = getEmailFromToken(accessToken)
+        if (email == null) {
+            reLogin()
+            return null
+        }
+
+        if (!isTokenExpired(accessToken)) {
+            return accessToken
+        } else if (!refreshToken.isNullOrEmpty()) {
+            val refreshResponse = RetrofitInstance.accountApi.reissueToken()
+            if (refreshResponse.isSuccessful) {
+                val newAccessToken = refreshResponse.headers()["access"]
+                newAccessToken?.let {
+                    saveAccessToken(context, it)
+                    accessToken = it
+                }
+
+                val cookie = refreshResponse.headers()["Set-Cookie"]
+                cookie?.split(";")?.forEach { cookie ->
+                    val cookiePair = cookie.split("=")
+                    if (cookiePair[0] == "refresh") {
+                        refreshToken = cookiePair[1].trim()
+                    }
+                }
+                saveRefreshToken(context, refreshToken!!)
+                return accessToken
+            } else {
+                reLogin()
+                return null
+            }
+        } else {
+            reLogin()
+            return null
+        }
+    }
+
+    private fun isTokenExpired(token: String): Boolean {
+        return try {
+            val claims: Claims = Jwts.parser()
+                .setSigningKey(secretKey.toByteArray())
+                .parseClaimsJws(token)
+                .body
+
+            val expiration: Date = claims.expiration
+            expiration.before(Date())
+        } catch (e: SignatureException) {
+            e.printStackTrace()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            true
+        }
+    }
+    private fun getEmailFromToken(token: String): String? {
         return try {
             val claims: Claims = Jwts.parser()
                 .setSigningKey(secretKey.toByteArray()) // JWT 토큰 서명에 사용된 비밀 키

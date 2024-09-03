@@ -1,4 +1,4 @@
-package com.example.doc_di.home
+package com.example.doc_di.home.appointment_schedule
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image

@@ -28,3 +28,13 @@ fun saveRefreshToken(context: Context, token: String) {
     val sharedPreferences = getEncryptedSharedPreferences(context)
     sharedPreferences.edit().putString("refresh_token", token).apply()
 }
+
+fun removeAccessToken(context: Context){
+    val sharedPreferences = getEncryptedSharedPreferences(context)
+    sharedPreferences.edit().remove("access_token").apply()
+}
+
+fun removeRefreshToken(context: Context){
+    val sharedPreferences = getEncryptedSharedPreferences(context)
+    sharedPreferences.edit().remove("refresh_token").apply()
+}
