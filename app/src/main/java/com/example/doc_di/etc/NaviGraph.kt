@@ -39,8 +39,6 @@ import com.example.doc_di.searchresult.SearchResult
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun NaviGraph(navController: NavHostController) {
-    val context = LocalContext.current
-
     val searchViewModel: SearchViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SearchViewModel(PillsSearchRepositoryImpl(RetrofitInstance.api)) as T
@@ -50,12 +48,11 @@ fun NaviGraph(navController: NavHostController) {
     val pillViewModel: PillInformationViewModel = viewModel()
     val btmBarViewModel: BtmBarViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
-    userViewModel.fetchUser(context, navController)
 
     NavHost(navController = navController, startDestination = Routes.login.route) {
 
         composable(Routes.login.route) {
-            LoginPage(navController)
+            LoginPage(navController, userViewModel)
         }
 
         composable(Routes.register.route) {

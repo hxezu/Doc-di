@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import java.security.SignatureException
 import java.util.Date
 
-class UserViewModel : ViewModel() {
+class UserViewModel: ViewModel(){
     val secretKey =
         "af86bed1b346575a174c4026addb078151bd2484be48655c69bb8155f7d3c1f3cafd0bf5f2dab7ad665ce4f9e42df366d421a9dc041d78e377fab127d237b988"
 
@@ -153,5 +153,10 @@ class UserViewModel : ViewModel() {
             e.printStackTrace()
             null
         }
+    }
+
+    fun clearUserData() {
+        _userInfo.postValue(null)
+        _userImage.postValue(null)
     }
 }

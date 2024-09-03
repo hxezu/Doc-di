@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
+import com.example.doc_di.UserViewModel
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.login.LoginImpl
 import com.example.doc_di.etc.Routes
@@ -33,7 +34,7 @@ import com.example.doc_di.login.GradientButton
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginPage(navController: NavController) {
+fun LoginPage(navController: NavController, userViewModel: UserViewModel) {
     val loginImpl = LoginImpl(RetrofitInstance.loginApi)
 
     val email = rememberSaveable { mutableStateOf("") }
@@ -84,7 +85,7 @@ fun LoginPage(navController: NavController) {
                 onClick = {
                     scope.launch {
                         try {
-                            loginImpl.login(email.value, password.value, context, navController, loginCheck)
+                            loginImpl.login(email.value, password.value, context, navController, loginCheck, userViewModel)
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }

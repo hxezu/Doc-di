@@ -59,6 +59,7 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
                         val accessToken = userViewModel.checkAccessAndReissue(context, navController)
                         val logoutResponse = RetrofitInstance.accountApi.logout(accessToken!!)
                         if (logoutResponse.isSuccessful){
+                            userViewModel.clearUserData()
                             removeAccessToken(context)
                             removeRefreshToken(context)
                             navController.navigate(Routes.login.route) {
@@ -77,7 +78,22 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
                 .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 4.dp)
                 .clickable {
-                    /* TODO 서버와 연동하여 계정 삭제 email만 주면 됨 */
+                    scope.launch {
+                        val accessToken = userViewModel.checkAccessAndReissue(context, navController)
+                        if (userViewModel.userInfo.value != null && accessToken != null){
+                            val deleteResponse = RetrofitInstance.accountApi.deleteAccount(userViewModel.userInfo.value!!.email ,accessToken!!)
+                            if (deleteResponse.isSuccessful){
+                                userViewModel.clearUserData()
+                                removeAccessToken(context)
+                                removeRefreshToken(context)
+                                navController.navigate(Routes.login.route) {
+                                    popUpTo(Routes.login.route) {
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
         )
         Divider(color = Color.LightGray)

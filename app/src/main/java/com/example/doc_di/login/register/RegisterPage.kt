@@ -107,7 +107,7 @@ fun RegisterPage(navController: NavController) {
                 gradientColors = gradientColor,
                 cornerRadius = cornerRadius,
                 roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
-                buttonName = "계생 생성"
+                buttonName = "계정 생성"
             )
             Spacer(modifier = Modifier.weight(1f))
         }

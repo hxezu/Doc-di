@@ -4,6 +4,7 @@ import com.example.doc_di.domain.ServerResponse
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -41,4 +42,9 @@ interface AccountApi {
         @Header("access") accessToken: String
     ): Response<ServerResponse<AccountDTO>>
 
+    @DELETE("user/delete")
+    suspend fun deleteAccount(
+        @Query("email") email: String,
+        @Header("access") accessToken: String
+    ): Response<Unit>
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
+import com.example.doc_di.UserViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.login.loginpage.saveAccessToken
 import com.example.doc_di.login.loginpage.saveRefreshToken
@@ -17,6 +18,7 @@ class LoginImpl(private val loginApi: LoginApi) {
         context: Context,
         navController: NavController,
         loginCheck: MutableState<Boolean>,
+        userViewModel: UserViewModel
     ) {
         val loginDTO = LoginDTO(
             username = username,
@@ -37,6 +39,8 @@ class LoginImpl(private val loginApi: LoginApi) {
                 println("refreshToken: $refreshToken")
                 saveRefreshToken(context, refreshToken)
             }
+
+            userViewModel.fetchUser(context, navController)
 
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
