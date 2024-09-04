@@ -10,9 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.doc_di.ui.theme.LightBlue
 import com.example.doc_di.ui.theme.MainBlue
 
 @Composable
@@ -24,18 +26,18 @@ fun EmailTextField(email: MutableState<String>) {
         label = {
             Text(
                 text = "이메일",
-                color = MaterialTheme.colorScheme.primary,
+                color = Color.Black,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
-        placeholder = { Text(text = "이메일") },
+        placeholder = { Text(text = "이메일", color = Color.Black) },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Email
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = LightBlue,
             cursorColor = MainBlue
         ),
         singleLine = true,

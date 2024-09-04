@@ -31,6 +31,7 @@ import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.login.LoginImpl
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.login.GradientButton
+import com.example.doc_di.ui.theme.LightBlue
 import kotlinx.coroutines.launch
 
 @Composable
@@ -100,6 +101,7 @@ fun LoginPage(navController: NavController, userViewModel: UserViewModel) {
             TextButton(onClick = { navController.navigate(Routes.register.route) }) {
                 Text(
                     text = "회원가입",
+                    color = LightBlue,
                     letterSpacing = 1.sp,
                     style = MaterialTheme.typography.labelLarge
                 )
@@ -108,6 +110,7 @@ fun LoginPage(navController: NavController, userViewModel: UserViewModel) {
             TextButton(onClick = { navController.navigate(Routes.reset.route) }) {
                 Text(
                     text = "아이디/비밀번호 찾기",
+                    color = LightBlue,
                     letterSpacing = 1.sp,
                     style = MaterialTheme.typography.labelLarge,
                 )

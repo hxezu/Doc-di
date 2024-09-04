@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.doc_di.login.register.registerinfo.Visibility
 import com.example.doc_di.login.register.registerinfo.VisibilityOff
+import com.example.doc_di.ui.theme.LightBlue
 import com.example.doc_di.ui.theme.MainBlue
 
 @Composable
@@ -36,11 +37,11 @@ fun PasswordTextField(password: MutableState<String>) {
         label = {
             Text(
                 text = "비밀번호",
-                color = MaterialTheme.colorScheme.primary,
+                color = Color.Black,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
-        placeholder = { Text( text = "비밀번호" ) },
+        placeholder = { Text( text = "비밀번호", color = Color.Black ) },
         visualTransformation = if (passwordHidden) PasswordVisualTransformation()
         else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(
@@ -49,7 +50,7 @@ fun PasswordTextField(password: MutableState<String>) {
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = LightBlue,
             cursorColor = MainBlue
         ),
         trailingIcon = {

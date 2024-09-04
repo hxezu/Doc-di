@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.doc_di.ui.theme.LightBlue
 import com.example.doc_di.ui.theme.MainBlue
 
 @Composable
@@ -48,19 +49,19 @@ fun RegisterName(name: MutableState<String>, isNameAvailable: MutableState<Boole
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                "이름",
-                color = MaterialTheme.colorScheme.primary,
+                text = "이름",
+                color = Color.Black,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
-        placeholder = { Text(text = "영문, 한글 10자 이내로 기재") },
+        placeholder = { Text(text = "영문, 한글 10자 이내로 기재", color = Color.Black) },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = LightBlue,
             cursorColor = MainBlue
         ),
         singleLine = true,

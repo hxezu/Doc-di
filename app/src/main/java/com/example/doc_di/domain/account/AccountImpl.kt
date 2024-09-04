@@ -7,6 +7,8 @@ import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
 import com.example.doc_di.UserViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.login.loginpage.removeAccessToken
+import com.example.doc_di.login.loginpage.removeRefreshToken
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +72,46 @@ class AccountImpl(private val accountApi: AccountApi) {
             }
         } else {
             Toast.makeText(context, "모든 정보를 정확히 기입해 주세요.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    suspend fun logoutAccount(
+        context: Context,
+        navController: NavController,
+        userViewModel: UserViewModel
+    ){
+        val accessToken = userViewModel.checkAccessAndReissue(context, navController)
+        val logoutResponse = accountApi.logout(accessToken!!)
+        if (logoutResponse.isSuccessful) {
+            userViewModel.clearUserData()
+            removeAccessToken(context)
+            removeRefreshToken(context)
+            navController.navigate(Routes.login.route) {
+                popUpTo(Routes.login.route) {
+                    inclusive = true
+                }
+            }
+        }
+    }
+
+    suspend fun deleteAccount(
+        context: Context,
+        navController: NavController,
+        userViewModel: UserViewModel
+    ){
+        val accessToken = userViewModel.checkAccessAndReissue(context, navController)
+        if (userViewModel.userInfo.value != null && accessToken != null) {
+            val deleteResponse = accountApi.deleteAccount( userViewModel.userInfo.value!!.email, accessToken)
+            if (deleteResponse.isSuccessful) {
+                userViewModel.clearUserData()
+                removeAccessToken(context)
+                removeRefreshToken(context)
+                navController.navigate(Routes.login.route) {
+                    popUpTo(Routes.login.route) {
+                        inclusive = true
+                    }
+                }
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
+import com.example.doc_di.ui.theme.LightBlue
 import com.example.doc_di.ui.theme.MainBlue
 
 @Composable
@@ -51,7 +52,7 @@ fun ModifyName(name: MutableState<String>, isNameAvailable: MutableState<Boolean
                 color = labelColor,
             )
         },
-        placeholder = { Text(text = "영문, 한글 10자 이내로 기재") },
+        placeholder = { Text(text = "영문, 한글 10자 이내로 기재", color = Color.Black) },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Text
@@ -59,6 +60,7 @@ fun ModifyName(name: MutableState<String>, isNameAvailable: MutableState<Boolean
         singleLine = true,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,
+            unfocusedBorderColor = LightBlue,
             cursorColor = MainBlue
         ),
         modifier = Modifier.fillMaxWidth(0.9f)

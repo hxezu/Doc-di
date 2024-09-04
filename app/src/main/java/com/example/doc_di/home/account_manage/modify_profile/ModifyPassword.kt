@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
 import com.example.doc_di.login.register.registerinfo.Visibility
 import com.example.doc_di.login.register.registerinfo.VisibilityOff
+import com.example.doc_di.ui.theme.LightBlue
 import com.example.doc_di.ui.theme.MainBlue
 
 @Composable
@@ -50,13 +51,14 @@ fun ModifyPassword(
         },
         visualTransformation = if (passwordHidden) PasswordVisualTransformation()
         else VisualTransformation.None,
-        placeholder = { Text(text = "새 비밀번호") },
+        placeholder = { Text(text = "새 비밀번호", color = Color.Black) },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Password
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,
+            unfocusedBorderColor = LightBlue,
             cursorColor = MainBlue
         ),
         trailingIcon = {
@@ -85,13 +87,14 @@ fun ModifyPassword(
         },
         visualTransformation = if (passwordCheckHidden) PasswordVisualTransformation()
         else VisualTransformation.None,
-        placeholder = { Text(text = "새 비밀번호화 동일하게 입력") },
+        placeholder = { Text(text = "새 비밀번호화 동일하게 입력", color =  Color.Black) },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,
+            unfocusedBorderColor = LightBlue,
             cursorColor = MainBlue
         ),
         trailingIcon = {

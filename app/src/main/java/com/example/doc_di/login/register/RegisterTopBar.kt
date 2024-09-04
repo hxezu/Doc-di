@@ -17,7 +17,7 @@ import com.example.doc_di.etc.Routes
 @Composable
 fun RegisterTopBar(navController: NavController) {
     CenterAlignedTopAppBar(
-        title = { Text("회원가입") },
+        title = { Text("회원가입", color = Color.Black) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent // 배경을 투명하게 설정
         ),
@@ -29,6 +29,7 @@ fun RegisterTopBar(navController: NavController) {
             }) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
+                    tint = Color.Black,
                     contentDescription = "뒤로가기"
                 )
             }

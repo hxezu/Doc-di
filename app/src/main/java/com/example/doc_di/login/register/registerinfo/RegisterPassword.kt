@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.doc_di.ui.theme.LightBlue
 import com.example.doc_di.ui.theme.MainBlue
 
 @Composable
@@ -40,11 +41,11 @@ fun RegisterPassword(
         label = {
             Text(
                 text = "비밀번호",
-                color = MaterialTheme.colorScheme.primary,
+                color = Color.Black,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
-        placeholder = { Text(text = "비밀번호") },
+        placeholder = { Text(text = "비밀번호", color = Color.Black) },
         visualTransformation = if (passwordHidden) PasswordVisualTransformation()
         else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(
@@ -53,14 +54,15 @@ fun RegisterPassword(
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = LightBlue,
             cursorColor = MainBlue
         ),
         trailingIcon = {
             IconButton(onClick = { passwordHidden = !passwordHidden }) {
                 Icon(
                     imageVector = if (passwordHidden) Visibility else VisibilityOff,
-                    contentDescription = if (passwordHidden) "Show Password" else "Hide Password"
+                    contentDescription = if (passwordHidden) "Show Password" else "Hide Password",
+                    tint = Color.Black
                 )
             }
         },
@@ -74,11 +76,11 @@ fun RegisterPassword(
         label = {
             Text(
                 text = "비밀번호 확인",
-                color = MaterialTheme.colorScheme.primary,
+                color = Color.Black,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
-        placeholder = { Text(text = "비밀번호와 동일하게 입력") },
+        placeholder = { Text(text = "비밀번호와 동일하게 입력", color = Color.Black) },
         visualTransformation = if (passwordCheckHidden) PasswordVisualTransformation()
         else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(
@@ -87,14 +89,15 @@ fun RegisterPassword(
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = LightBlue,
             cursorColor = MainBlue
         ),
         trailingIcon = {
             IconButton(onClick = { passwordCheckHidden = !passwordCheckHidden }) {
                 Icon(
                     imageVector = if (passwordCheckHidden) Visibility else VisibilityOff,
-                    contentDescription = if (passwordCheckHidden) "Show Password" else "Hide Password"
+                    contentDescription = if (passwordCheckHidden) "Show Password" else "Hide Password",
+                    tint = Color.Black
                 )
             }
         },
