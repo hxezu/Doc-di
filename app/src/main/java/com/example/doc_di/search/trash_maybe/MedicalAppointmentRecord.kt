@@ -1,4 +1,4 @@
-package com.example.doc_di.search
+package com.example.doc_di.search.trash_maybe
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image

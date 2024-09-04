@@ -1,4 +1,4 @@
-package com.example.doc_di.search.searchmethod
+package com.example.doc_di.search.pillsearch.searchmethod.shapesearch
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults

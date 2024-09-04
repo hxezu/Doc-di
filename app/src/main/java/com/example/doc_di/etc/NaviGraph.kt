@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,12 +25,12 @@ import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.management.addmedication.AddMedicationScreenUI
 import com.example.doc_di.management.addschedule.AddScheduleScreenUI
 import com.example.doc_di.management.home.ManagementScreen
-import com.example.doc_di.search.MedicalAppointmentRecord
-import com.example.doc_di.search.PrescribedMedicineList
-import com.example.doc_di.search.PrescriptionRecord
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchViewModel
-import com.example.doc_di.search.searchmethod.SearchMethod
+import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
+import com.example.doc_di.search.trash_maybe.MedicalAppointmentRecord
+import com.example.doc_di.search.trash_maybe.PrescribedMedicineList
+import com.example.doc_di.search.trash_maybe.PrescriptionRecord
 import com.example.doc_di.searchresult.PillInformation
 import com.example.doc_di.searchresult.PillInformationViewModel
 import com.example.doc_di.searchresult.SearchResult
@@ -94,7 +93,7 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.search.route) {
-            Search(navController, searchViewModel, btmBarViewModel)
+            Search(navController, searchViewModel, btmBarViewModel, userViewModel)
         }
 
         composable(route = Routes.searchMethod.route) {

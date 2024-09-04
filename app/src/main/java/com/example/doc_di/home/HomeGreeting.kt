@@ -31,7 +31,7 @@ fun HomeGreeting(navController: NavController, userViewModel: UserViewModel) {
     if (userImage != null && userInfo != null){
         Image(
             painter = BitmapPainter(userViewModel.userImage.value!!.asImageBitmap()),
-            contentDescription = "프로필",
+            contentDescription = "홈 프로필 이미지",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(66.dp)

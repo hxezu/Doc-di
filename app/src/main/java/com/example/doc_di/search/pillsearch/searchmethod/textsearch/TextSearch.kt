@@ -1,4 +1,4 @@
-package com.example.doc_di.search.searchmethod
+package com.example.doc_di.search.pillsearch.searchmethod.textsearch
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -21,7 +21,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,7 +45,7 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
     val howSearchButtonColor = Color(0xFF007AEB)
     val mainSearchColor = Color(0xFF1892FA)
 
-    var nameSearch by remember { mutableStateOf("") }
+    var nameSearch by rememberSaveable { mutableStateOf("") }
     val option = mutableMapOf<String, String>()
 
     fun doSearch() {
@@ -89,6 +89,7 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
             },
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = howSearchButtonColor,
+                cursorColor = howSearchButtonColor,
                 unfocusedBorderColor = howSearchButtonColor
             ),
             shape = RoundedCornerShape(12.dp),
@@ -96,6 +97,7 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
                 imeAction = ImeAction.Search,
                 keyboardType = KeyboardType.Text
             ),
+            singleLine = true,
             keyboardActions = KeyboardActions(onSearch = { doSearch() }),
             modifier = Modifier
                 .fillMaxWidth()
