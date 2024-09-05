@@ -1,4 +1,4 @@
-package com.example.doc_di.searchresult.pillreview
+package com.example.doc_di.search.pillsearch.searchresult.pill_information.contents.pill_review
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -130,6 +130,7 @@ fun PillReviewDialog(
                             onValueChange = { reviewText = it },
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = buttonColor,
+                                cursorColor = buttonColor,
                                 unfocusedBorderColor = buttonColor
                             ),
                             shape = RoundedCornerShape(24.dp),

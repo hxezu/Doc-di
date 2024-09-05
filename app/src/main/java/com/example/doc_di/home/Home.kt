@@ -41,7 +41,7 @@ import com.example.doc_di.R
 import com.example.doc_di.UserViewModel
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
-import com.example.doc_di.etc.LoadingScreen
+import com.example.doc_di.etc.LoadingHomeScreen
 import com.example.doc_di.etc.Routes
 import kotlin.system.exitProcess
 
@@ -92,7 +92,7 @@ fun Home(
         containerColor = Color.Transparent,
     ) {
         if (userViewModel.userInfo.value == null) {
-            LoadingScreen()
+            LoadingHomeScreen()
         } else {
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,

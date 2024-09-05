@@ -28,12 +28,11 @@ import com.example.doc_di.management.home.ManagementScreen
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
+import com.example.doc_di.search.pillsearch.searchresult.SearchResult
+import com.example.doc_di.search.pillsearch.searchresult.pill_information.PillInformation
 import com.example.doc_di.search.trash_maybe.MedicalAppointmentRecord
 import com.example.doc_di.search.trash_maybe.PrescribedMedicineList
 import com.example.doc_di.search.trash_maybe.PrescriptionRecord
-import com.example.doc_di.searchresult.PillInformation
-import com.example.doc_di.searchresult.PillInformationViewModel
-import com.example.doc_di.searchresult.SearchResult
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
@@ -44,7 +43,6 @@ fun NaviGraph(navController: NavHostController) {
         }
     })
 
-    val pillViewModel: PillInformationViewModel = viewModel()
     val btmBarViewModel: BtmBarViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
 
@@ -105,7 +103,7 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.pillInformation.route) {
-            PillInformation(navController, pillViewModel, btmBarViewModel, searchViewModel)
+            PillInformation(navController, btmBarViewModel, searchViewModel)
         }
 
         composable(route = Routes.medicalAppointmentRecord.route) {

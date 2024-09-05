@@ -1,4 +1,4 @@
-package com.example.doc_di.searchresult
+package com.example.doc_di.search.pillsearch.searchresult.pill_information.contents
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.sp
 import com.example.doc_di.search.SearchViewModel
 
 @Composable
-fun PillWarning(searchViewModel: SearchViewModel) {
+fun PillInfo(searchViewModel:SearchViewModel) {
+    val selectedPill = searchViewModel.getSelectedPill()
     val selectedPillInfo = searchViewModel.pillInfo.collectAsState().value
 
     val cardTitleColor = Color(0xFF333333)
@@ -48,66 +49,49 @@ fun PillWarning(searchViewModel: SearchViewModel) {
                     modifier = Modifier
                         .padding(16.dp)
                 ) {
-                    Text(text = "경고", color = cardTitleColor, fontSize = 15.sp)
+                    Text(text = "외형정보", color = cardTitleColor, fontSize = 15.sp)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = if (selectedPillInfo.atpnWarnQesitm != "") selectedPillInfo.atpnWarnQesitm else "- 정보 미제공 -",
+                        text = "성상 : ${if (selectedPill.chart != "") selectedPill.chart else "-"}",
                         color = cardDetailTextColor,
-                        fontSize = 10.sp,
-                        lineHeight = 14.sp
+                        lineHeight = 14.sp,
+                        fontSize = 10.sp
                     )
-                }
-            }
-        }
-
-        item {
-            Card(
-                shape = MaterialTheme.shapes.small,
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier
-                        .padding(16.dp)
-                ) {
-                    Text(text = "주의", color = cardTitleColor, fontSize = 15.sp)
-                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = if(selectedPillInfo.atpnQesitm != "") selectedPillInfo.atpnQesitm else "- 정보 미제공 -",
+                        text = "제형 : ${
+                            when (selectedPill.formCodeName) {
+                                "" -> "-"
+                                "나정" -> "정제"
+                                else -> selectedPill.formCodeName
+                            }
+                        }",
                         color = cardDetailTextColor,
-                        fontSize = 10.sp,
-                        lineHeight = 14.sp
+                        lineHeight = 14.sp,
+                        fontSize = 10.sp
                     )
-                }
-            }
-        }
-
-        item {
-            Card(
-                shape = MaterialTheme.shapes.small,
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier
-                        .padding(16.dp)
-                ) {
                     Text(
-                        text = "부작용",
-                        color = cardTitleColor,
-                        fontSize = 15.sp
+                        text = "모양 : ${if (selectedPill.drugShape != "") selectedPill.drugShape else "-"}",
+                        color = cardDetailTextColor,
+                        lineHeight = 14.sp,
+                        fontSize = 10.sp
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text =if (selectedPillInfo.seQesitm != "") selectedPillInfo.seQesitm else "- 정보 미제공 -",
+                        text = "색상 : ${if (selectedPill.colorClass1 != "") selectedPill.colorClass1 else "-"}, " +
+                                if (selectedPill.colorClass2 != "") selectedPill.colorClass2 else "-",
+                        color = cardDetailTextColor,
+                        lineHeight = 14.sp,
+                        fontSize = 10.sp
+                    )
+                    Text(
+                        text = "분할선 : (앞) ${if (selectedPill.lineFront != "") "있음" else "없음"}, " +
+                                "(뒤) ${if (selectedPill.lineBack != "") "있음" else "없음"}",
+                        color = cardDetailTextColor,
+                        lineHeight = 14.sp,
+                        fontSize = 10.sp
+                    )
+                    Text(
+                        text = "식별표기 : (앞) ${if (selectedPill.printFront != "") selectedPill.printFront else "-"}, " +
+                                "(뒤) ${if (selectedPill.printBack !="") selectedPill.printBack else "-"}",
                         color = cardDetailTextColor,
                         lineHeight = 14.sp,
                         fontSize = 10.sp
@@ -130,14 +114,36 @@ fun PillWarning(searchViewModel: SearchViewModel) {
                     modifier = Modifier
                         .padding(16.dp)
                 ) {
-                    Text(
-                        text = "약물 병용 주의",
-                        color = cardTitleColor,
-                        fontSize = 15.sp
-                    )
+                    Text(text = "효능", color = cardTitleColor, fontSize = 15.sp)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = if(selectedPillInfo.intrcQesitm != "") selectedPillInfo.intrcQesitm  else "- 정보 미제공 -",
+                        text = if (selectedPillInfo.efcyQesitm != "") selectedPillInfo.efcyQesitm else "- 정보 미제공 -",
+                        color = cardDetailTextColor,
+                        lineHeight = 14.sp,
+                        fontSize = 10.sp
+                    )
+                }
+            }
+        }
+
+        item {
+            Card(
+                shape = MaterialTheme.shapes.small,
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .padding(16.dp)
+                ) {
+                    Text(text = "보관 방법", color = cardTitleColor, fontSize = 15.sp)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = if (selectedPillInfo.depositMethodQesitm != "") selectedPillInfo.depositMethodQesitm else "- 정보 미제공 -",
                         color = cardDetailTextColor,
                         lineHeight = 14.sp,
                         fontSize = 10.sp
@@ -147,3 +153,4 @@ fun PillWarning(searchViewModel: SearchViewModel) {
         }
     }
 }
+

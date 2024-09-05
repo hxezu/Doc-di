@@ -1,4 +1,4 @@
-package com.example.doc_di.searchresult
+package com.example.doc_di.search.pillsearch.searchresult.pill_information.contents
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -11,7 +11,7 @@ import com.example.doc_di.ui.theme.LightBlue
 import com.example.doc_di.ui.theme.Line
 
 @Composable
-fun LoadingScreen() {
+fun LoadingHomeScreen() {
     Box(modifier = Modifier.fillMaxSize()) {
         LinearProgressIndicator(
             trackColor = Line,
