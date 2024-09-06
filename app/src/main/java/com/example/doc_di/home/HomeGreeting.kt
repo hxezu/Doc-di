@@ -42,7 +42,7 @@ fun HomeGreeting(navController: NavController, userViewModel: UserViewModel) {
         )
 
         Text(
-            text = "안녕하세요,\n${userViewModel.userInfo.value?.name}님 \uD83D\uDE00",
+            text = "안녕하세요,\n${userViewModel.userInfo.value!!.name}님 \uD83D\uDE00",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             lineHeight = 32.sp,

@@ -14,7 +14,7 @@ import androidx.navigation.compose.composable
 import com.example.doc_di.UserViewModel
 import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.domain.RetrofitInstance
-import com.example.doc_di.domain.pillsearch.PillsSearchRepositoryImpl
+import com.example.doc_di.domain.pill.PillsSearchRepositoryImpl
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.account_manage.ModifyLogoutAccountDelete
 import com.example.doc_di.home.account_manage.modify_profile.Profile
@@ -30,6 +30,7 @@ import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
 import com.example.doc_di.search.pillsearch.searchresult.SearchResult
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.PillInformation
+import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import com.example.doc_di.search.trash_maybe.MedicalAppointmentRecord
 import com.example.doc_di.search.trash_maybe.PrescribedMedicineList
 import com.example.doc_di.search.trash_maybe.PrescriptionRecord
@@ -39,12 +40,13 @@ import com.example.doc_di.search.trash_maybe.PrescriptionRecord
 fun NaviGraph(navController: NavHostController) {
     val searchViewModel: SearchViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return SearchViewModel(PillsSearchRepositoryImpl(RetrofitInstance.api)) as T
+            return SearchViewModel(PillsSearchRepositoryImpl(RetrofitInstance.pillApi)) as T
         }
     })
 
     val btmBarViewModel: BtmBarViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
+    val reviewViewModel: ReviewViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = Routes.login.route) {
 
@@ -103,7 +105,7 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.pillInformation.route) {
-            PillInformation(navController, btmBarViewModel, searchViewModel)
+            PillInformation(navController, btmBarViewModel, searchViewModel, userViewModel, reviewViewModel)
         }
 
         composable(route = Routes.medicalAppointmentRecord.route) {

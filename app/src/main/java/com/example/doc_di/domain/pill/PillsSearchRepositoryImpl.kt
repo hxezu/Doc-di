@@ -1,21 +1,21 @@
-package com.example.doc_di.domain.pillsearch
+package com.example.doc_di.domain.pill
 
 import android.util.Log
-import com.example.doc_di.domain.model.PillInfo
 import com.example.doc_di.domain.model.Pill
+import com.example.doc_di.domain.model.PillInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okio.IOException
 import retrofit2.HttpException
 
 class PillsSearchRepositoryImpl(
-    private val api : Api
+    private val pillApi : PillApi
 ): PillsSearchRepository {
     override suspend fun getPillSearchList(queryParams: Map<String,String>): Flow<Result<List<Pill>>> {
         return flow{
             val pillsFromApi = try{
-                Log.d("pillsFromApi", "Result.Success: ${api.getPillSearchList(queryParams)}")
-                api.getPillSearchList(queryParams)
+                Log.d("pillsFromApi", "Result.Success: ${pillApi.getPillSearchList(queryParams)}")
+                pillApi.getPillSearchList(queryParams)
             }
             catch (e: IOException){
                 e.printStackTrace()
@@ -40,7 +40,7 @@ class PillsSearchRepositoryImpl(
     override suspend fun getPillInfo(name: String): Flow<Result<PillInfo>> {
         return flow{
             val pillsFromApi = try{
-                api.getPillInfo(name)
+                pillApi.getPillInfo(name)
             }
             catch (e: IOException){
                 e.printStackTrace()

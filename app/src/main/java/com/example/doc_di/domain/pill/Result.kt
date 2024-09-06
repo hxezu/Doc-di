@@ -1,4 +1,4 @@
-package com.example.doc_di.domain.pillsearch
+package com.example.doc_di.domain.pill
 
 sealed class Result<T>(
     val data: T? = null,

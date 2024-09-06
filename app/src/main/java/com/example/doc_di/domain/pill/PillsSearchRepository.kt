@@ -1,7 +1,7 @@
-package com.example.doc_di.domain.pillsearch
+package com.example.doc_di.domain.pill
 
-import com.example.doc_di.domain.model.PillInfo
 import com.example.doc_di.domain.model.Pill
+import com.example.doc_di.domain.model.PillInfo
 import kotlinx.coroutines.flow.Flow
 
 interface PillsSearchRepository {

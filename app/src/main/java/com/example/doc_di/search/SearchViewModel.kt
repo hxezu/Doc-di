@@ -5,10 +5,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.doc_di.domain.model.PillInfo
-import com.example.doc_di.domain.pillsearch.PillsSearchRepository
-import com.example.doc_di.domain.pillsearch.Result
 import com.example.doc_di.domain.model.Pill
+import com.example.doc_di.domain.model.PillInfo
+import com.example.doc_di.domain.pill.PillsSearchRepository
+import com.example.doc_di.domain.pill.Result
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

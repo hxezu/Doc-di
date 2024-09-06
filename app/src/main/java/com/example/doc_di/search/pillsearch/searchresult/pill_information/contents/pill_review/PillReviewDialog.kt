@@ -28,14 +28,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,18 +44,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavController
+import com.example.doc_di.UserViewModel
+import com.example.doc_di.domain.review.ReviewImpl
+import com.example.doc_di.etc.observeAsState
+import com.example.doc_di.search.SearchViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PillReviewDialog(
     onDismiss: () -> Unit,
+    navController: NavController,
+    searchViewModel: SearchViewModel,
+    userViewModel: UserViewModel
 ) {
-    var reviewText by remember { mutableStateOf("") }
-    var curStarRating by remember { mutableIntStateOf(0) }
-
     val starYellow = Color(0xFFFFC107)
     val starGray = Color(0xFFE9EBED)
     val buttonColor = Color(0xFF4B7BE5)
+
+    var reviewText by rememberSaveable { mutableStateOf("") }
+    var curStarRating by rememberSaveable { mutableStateOf<Short>(0) }
+
+    val selectedPill = searchViewModel.getSelectedPill()
+    val userInfo by userViewModel.userInfo.observeAsState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val reviewImpl = ReviewImpl()
 
     Dialog(
         onDismissRequest = { onDismiss() },
@@ -106,10 +122,10 @@ fun PillReviewDialog(
                             Icon(
                                 imageVector = Icons.Rounded.Star,
                                 contentDescription = "평점",
-                                tint = if (curStarRating >= i) starYellow else starGray,
+                                tint = if (curStarRating >= i.toShort()) starYellow else starGray,
                                 modifier = Modifier
                                     .size(40.dp)
-                                    .clickable { curStarRating = i }
+                                    .clickable { curStarRating = i.toShort() }
                             )
                             if (i in 1..4) {
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -147,7 +163,20 @@ fun PillReviewDialog(
                     }
 
                     Button(
-                        onClick = { onDismiss() },
+                        onClick = {
+                            scope.launch {
+                                reviewImpl.createReview(
+                                    userInfo,
+                                    selectedPill,
+                                    reviewText,
+                                    curStarRating,
+                                    context,
+                                    navController,
+                                    userViewModel,
+                                    onDismiss
+                                )
+                            }
+                        },
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(buttonColor),
                         modifier = Modifier

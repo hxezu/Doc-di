@@ -18,8 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+
 @Composable
-fun PillInformationBar(showSearch: MutableList<Boolean>) {
+fun PillInformationBar(reviewViewModel: ReviewViewModel) {
     val buttonColor = Color(0xFF007AEB)
 
     val searchTitle = arrayOf("정보", "용법", "주의사항", "효능통계")
@@ -32,14 +33,14 @@ fun PillInformationBar(showSearch: MutableList<Boolean>) {
         items(4) { index ->
             Button(
                 onClick = {
-                    for (j in 0 until showSearch.size) {
-                        showSearch[j] = index == j
+                    for (j in 0 until reviewViewModel.showSearch.size) {
+                        reviewViewModel.showSearch[j] = index == j
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    if (showSearch[index]) buttonColor else Color.Transparent
+                    if (reviewViewModel.showSearch[index]) buttonColor else Color.Transparent
                 ),
-                border = if (!showSearch[index]) BorderStroke(
+                border = if (!reviewViewModel.showSearch[index]) BorderStroke(
                     1.dp,
                     Color.LightGray
                 )
@@ -51,9 +52,9 @@ fun PillInformationBar(showSearch: MutableList<Boolean>) {
             ) {
                 Text(
                     text = searchTitle[index],
-                    color = if (showSearch[index]) Color.White else Color.LightGray,
+                    color = if (reviewViewModel.showSearch[index]) Color.White else Color.LightGray,
                     fontSize = 13.sp,
-                    fontWeight = if (showSearch[index]) FontWeight.Bold else FontWeight.Normal
+                    fontWeight = if (reviewViewModel.showSearch[index]) FontWeight.Bold else FontWeight.Normal
                 )
             }
         }
