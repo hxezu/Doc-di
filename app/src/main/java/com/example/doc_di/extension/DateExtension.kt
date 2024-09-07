@@ -15,13 +15,14 @@ fun Date.toFormattedMonthDateString(): String {
     return sdf.format(this)
 }
 
-fun Date.toFormattedYearMonthDateString(): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+fun Date.toFormattedKoreanDateString(): String {
+    val sdf = SimpleDateFormat("M월 d일", Locale.KOREA)
     return sdf.format(this)
 }
 
-fun Date.toFormattedKoreanDateString(): String {
-    val sdf = SimpleDateFormat("M월 d일", Locale.KOREA)
+
+fun Date.toFormattedYearMonthDateString(): String {
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     return sdf.format(this)
 }
 
