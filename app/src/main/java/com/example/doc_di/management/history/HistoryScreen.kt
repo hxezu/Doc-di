@@ -16,17 +16,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.doc_di.R
 import com.example.doc_di.domain.model.Medication
 import com.example.doc_di.extension.hasPassed
 import com.example.doc_di.management.history.viewmodel.HistoryState
 import com.example.doc_di.management.history.viewmodel.HistoryViewModel
-import com.example.doc_di.management.home.MedicationCard
+import com.example.doc_di.management.home.utils.MedicationCard
 import com.example.doc_di.management.home.MedicationListItem
 
 @Composable

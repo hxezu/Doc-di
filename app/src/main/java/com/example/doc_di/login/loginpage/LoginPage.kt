@@ -38,8 +38,8 @@ import kotlinx.coroutines.launch
 fun LoginPage(navController: NavController, userViewModel: UserViewModel) {
     val loginImpl = LoginImpl(RetrofitInstance.loginApi)
 
-    val email = rememberSaveable { mutableStateOf("") }
-    val password = rememberSaveable { mutableStateOf("") }
+    val email = rememberSaveable { mutableStateOf("q") }
+    val password = rememberSaveable { mutableStateOf("1") }
     val loginCheck = rememberSaveable { mutableStateOf(false) }
 
     val gradientColor = listOf(Color(0xFF0052D4), Color(0xFF4364F7), Color(0xFF6FB1FC))
