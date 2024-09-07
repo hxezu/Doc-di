@@ -11,15 +11,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -75,12 +71,12 @@ fun ManagementScreen(
                     MultiFabItem(
                         iconRes = R.drawable.pillemoji,
                         label = "복용 약 추가",
-                        labelColor = MainBlue,
+                        labelColor = Color.Black,
                     ),
                     MultiFabItem(
                         iconRes = R.drawable.hospitalemoji,
                         label = "진료 일정 추가",
-                        labelColor = MainBlue
+                        labelColor = Color.Black
                     ),
                 ),
                 onFabItemClicked = { println(it) },

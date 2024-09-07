@@ -67,6 +67,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
@@ -78,6 +79,7 @@ import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.management.addmedication.model.CalendarInformation
 import com.example.doc_di.management.addmedication.viewmodel.AddMedicationViewModel
+import com.example.doc_di.ui.theme.LightBlue
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.HOUR_MINUTE_FORMAT
 import com.example.doc_di.util.Recurrence
@@ -128,7 +130,7 @@ fun AddMedicationScreen(
         topBar = {
             TopAppBar(
                 modifier = Modifier
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = 25.dp),
                 navigationIcon = {
                     FloatingActionButton(
                         onClick = {
@@ -264,7 +266,13 @@ fun AddMedicationScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                 }
-                RecurrenceDropdownMenu { recurrence = it }
+//                RecurrenceDropdownMenu(
+//                    recurrence = { selectedRecurrence ->
+//                        recurrence = selectedRecurrence
+//                        isRecurrenceSelected = true
+//                    },
+//                    isRecurrenceSelected = isRecurrenceSelected
+//                )
             }
 
             if (isMaxDoseError) {
@@ -276,7 +284,7 @@ fun AddMedicationScreen(
             }
 
             Spacer(modifier = Modifier.padding(4.dp))
-            EndDateTextField { endDate = it }
+            //EndDateTextField { endDate = it }
 
             Spacer(modifier = Modifier.padding(4.dp))
             Text(
@@ -382,7 +390,8 @@ private fun showMaxSelectionSnackbar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
+fun RecurrenceDropdownMenu(recurrence: (String) -> Unit,
+                           isRecurrenceSelected: Boolean) {
     val recurrenceMap = mapOf(
         Recurrence.Daily to "매일",
         Recurrence.Weekly to "매주",
@@ -398,6 +407,7 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
+            color = Color.Black,
             text = "복용 주기",
             style = MaterialTheme.typography.bodyLarge
         )
@@ -411,7 +421,11 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        tint = Color.Black // 아이콘 색상 설정
+                    )
                 },
                 modifier = Modifier
                     .menuAnchor()
@@ -421,8 +435,9 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
                     },
                 shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = if (isFocused) MainBlue else Color.Black,
-                    unfocusedBorderColor = if (isFocused) MainBlue else Color.Black
+                    textColor = if (isRecurrenceSelected) Color.Black else LightBlue,
+                    focusedBorderColor = if (isFocused) MainBlue else LightBlue,
+                    unfocusedBorderColor = if (isFocused) MainBlue else LightBlue
                 )
             )
 
@@ -453,7 +468,8 @@ fun TimerTextField(
     isOnlyItem: Boolean,
     time: (CalendarInformation) -> Unit,
     onDeleteClick: () -> Unit,
-    logEvent: () -> Unit
+    logEvent: () -> Unit,
+    isSelected: Boolean = false
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed: Boolean by interactionSource.collectIsPressedAsState()
@@ -500,7 +516,8 @@ fun TimerTextField(
             shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MainBlue,
-                unfocusedBorderColor = Color.Black
+                unfocusedBorderColor = LightBlue,
+                textColor = if (isSelected) LightBlue else Color.Black,
             ),
             interactionSource = interactionSource
         )
@@ -508,163 +525,16 @@ fun TimerTextField(
 }
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddMedicationScreenUI(
-    navController: NavController,
-    btmBarViewModel: BtmBarViewModel
-){
-    var text by rememberSaveable { mutableStateOf("") }
-    var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
-    var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
-    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(
-        CalendarInformation(
-            Calendar.getInstance())
-    ) }
 
-    fun addTime(time: CalendarInformation) {
-        selectedTimes.add(time)
-    }
-    fun removeTime(time: CalendarInformation) {
-        selectedTimes.remove(time)
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                modifier = Modifier
-                    .height(70.dp)
-                    .padding(vertical = 16.dp),
-                navigationIcon = {
-                    FloatingActionButton(
-                        onClick = {
-                        },
-                        containerColor = Color.Transparent,
-                        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MainBlue
-                        )
-                    }
-                },
-                title = {
-                    Text(
-                        text = "복용 약 추가",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.headlineSmall,
-                    )
-                }
-            )
-        },
-        bottomBar = {
-            BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)  // Apply paddingValues here to avoid overlapping with the TopAppBar
-                .padding(horizontal = 20.dp)  // Additional padding as needed
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            AddMedicationName()
-            Spacer(modifier = Modifier.padding(4.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                DoseInputField(maxDose = 99, onValueChange = { doseValue -> })
-                RecurrenceDropdownMenu { recurrence = it }
-            }
-
-            Spacer(modifier = Modifier.padding(4.dp))
-            EndDateTextField { endDate = it }
-
-            Spacer(modifier = Modifier.padding(4.dp))
-
-            Text(
-                text = "복용 시간",
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            for (index in selectedTimes.indices) {
-                TimerTextField(
-                    isLastItem = selectedTimes.lastIndex == index,
-                    isOnlyItem = selectedTimes.size == 1,
-                    time = {
-                        selectedTimes[index] = it
-                    },
-                    onDeleteClick = {
-                        removeTime(selectedTimes[index])
-                    },
-                    logEvent = {
-                        //viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
-                    },
-                )
-            }
-            Spacer(modifier = Modifier.padding(4.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    onClick = {
-                        addTime(CalendarInformation(Calendar.getInstance()))
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MainBlue
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(
-                        defaultElevation = 10.dp,
-                        pressedElevation = 0.dp,
-                        disabledElevation = 0.dp
-                    ),
-                ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                    Text("시간 추가")
-                }
-            }
-            Spacer(modifier = Modifier.weight(1f))
-
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(30.dp)
-                        .height(56.dp),
-                    onClick = {
-                    },
-                    shape = MaterialTheme.shapes.extraLarge,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MainBlue
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(
-                        defaultElevation = 10.dp,
-                        pressedElevation = 0.dp,
-                        disabledElevation = 0.dp
-                    ),
-                ) {
-                    Text(
-                        text = "추가",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EndDateTextField(endDate: (Long) -> Unit) {
+fun EndDateTextField(
+    onDateSelected: (Long) -> Unit,
+    isEndDateSelected: Boolean
+) {
     Text(
+        color = Color.Black,
         text = "복용 종료일",
         style = MaterialTheme.typography.bodyLarge
     )
@@ -702,7 +572,7 @@ fun EndDateTextField(endDate: (Long) -> Unit) {
         shouldDisplay = shouldDisplay,
         onConfirmClicked = { selectedDateInMillis ->
             selectedDate = selectedDateInMillis.toFormattedDateString()
-            endDate(selectedDateInMillis)
+            onDateSelected(selectedDateInMillis)
         },
         dismissRequest = {
             shouldDisplay = false
@@ -724,14 +594,15 @@ fun EndDateTextField(endDate: (Long) -> Unit) {
             Icon(
                 imageVector = Icons.Default.DateRange,
                 contentDescription = "Select date",
-                tint = if (isFocused) MainBlue else Color.Black
+                tint = if (isFocused) MainBlue else LightBlue
             )
         },
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = if (isFocused) MainBlue else Color.Black,
-            unfocusedBorderColor = if (isFocused) MainBlue else Color.Black,
-            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+            focusedBorderColor = if (isFocused) MainBlue else LightBlue,
+            unfocusedBorderColor = if (isFocused) MainBlue else LightBlue,
+            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            textColor = if (isEndDateSelected) Color.Black else LightBlue,
         ),
         interactionSource = interactionSource
     )
@@ -751,7 +622,8 @@ fun DoseInputField(
     Column {
         Text(
             text = "1회 투약량",
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.Black
         )
 
         OutlinedTextField(
@@ -778,7 +650,7 @@ fun DoseInputField(
             label = {
                 Text(
                     "예시) 1",
-                    color = Color.Black,
+                    color = LightBlue,
                     style = MaterialTheme.typography.labelMedium,
                 )
             },
@@ -788,8 +660,8 @@ fun DoseInputField(
                 keyboardType = KeyboardType.Number
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = if (isFocused) MainBlue else Color.Black,
-                unfocusedBorderColor = if (isFocused) MainBlue else Color.Black
+                focusedBorderColor = if (isFocused) MainBlue else LightBlue,
+                unfocusedBorderColor = if (isFocused) MainBlue else LightBlue
             ),
             singleLine = true,
             modifier = Modifier
@@ -823,7 +695,8 @@ fun AddMedicationName(){
 
     Text(
         text = "제품명",
-        style = MaterialTheme.typography.bodyLarge
+        style = MaterialTheme.typography.bodyLarge,
+        color = Color.Black
     )
 
     OutlinedTextField(
@@ -833,7 +706,7 @@ fun AddMedicationName(){
         label = {
             Text(
                 "예시) 록프라정",
-                color = Color.Black,
+                color = LightBlue,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
@@ -842,8 +715,8 @@ fun AddMedicationName(){
             keyboardType = KeyboardType.Text
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = if (isFocused) MainBlue else Color.Black,
-            unfocusedBorderColor = if (isFocused) MainBlue else Color.Black
+            focusedBorderColor = if (isFocused) MainBlue else LightBlue,
+            unfocusedBorderColor = if (isFocused) MainBlue else LightBlue
         ),
         singleLine = true,
         modifier = Modifier
@@ -861,11 +734,3 @@ fun AddMedicationName(){
 
 }
 
-@Preview(showBackground = true)
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddMedicationScreenUIPreview( ){
-    val navController = rememberNavController()
-    val btmBarViewModel: BtmBarViewModel = viewModel()
-    AddMedicationScreenUI(navController = navController, btmBarViewModel = btmBarViewModel)
-}

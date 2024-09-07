@@ -168,11 +168,11 @@ fun DateItem(
 ) {
     Column {
         Text(
-            text = date.day, // day "Mon", "Tue"
+            text = date.day, // day "월", "화"
             modifier = Modifier.align(Alignment.CenterHorizontally),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.outline
+            color = if (date.isSelected) MainBlue else MaterialTheme.colorScheme.outline
         )
         Card(
             modifier = Modifier
