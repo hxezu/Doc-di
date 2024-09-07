@@ -41,7 +41,7 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -77,6 +78,7 @@ import com.example.doc_di.extension.toFormattedMonthDateString
 import com.example.doc_di.management.addmedication.navigation.AddMedicationDestination
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.extension.toFormattedKoreanDateString
 import com.example.doc_di.management.addmedication.AddMedicationScreenUI
 import com.example.doc_di.management.home.data.CalendarDataSource
 import com.example.doc_di.management.home.model.CalendarModel
@@ -103,16 +105,14 @@ fun ManagementScreen(
     val fabVisibility = rememberSaveable { (mutableStateOf(true)) }
 
     Scaffold(
-        bottomBar = {
-            BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
-        },
-        floatingActionButton = {
+            backgroundColor = Color.Transparent,
+            bottomBar = {
+                BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) },
+            floatingActionButton = {
             if (fabVisibility.value) {
                 Box(
                     contentAlignment = Alignment.BottomCenter,
                     modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(8.dp)
                 ){
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(16.dp), // Space between buttons
@@ -124,11 +124,12 @@ fun ManagementScreen(
                 }
             }
         },
-        floatingActionButtonPosition = FabPosition.Center
-    ) {
+        ) {
             paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier
+                .padding(paddingValues)
+                .background(Color.Transparent),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 //            DailyMedications(
@@ -200,7 +201,7 @@ fun ManagementScreen(
             val logEvent: (String) -> Unit = {}
 
             // Render the DailyMedications with sample data
-            Surface(color = MaterialTheme.colorScheme.background) {
+            Surface(color = Color.Transparent) {
                 DailyMedications(
                     navController = rememberNavController(), // Use a rememberNavController for previews
                     state = sampleState,
@@ -442,7 +443,7 @@ fun DateHeader(
             text = if (data.selectedDate.isToday) {
                 "오늘"
             } else {
-                data.selectedDate.date.toFormattedMonthDateString() + "일"
+                data.selectedDate.date.toFormattedKoreanDateString()
             },
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,

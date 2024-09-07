@@ -20,6 +20,11 @@ fun Date.toFormattedYearMonthDateString(): String {
     return sdf.format(this)
 }
 
+fun Date.toFormattedKoreanDateString(): String {
+    val sdf = SimpleDateFormat("M월 d일", Locale.KOREA)
+    return sdf.format(this)
+}
+
 fun String.toDate(): Date? {
     return try {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
