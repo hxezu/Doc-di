@@ -3,31 +3,13 @@ package com.example.doc_di.management.home
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,22 +25,20 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.doc_di.R
 import com.example.doc_di.analytics.AnalyticsEvents
 import com.example.doc_di.domain.model.Medication
 import com.example.doc_di.etc.BottomNavigationBar
-import com.example.doc_di.extension.toFormattedDateShortString
-import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.etc.BtmBarViewModel
-import com.example.doc_di.etc.Routes
-import com.example.doc_di.extension.toFormattedKoreanDateString
-import com.example.doc_di.management.home.data.CalendarDataSource
 import com.example.doc_di.management.home.model.CalendarModel
 import com.example.doc_di.management.home.utils.DatesHeader
-import com.example.doc_di.management.home.utils.DoseFAB
 import com.example.doc_di.management.home.viewmodel.ManagementState
 import com.example.doc_di.management.home.utils.EmptyCard
+import com.example.doc_di.management.home.utils.FabIcon
+import com.example.doc_di.management.home.utils.FabOption
 import com.example.doc_di.management.home.utils.MedicationCard
-import com.example.doc_di.management.home.utils.ScheduleFAB
+import com.example.doc_di.management.home.utils.MultiFabItem
+import com.example.doc_di.management.home.utils.MultiFloatingActionButton
 import com.example.doc_di.ui.theme.MainBlue
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -80,22 +60,36 @@ fun ManagementScreen(
             BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
         },
         floatingActionButton = {
-            if (fabVisibility.value) {
-                Box(
-                    contentAlignment = Alignment.BottomCenter,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 25.dp)
-                ){
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp), // Space between buttons
-                        verticalAlignment = Alignment.Bottom
-                    ) {
-                        ScheduleFAB(navController)
-                        DoseFAB(navController)
-                    }
-                }
-            }
+            MultiFloatingActionButton(
+                fabIcon = FabIcon(
+                    iconRes = R.drawable.ic_baseline_add_24,
+                    iconResAfterRotate = R.drawable.ic_baseline_remove_24,
+                    iconRotate = 180f
+                ),
+                fabOption = FabOption(
+                    iconTint = Color.White,
+                    showLabels = true,
+                    backgroundTint = MainBlue,
+                ),
+                itemsMultiFab = listOf(
+                    MultiFabItem(
+                        iconRes = R.drawable.pillemoji,
+                        label = "복용 약 추가",
+                        labelColor = MainBlue,
+                    ),
+                    MultiFabItem(
+                        iconRes = R.drawable.hospitalemoji,
+                        label = "진료 일정 추가",
+                        labelColor = MainBlue
+                    ),
+                ),
+                onFabItemClicked = { println(it) },
+                fabTitle = "MultiFloatActionButton",
+                showFabTitle = false,
+                navController = navController,
+                modifier = Modifier
+                    .padding(end = 16.dp, bottom = 20.dp) // Right and Bottom Padding
+            )
         },
     ) { paddingValues ->
 
