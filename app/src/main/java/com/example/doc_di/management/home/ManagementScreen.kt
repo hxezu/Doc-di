@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -191,7 +193,7 @@ fun DailyMedications(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp), // Padding around the entire column
+            .padding(start = 8.dp, end = 8.dp, top = 30.dp, bottom = 8.dp), // Padding around the entire column
         verticalArrangement = Arrangement.spacedBy(16.dp) // Space between children
     ) {
         // DatesHeader should be at the top

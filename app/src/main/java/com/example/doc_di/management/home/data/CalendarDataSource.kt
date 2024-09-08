@@ -21,7 +21,12 @@ class CalendarDataSource {
         calendar.time = startDate
 
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        if (calendar.time.after(startDate)) {
+            // 현재 날짜가 주의 시작일보다 이전일 경우, 이전 주로 조정
+            calendar.add(Calendar.WEEK_OF_YEAR, -1)
+        }
         val firstDayOfWeek = calendar.time
+        //val firstDayOfWeek = calendar.time
 
         calendar.add(Calendar.DAY_OF_YEAR, 6)
         val endDayOfWeek = calendar.time

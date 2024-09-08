@@ -106,7 +106,7 @@ fun DateHeader(
     onNextClickListener: (Date) -> Unit
 ) {
     Row(
-        modifier = Modifier.padding(top = 25.dp, bottom = 25.dp, start = 20.dp),
+        modifier = Modifier.padding(top = 25.dp, bottom = 25.dp, start = 15.dp),
     ) {
         Text(
             modifier = Modifier
