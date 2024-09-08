@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.FabPosition
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -25,6 +28,10 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -48,6 +55,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.etc.Routes
 import com.example.doc_di.management.addmedication.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Recurrence
@@ -70,9 +78,11 @@ fun AddMedicationScreenUI(
         CalendarInformation(
             Calendar.getInstance())
     ) }
+    var isNameEntered by remember { mutableStateOf(false) }
+    var isDoseEntered by remember { mutableStateOf(false) }
     var isRecurrenceSelected by remember { mutableStateOf(false) }
     var isEndDateSelected by remember { mutableStateOf(false) }
-    var selectedTimeIndex by remember { mutableStateOf(-1) }
+    var isTimeSelected by remember { mutableStateOf(false) }
 
     fun addTime(time: CalendarInformation) {
         selectedTimes.add(time)
@@ -85,34 +95,56 @@ fun AddMedicationScreenUI(
         backgroundColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                modifier = Modifier
-                    .height(75.dp)
-                    .padding(top = 25.dp, bottom = 16.dp),
+                title = { },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                ),
                 navigationIcon = {
-                    FloatingActionButton(
+                    IconButton(
                         onClick = {
+                            navController.navigate(Routes.managementScreen.route) {
+                                navController.popBackStack()
+                            }
                         },
-                        containerColor = Color.Transparent,
-                        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = MainBlue
+                            tint = Color.Black
                         )
                     }
                 },
-                title = {},
-                colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = Color.Transparent,
-                    navigationIconContentColor = MainBlue,
-                    titleContentColor = Color.Black
-                ),
             )
         },
         bottomBar = {
             BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
-        }
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                text = { Text("저장",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White) },
+                onClick = {
+                    navController.navigate(Routes.addMedicationScreen.route)
+                },
+                icon = {
+                    Icon(imageVector = Icons.Default.Check,
+                        contentDescription = "Add",
+                        tint = Color.White)
+                },
+                containerColor = MainBlue,
+                elevation = FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 10.dp,
+                    pressedElevation = 0.dp,
+                ),
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(40.dp),
+                shape = MaterialTheme.shapes.extraLarge
+            )
+
+        },
+        floatingActionButtonPosition = FabPosition.Center,
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -135,11 +167,20 @@ fun AddMedicationScreenUI(
                 )
             }
 
-            AddMedicationName()
+            AddMedicationName(
+                isNameEntered = isNameEntered,
+                onNameChange = { name ->
+                    isNameEntered = name.isNotEmpty()
+                })
             Spacer(modifier = Modifier.padding(4.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                DoseInputField(maxDose = 99, onValueChange = { doseValue -> })
+                DoseInputField(
+                    isDoseEntered = isDoseEntered,
+                    maxDose = 99,
+                    onValueChange = { doseValue ->
+                        isDoseEntered = doseValue.isNotEmpty()
+                    })
                 RecurrenceDropdownMenu (
                     recurrence = { selectedRecurrence ->
                         recurrence = selectedRecurrence
@@ -171,14 +212,15 @@ fun AddMedicationScreenUI(
                     isOnlyItem = selectedTimes.size == 1,
                     time = {
                         selectedTimes[index] = it
+                        isTimeSelected = true
                     },
                     onDeleteClick = {
                         removeTime(selectedTimes[index])
                     },
-                    isSelected = selectedTimeIndex == index,
                     logEvent = {
                         //viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
                     },
+                    isTimeSelected = isTimeSelected
                 )
             }
             Spacer(modifier = Modifier.padding(4.dp))
@@ -189,11 +231,12 @@ fun AddMedicationScreenUI(
                 contentAlignment = Alignment.Center
             ) {
                 Button(
+                    modifier = Modifier.padding(bottom = 70.dp),
                     onClick = {
                         addTime(CalendarInformation(Calendar.getInstance()))
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MainBlue
+                        containerColor = Color.White
                     ),
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 10.dp,
@@ -201,39 +244,13 @@ fun AddMedicationScreenUI(
                         disabledElevation = 0.dp
                     ),
                 ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                    Text("시간 추가")
+                    Icon(imageVector = Icons.Default.Notifications,
+                        contentDescription = "Add",
+                        tint = MainBlue)
+                    Text("시간 추가", color = MainBlue, modifier = Modifier.padding(start = 10.dp))
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
-
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(30.dp)
-                        .height(56.dp),
-                    onClick = {
-                    },
-                    shape = MaterialTheme.shapes.extraLarge,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MainBlue
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(
-                        defaultElevation = 10.dp,
-                        pressedElevation = 0.dp,
-                        disabledElevation = 0.dp
-                    ),
-                ) {
-                    Text(
-                        text = "저장",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
         }
     }
 }

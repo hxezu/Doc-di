@@ -1,11 +1,13 @@
 package com.example.doc_di.management.home.utils
 
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -32,16 +34,6 @@ fun MiniFabItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(end = 12.dp)
     ) {
-        if (showLabel) {
-            Text(
-                item.label,
-                fontSize = 12.sp,
-                color = item.labelColor,
-                modifier = Modifier
-                    .padding(start = 6.dp, end = 6.dp, top = 4.dp, bottom = 4.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-        }
         FloatingActionButton(
             modifier = Modifier.size(40.dp),
             onClick = {
@@ -60,6 +52,17 @@ fun MiniFabItem(
                     tint = Color.Unspecified
                 )
             }
+        }
+        if (showLabel) {
+            Text(
+                item.label,
+                fontSize = 12.sp,
+                color = item.labelColor,
+                modifier = Modifier
+                    .padding(start = 10.dp, end = 6.dp, top = 4.dp, bottom = 4.dp)
+                    .widthIn(min = 80.dp, max = 120.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
         }
     }
 }

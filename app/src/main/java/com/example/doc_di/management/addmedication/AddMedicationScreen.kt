@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -79,7 +80,6 @@ import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.management.addmedication.model.CalendarInformation
 import com.example.doc_di.management.addmedication.viewmodel.AddMedicationViewModel
-import com.example.doc_di.ui.theme.LightBlue
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.HOUR_MINUTE_FORMAT
 import com.example.doc_di.util.Recurrence
@@ -292,19 +292,19 @@ fun AddMedicationScreen(
                 style = MaterialTheme.typography.bodyLarge
             )
 
-            for (index in selectedTimes.indices) {
-                TimerTextField(
-                    isLastItem = selectedTimes.lastIndex == index,
-                    isOnlyItem = selectedTimes.size == 1,
-                    time = {
-                        selectedTimes[index] = it
-                    },
-                    onDeleteClick = { removeTime(selectedTimes[index]) },
-                    logEvent = {
-                        viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
-                    },
-                )
-            }
+//            for (index in selectedTimes.indices) {
+//                TimerTextField(
+//                    isLastItem = selectedTimes.lastIndex == index,
+//                    isOnlyItem = selectedTimes.size == 1,
+//                    time = {
+//                        selectedTimes[index] = it
+//                    },
+//                    onDeleteClick = { removeTime(selectedTimes[index]) },
+//                    logEvent = {
+//                        viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
+//                    },
+//                )
+//            }
 
             Button(
                 onClick = { addTime(CalendarInformation(Calendar.getInstance())) }
@@ -435,9 +435,9 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit,
                     },
                 shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    textColor = if (isRecurrenceSelected) Color.Black else LightBlue,
-                    focusedBorderColor = if (isFocused) MainBlue else LightBlue,
-                    unfocusedBorderColor = if (isFocused) MainBlue else LightBlue
+                    textColor = if (isRecurrenceSelected) Color.Black else Color.Gray,
+                    focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
+                    unfocusedBorderColor = if (isRecurrenceSelected) MainBlue else Color.Gray
                 )
             )
 
@@ -469,7 +469,7 @@ fun TimerTextField(
     time: (CalendarInformation) -> Unit,
     onDeleteClick: () -> Unit,
     logEvent: () -> Unit,
-    isSelected: Boolean = false
+    isTimeSelected: Boolean
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed: Boolean by interactionSource.collectIsPressedAsState()
@@ -496,7 +496,8 @@ fun TimerTextField(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             readOnly = true,
-            value = selectedTime.getDateFormatted(HOUR_MINUTE_FORMAT),
+            value = selectedTime.getDateFormatted("a HH:mm"),
+            //value = selectedTime.getDateFormatted(HOUR_MINUTE_FORMAT),
             onValueChange = {},
             trailingIcon = {
                 if (isLastItem && !isOnlyItem) {
@@ -507,7 +508,7 @@ fun TimerTextField(
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete",
-                            tint = MaterialTheme.colorScheme.error,
+                            tint = MainBlue,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -516,8 +517,8 @@ fun TimerTextField(
             shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MainBlue,
-                unfocusedBorderColor = LightBlue,
-                textColor = if (isSelected) LightBlue else Color.Black,
+                unfocusedBorderColor = if (isTimeSelected) MainBlue else Color.Gray,
+                textColor = if (isTimeSelected) Color.Black else Color.Gray,
             ),
             interactionSource = interactionSource
         )
@@ -594,15 +595,15 @@ fun EndDateTextField(
             Icon(
                 imageVector = Icons.Default.DateRange,
                 contentDescription = "Select date",
-                tint = if (isFocused) MainBlue else LightBlue
+                tint = if (isFocused) MainBlue else Color.Gray
             )
         },
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = if (isFocused) MainBlue else LightBlue,
-            unfocusedBorderColor = if (isFocused) MainBlue else LightBlue,
+            focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
+            unfocusedBorderColor = if (isEndDateSelected) MainBlue else Color.Gray,
             disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            textColor = if (isEndDateSelected) Color.Black else LightBlue,
+            textColor = if (isEndDateSelected) Color.Black else Color.Gray,
         ),
         interactionSource = interactionSource
     )
@@ -611,6 +612,7 @@ fun EndDateTextField(
 
 @Composable
 fun DoseInputField(
+    isDoseEntered: Boolean,
     maxDose: Int,
     onValueChange: (String) -> Unit,
     ) {
@@ -619,7 +621,9 @@ fun DoseInputField(
     var isMaxDoseError by rememberSaveable { mutableStateOf(false) }
     var isFocused by rememberSaveable { mutableStateOf(false) }
 
-    Column {
+    Column (
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ){
         Text(
             text = "1회 투약량",
             style = MaterialTheme.typography.bodyLarge,
@@ -647,11 +651,11 @@ fun DoseInputField(
                     )
                 }
             },
-            label = {
+            placeholder = {
                 Text(
-                    "예시) 1",
-                    color = LightBlue,
-                    style = MaterialTheme.typography.labelMedium,
+                    text = "예시) 1",
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.labelMedium
                 )
             },
             isError = isMaxDoseError,
@@ -660,8 +664,8 @@ fun DoseInputField(
                 keyboardType = KeyboardType.Number
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = if (isFocused) MainBlue else LightBlue,
-                unfocusedBorderColor = if (isFocused) MainBlue else LightBlue
+                focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
+                unfocusedBorderColor = if (isDoseEntered) MainBlue else Color.Gray
             ),
             singleLine = true,
             modifier = Modifier
@@ -688,7 +692,8 @@ fun DoseInputField(
 }
 
 @Composable
-fun AddMedicationName(){
+fun AddMedicationName(isNameEntered: Boolean,
+                      onNameChange: (String) -> Unit){
     val keyboardController = LocalSoftwareKeyboardController.current
     var text by rememberSaveable { mutableStateOf("") }
     var isFocused by rememberSaveable { mutableStateOf(false) }
@@ -701,13 +706,16 @@ fun AddMedicationName(){
 
     OutlinedTextField(
         value = text,
-        onValueChange = {text = it},
+        onValueChange = {
+            text = it
+            onNameChange(it) // 부모 컴포저블에 텍스트 변경을 알림
+        },
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
-        label = {
+        placeholder = {
             Text(
-                "예시) 록프라정",
-                color = LightBlue,
-                style = MaterialTheme.typography.labelMedium,
+                text = "예시) 록프라정",
+                color = Color.Gray,
+                style = MaterialTheme.typography.labelMedium
             )
         },
         keyboardOptions = KeyboardOptions(
@@ -715,8 +723,8 @@ fun AddMedicationName(){
             keyboardType = KeyboardType.Text
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = if (isFocused) MainBlue else LightBlue,
-            unfocusedBorderColor = if (isFocused) MainBlue else LightBlue
+            focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
+            unfocusedBorderColor = if (isNameEntered) MainBlue else Color.Gray
         ),
         singleLine = true,
         modifier = Modifier

@@ -79,7 +79,7 @@ fun MedicationCard(
                         .padding(start = 15.dp)
                         .align(Alignment.CenterVertically)
                         .weight(1f),
-                    painter = painterResource(id = R.drawable.pill),
+                    painter = painterResource(id = R.drawable.pillemoji),
                     contentDescription = "용법 이미지"
                 )
 

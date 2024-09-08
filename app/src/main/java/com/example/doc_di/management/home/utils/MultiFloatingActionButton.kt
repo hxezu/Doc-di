@@ -47,7 +47,7 @@ fun MultiFloatingActionButton(
 
     Column(
         modifier = modifier.wrapContentSize(),
-        horizontalAlignment = Alignment.End,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AnimatedVisibility(
             visible = fabState.value == MultiFabState.Expanded,
@@ -75,8 +75,6 @@ fun MultiFloatingActionButton(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (fabState.value.isExpanded() && showFabTitle)
-                Text(text = fabTitle!!, modifier = Modifier.padding(end = 16.dp), fontSize = 12.sp)
             FloatingActionButton(
                 onClick = {
                     fabState.value = fabState.value.toggleValue()
@@ -94,6 +92,8 @@ fun MultiFloatingActionButton(
                     tint = fabOption.iconTint
                 )
             }
+            if (fabState.value.isExpanded() && showFabTitle)
+                Text(text = fabTitle!!, modifier = Modifier.padding(end = 16.dp), fontSize = 12.sp)
         }
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -83,10 +84,10 @@ fun ManagementScreen(
                 fabTitle = "MultiFloatActionButton",
                 showFabTitle = false,
                 navController = navController,
-                modifier = Modifier
-                    .padding(end = 16.dp, bottom = 20.dp) // Right and Bottom Padding
+                modifier = Modifier.padding(bottom = 20.dp)
             )
         },
+        floatingActionButtonPosition = FabPosition.Center,
     ) { paddingValues ->
 
         Column(

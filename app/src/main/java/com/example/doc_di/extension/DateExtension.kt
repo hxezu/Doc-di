@@ -42,7 +42,7 @@ fun Date.toFormattedDateShortString(): String {
 }
 
 fun Long.toFormattedDateString(): String {
-    val sdf = SimpleDateFormat("LLLL dd, yyyy", Locale.getDefault())
+    val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.getDefault())
     return sdf.format(this)
 }
 
@@ -50,6 +50,7 @@ fun Date.toFormattedTimeString(): String {
     val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     return timeFormat.format(this)
 }
+
 
 fun Date.hasPassed(): Boolean {
     val calendar = Calendar.getInstance()

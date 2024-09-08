@@ -15,13 +15,27 @@ class CalendarInformation(private val calendar: Calendar) {
 
     fun getTimeInMillis() = calendar.timeInMillis
 
+//    fun getDateFormatted(pattern: String): String {
+//        return try {
+//            SimpleDateFormat(pattern, Locale.getDefault()).format(calendar.time)
+//        } catch (ex: MissingFormatArgumentException) {
+//            throw ex
+//        }
+//    }
+
     fun getDateFormatted(pattern: String): String {
         return try {
-            SimpleDateFormat(pattern, Locale.getDefault()).format(calendar.time)
+            val dateFormat = SimpleDateFormat(pattern, Locale.KOREAN)
+            // Use DateFormatSymbols to get Korean AM/PM symbols
+            val symbols = dateFormat.dateFormatSymbols
+            symbols.amPmStrings = arrayOf("오전", "오후")
+            dateFormat.dateFormatSymbols = symbols
+            dateFormat.format(calendar.time)
         } catch (ex: MissingFormatArgumentException) {
             throw ex
         }
     }
+
 
     inner class TimeInformation(
         val hour: Int,
