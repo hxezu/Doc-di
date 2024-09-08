@@ -71,25 +71,38 @@ fun AddMedicationScreenUI(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel
 ){
-    var text by rememberSaveable { mutableStateOf("") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
     var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
-    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(
-        CalendarInformation(
-            Calendar.getInstance())
-    ) }
+
     var isNameEntered by remember { mutableStateOf(false) }
     var isDoseEntered by remember { mutableStateOf(false) }
     var isRecurrenceSelected by remember { mutableStateOf(false) }
     var isEndDateSelected by remember { mutableStateOf(false) }
-    var isTimeSelected by remember { mutableStateOf(false) }
+
+    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
+    var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
+    var lastSelectedIndex by remember { mutableStateOf<Int?>(null) }
+
+    fun setTimeSelected(index: Int, isSelected: Boolean) {
+        selectedTimeIndices = if (isSelected) {
+            selectedTimeIndices + index
+        } else {
+            selectedTimeIndices - index
+        }
+        lastSelectedIndex = if (isSelected) index else lastSelectedIndex
+    }
 
     fun addTime(time: CalendarInformation) {
         selectedTimes.add(time)
     }
+
     fun removeTime(time: CalendarInformation) {
         selectedTimes.remove(time)
     }
+
+    // Check if the last TimerTextField is selected
+    val isButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
+
 
     Scaffold(
         backgroundColor = Color.Transparent,
@@ -212,15 +225,16 @@ fun AddMedicationScreenUI(
                     isOnlyItem = selectedTimes.size == 1,
                     time = {
                         selectedTimes[index] = it
-                        isTimeSelected = true
+                        setTimeSelected(index, true)
                     },
                     onDeleteClick = {
                         removeTime(selectedTimes[index])
+                        setTimeSelected(index, false)
                     },
                     logEvent = {
                         //viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
                     },
-                    isTimeSelected = isTimeSelected
+                    isTimeSelected = selectedTimeIndices.contains(index)
                 )
             }
             Spacer(modifier = Modifier.padding(4.dp))
@@ -233,21 +247,25 @@ fun AddMedicationScreenUI(
                 Button(
                     modifier = Modifier.padding(bottom = 70.dp),
                     onClick = {
-                        addTime(CalendarInformation(Calendar.getInstance()))
+                        if (isButtonEnabled) {
+                            addTime(CalendarInformation(Calendar.getInstance()))
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White
+                        containerColor = Color.White,
+                        contentColor = if (isButtonEnabled) MainBlue else Color.Gray
                     ),
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 10.dp,
                         pressedElevation = 0.dp,
                         disabledElevation = 0.dp
                     ),
+                    enabled = isButtonEnabled
                 ) {
                     Icon(imageVector = Icons.Default.Notifications,
                         contentDescription = "Add",
-                        tint = MainBlue)
-                    Text("시간 추가", color = MainBlue, modifier = Modifier.padding(start = 10.dp))
+                        tint = if (isButtonEnabled) MainBlue else Color.Gray)
+                    Text("시간 추가", color = if (isButtonEnabled) MainBlue else Color.Gray, modifier = Modifier.padding(start = 10.dp))
                 }
             }
             Spacer(modifier = Modifier.weight(1f))

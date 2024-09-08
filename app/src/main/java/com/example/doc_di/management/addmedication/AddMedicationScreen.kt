@@ -497,7 +497,6 @@ fun TimerTextField(
             modifier = Modifier.fillMaxWidth(),
             readOnly = true,
             value = selectedTime.getDateFormatted("a HH:mm"),
-            //value = selectedTime.getDateFormatted(HOUR_MINUTE_FORMAT),
             onValueChange = {},
             trailingIcon = {
                 if (isLastItem && !isOnlyItem) {
