@@ -1,7 +1,9 @@
 package com.example.doc_di.management.addmedication
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.content.MediaType.Companion.Image
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.FabPosition
 import androidx.compose.material.icons.Icons
@@ -47,12 +50,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.decode.ImageSource
+import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
@@ -168,15 +174,24 @@ fun AddMedicationScreenUI(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 25.dp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 25.dp),
+                verticalAlignment = CenterVertically // Aligns the image and text vertically in the center
             ){
+                Image(
+                    painter = painterResource(id = R.drawable.pillemoji),
+                    contentDescription = "Icon",
+                    modifier = Modifier.size(30.dp) // Adjust size if necessary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
                     text = "복용 약 추가",
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color.Black
+                    color = Color.Black,
                 )
             }
 
