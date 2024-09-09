@@ -3,8 +3,6 @@ package com.example.doc_di.management.addmedication
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.content.MediaType.Companion.Image
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,16 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.FabPosition
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -57,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.decode.ImageSource
 import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
@@ -107,7 +101,8 @@ fun AddMedicationScreenUI(
     }
 
     // Check if the last TimerTextField is selected
-    val isButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
+    val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
+    val isSaveButtonEnabled = isNameEntered && isDoseEntered && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
 
 
     Scaffold(
@@ -142,16 +137,18 @@ fun AddMedicationScreenUI(
             ExtendedFloatingActionButton(
                 text = { Text("저장",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White) },
+                    color = Color.White )},
                 onClick = {
-                    navController.navigate(Routes.addMedicationScreen.route)
+                    if (isSaveButtonEnabled) {
+                        navController.navigate(Routes.managementScreen.route)
+                    }
                 },
                 icon = {
                     Icon(imageVector = Icons.Default.Check,
                         contentDescription = "Add",
                         tint = Color.White)
                 },
-                containerColor = MainBlue,
+                containerColor = if (isSaveButtonEnabled) MainBlue else Color.Gray,
                 elevation = FloatingActionButtonDefaults.elevation(
                     defaultElevation = 10.dp,
                     pressedElevation = 0.dp,
@@ -159,7 +156,7 @@ fun AddMedicationScreenUI(
                 modifier = Modifier
                     .width(200.dp)
                     .height(40.dp),
-                shape = MaterialTheme.shapes.extraLarge
+                shape = MaterialTheme.shapes.extraLarge,
             )
 
         },
@@ -262,25 +259,25 @@ fun AddMedicationScreenUI(
                 Button(
                     modifier = Modifier.padding(bottom = 70.dp),
                     onClick = {
-                        if (isButtonEnabled) {
+                        if (isTimerButtonEnabled) {
                             addTime(CalendarInformation(Calendar.getInstance()))
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
-                        contentColor = if (isButtonEnabled) MainBlue else Color.Gray
+                        contentColor = if (isTimerButtonEnabled) MainBlue else Color.Gray
                     ),
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 10.dp,
                         pressedElevation = 0.dp,
                         disabledElevation = 0.dp
                     ),
-                    enabled = isButtonEnabled
+                    enabled = isTimerButtonEnabled
                 ) {
                     Icon(imageVector = Icons.Default.Notifications,
                         contentDescription = "Add",
-                        tint = if (isButtonEnabled) MainBlue else Color.Gray)
-                    Text("시간 추가", color = if (isButtonEnabled) MainBlue else Color.Gray, modifier = Modifier.padding(start = 10.dp))
+                        tint = if (isTimerButtonEnabled) MainBlue else Color.Gray)
+                    Text("시간 추가", color = if (isTimerButtonEnabled) MainBlue else Color.Gray, modifier = Modifier.padding(start = 10.dp))
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
