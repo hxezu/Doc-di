@@ -18,9 +18,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val pillsSearchRepository: PillsSearchRepository
-) :ViewModel(){
-    var showSearch = mutableStateListOf(false,false,false)
+    private val pillsSearchRepository: PillsSearchRepository,
+) : ViewModel() {
+    var showSearch = mutableStateListOf(false, false, false)
     var searchTitle = arrayOf("제품명 검색", "모양 검색", "사진 검색")
 
     private val selectedPill = mutableStateOf<Pill?>(null)
@@ -39,19 +39,16 @@ class SearchViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    init {
-        searchPillsByOptions()
-    }
-
-    fun searchPillsByOptions(){
+    fun searchPillsByOptions() {
         viewModelScope.launch {
             _isLoading.value = true
             pillsSearchRepository.getPillSearchList(options).collectLatest { result ->
                 _isLoading.value = false
-                when(result){
+                when (result) {
                     is Result.Error -> {
                         _showErrorToastChannel.send(true)
                     }
+
                     is Result.Success -> {
                         Log.d("PillsViewModel", "Result.Success: ${result.data}")
                         result.data?.let { pillsList ->
@@ -63,15 +60,30 @@ class SearchViewModel(
         }
     }
 
-    fun setPillInfo(name: String){
+    fun setSelectedPillByPillName(pillName: String){
+        val option = mutableMapOf<String, String>()
+        option["name"] = pillName
+        setOptions(option)
+        searchPillsByOptions()
+
+        val pillList = pills.value
+        pillList.forEach { pill ->
+            if (pill.itemName == pillName){
+                selectedPill.value = pill
+            }
+        }
+    }
+
+    fun setPillInfo(name: String) {
         viewModelScope.launch {
             _isLoading.value = true
             pillsSearchRepository.getPillInfo(name).collectLatest { result ->
                 _isLoading.value = false
-                when(result){
+                when (result) {
                     is Result.Error -> {
                         _showErrorToastChannel.send(true)
                     }
+
                     is Result.Success -> {
                         result.data?.let { pillInfo ->
                             _pillInfo.update { pillInfo }
@@ -82,15 +94,15 @@ class SearchViewModel(
         }
     }
 
-    fun setSelectedPill (pill : Pill){
+    fun setSelectedPill(pill: Pill) {
         selectedPill.value = pill
     }
 
-    fun getSelectedPill (): Pill{
+    fun getSelectedPill(): Pill {
         return selectedPill.value!!
     }
 
-    fun setOptions (queryParams: Map<String,String>){
+    fun setOptions(queryParams: Map<String, String>) {
         options = queryParams
     }
 
@@ -98,7 +110,7 @@ class SearchViewModel(
         _pillInfo.value = PillInfo()
     }
 
-    fun resetPills(){
+    fun resetPills() {
         _pills.value = emptyList()
     }
 }

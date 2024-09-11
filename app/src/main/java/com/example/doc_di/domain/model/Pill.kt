@@ -32,5 +32,7 @@ data class Pill(
     val markCodeFrontImg: String,
     val printBack: String?,
     val printFront: String?,
-    val thick: String
+    val thick: String,
+    val rateTotal: Int,
+    val rateAmount: Int
 )

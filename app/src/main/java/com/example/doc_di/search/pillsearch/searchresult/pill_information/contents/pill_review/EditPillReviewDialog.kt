@@ -1,6 +1,5 @@
 package com.example.doc_di.search.pillsearch.searchresult.pill_information.contents.pill_review
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,34 +46,33 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.doc_di.UserViewModel
-import com.example.doc_di.domain.review.ReviewImpl
-import com.example.doc_di.etc.observeAsState
+import com.example.doc_di.domain.RetrofitInstance
+import com.example.doc_di.domain.review.ReviewData
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
-@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PillReviewDialog(
+fun EditPillReviewDialog(
     onDismiss: () -> Unit,
+    review: ReviewData,
     navController: NavController,
-    searchViewModel: SearchViewModel,
+    reviewViewModel: ReviewViewModel,
     userViewModel: UserViewModel,
-    reviewViewModel: ReviewViewModel
+    searchViewModel: SearchViewModel
 ) {
     val starYellow = Color(0xFFFFC107)
     val starGray = Color(0xFFE9EBED)
     val buttonColor = Color(0xFF4B7BE5)
 
-    var reviewText by rememberSaveable { mutableStateOf("") }
-    var curStarRating by rememberSaveable { mutableStateOf<Short>(0) }
-
+    var reviewText by rememberSaveable { mutableStateOf(review.statistic) }
+    var curStarRating by rememberSaveable { mutableStateOf(review.rate) }
     val selectedPill = searchViewModel.getSelectedPill()
-    val userInfo by userViewModel.userInfo.observeAsState()
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val reviewImpl = ReviewImpl()
 
     Dialog(
         onDismissRequest = { onDismiss() },
@@ -169,17 +167,25 @@ fun PillReviewDialog(
                     Button(
                         onClick = {
                             scope.launch {
-                                reviewImpl.createReview(
-                                    userInfo,
-                                    selectedPill,
-                                    reviewText,
-                                    curStarRating,
-                                    context,
-                                    navController,
-                                    userViewModel,
-                                    reviewViewModel,
-                                    onDismiss
+                                val accessToken =
+                                    userViewModel.checkAccessAndReissue(context, navController)
+
+                                val currentDate = LocalDate.now().toString()
+                                val reviewData = ReviewData(
+                                    id = review.id,
+                                    email = review.email,
+                                    name = review.name,
+                                    medicineName = selectedPill.itemName,
+                                    statistic = reviewText,
+                                    date = currentDate,
+                                    rate = curStarRating
                                 )
+
+                                val editResponse = RetrofitInstance.reviewApi.editReview(accessToken!!, reviewData)
+                                if (editResponse.isSuccessful){
+                                    reviewViewModel.fetchReviewInfo(context, navController, userViewModel, review.medicineName)
+                                    onDismiss()
+                                }
                             }
                         },
                         shape = RoundedCornerShape(20.dp),
@@ -188,7 +194,7 @@ fun PillReviewDialog(
                             .fillMaxWidth()
                             .height(48.dp)
                     ) {
-                        Text(text = "작성 완료", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Text(text = "수정 완료", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
