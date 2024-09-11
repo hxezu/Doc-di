@@ -39,12 +39,14 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,12 +55,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
+import com.example.doc_di.domain.RetrofitInstance
+import com.example.doc_di.domain.register.RegisterImpl
+import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.management.addmedication.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Recurrence
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 
@@ -71,6 +77,10 @@ fun AddMedicationScreenUI(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel
 ){
+    val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
     var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
 
@@ -103,6 +113,7 @@ fun AddMedicationScreenUI(
     // Check if the last TimerTextField is selected
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
     val isSaveButtonEnabled = isNameEntered && isDoseEntered && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
+
 
 
     Scaffold(
@@ -140,6 +151,21 @@ fun AddMedicationScreenUI(
                     color = Color.White )},
                 onClick = {
                     if (isSaveButtonEnabled) {
+                        scope.launch {
+                            reminderImpl.createReminder(
+                                " ",
+                                " ",
+                                " ",
+                                1,
+                                1,
+                                1,
+                                " ",
+                                context,
+                                isSaveButtonEnabled,
+                                isSaveButtonEnabled,
+                                navController
+                            )
+                        }
                         navController.navigate(Routes.managementScreen.route)
                     }
                 },
