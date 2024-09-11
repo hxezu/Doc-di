@@ -22,20 +22,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.doc_di.UserViewModel
 import com.example.doc_di.domain.model.Pill
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.search.SearchViewModel
+import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 
 @Composable
-fun ShowPillList(pillList: List<Pill>, navController: NavController, searchViewModel: SearchViewModel) {
+fun ShowPillList(
+    pillList: List<Pill>,
+    navController: NavController,
+    userViewModel: UserViewModel,
+    searchViewModel: SearchViewModel,
+    reviewViewModel: ReviewViewModel,
+) {
     val cardPillTextColor = Color(0xFF262C3D)
     val reviewTextColor = Color(0xFF747F9E)
     val starColor = Color(0xFFFFC107)
 
+    val context = LocalContext.current
     LazyColumn {
         items(pillList) { pill ->
             Card(
@@ -46,8 +56,18 @@ fun ShowPillList(pillList: List<Pill>, navController: NavController, searchViewM
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
                     .clickable {
+                        reviewViewModel.showSearch[0] = true
+                        reviewViewModel.showSearch[1] = false
+                        reviewViewModel.showSearch[2] = false
+                        reviewViewModel.showSearch[3] = false
                         searchViewModel.setSelectedPill(pill)
                         searchViewModel.setPillInfo(pill.itemName)
+                        reviewViewModel.fetchReviewInfo(
+                            context,
+                            navController,
+                            userViewModel,
+                            pill.itemName
+                        )
                         navController.navigate(Routes.pillInformation.route) {
                             popUpTo(Routes.searchMethod.route) {
                                 inclusive = false
@@ -71,12 +91,17 @@ fun ShowPillList(pillList: List<Pill>, navController: NavController, searchViewM
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.Star,
-                            tint = starColor,
+                            tint = if (pill.rateAmount != 0) starColor else reviewTextColor,
                             contentDescription = "별점",
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "4.5(834)",
+                            text = if (pill.rateAmount != 0) {
+                                val rate = pill.rateTotal.toDouble() / pill.rateAmount
+                                String.format("%.1f", rate) + "(${pill.rateAmount})"
+                            } else {
+                                "후기 미제공"
+                            },
                             color = reviewTextColor,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,

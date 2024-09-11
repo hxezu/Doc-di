@@ -19,10 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.doc_di.UserViewModel
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.GoBack
 import com.example.doc_di.search.SearchViewModel
+import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import com.example.doc_di.ui.theme.LightBlue
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -30,7 +32,9 @@ import com.example.doc_di.ui.theme.LightBlue
 fun SearchResult(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
+    userViewModel: UserViewModel,
     searchViewModel: SearchViewModel,
+    reviewViewModel: ReviewViewModel
 ) {
     val titleColor = Color(0xFF303437)
 
@@ -74,9 +78,9 @@ fun SearchResult(
             }
             else {
                 if (pillList.isEmpty()) {
-                    Text(text = "조회되는 경구약제가 없습니다.")
+                    Text(text = "조회되는 경구약제가 없습니다.", color = Color.Black)
                 } else {
-                    ShowPillList(pillList, navController, searchViewModel)
+                    ShowPillList(pillList, navController, userViewModel, searchViewModel, reviewViewModel)
                 }
             }
         }

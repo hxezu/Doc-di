@@ -101,11 +101,23 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.searchResult.route) {
-            SearchResult(navController, btmBarViewModel, searchViewModel)
+            SearchResult(
+                navController,
+                btmBarViewModel,
+                userViewModel,
+                searchViewModel,
+                reviewViewModel
+            )
         }
 
         composable(route = Routes.pillInformation.route) {
-            PillInformation(navController, btmBarViewModel, searchViewModel, userViewModel, reviewViewModel)
+            PillInformation(
+                navController,
+                btmBarViewModel,
+                searchViewModel,
+                userViewModel,
+                reviewViewModel
+            )
         }
 
         composable(route = Routes.medicalAppointmentRecord.route) {

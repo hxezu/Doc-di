@@ -55,7 +55,7 @@ fun PillInformation(
     btmBarViewModel: BtmBarViewModel,
     searchViewModel: SearchViewModel,
     userViewModel: UserViewModel,
-    reviewViewModel: ReviewViewModel
+    reviewViewModel: ReviewViewModel,
 ) {
     val titleColor = Color(0xFF303437)
     val buttonColor = Color(0xFF007AEB)
@@ -73,9 +73,10 @@ fun PillInformation(
     if (showPillReviewDialog) {
         PillReviewDialog(
             onDismiss = { showPillReviewDialog = false },
-            navController =  navController,
+            navController = navController,
             searchViewModel = searchViewModel,
-            userViewModel = userViewModel
+            userViewModel = userViewModel,
+            reviewViewModel = reviewViewModel
         )
     }
 
@@ -143,7 +144,13 @@ fun PillInformation(
                 reviewViewModel.showSearch[0] -> PillInfo(searchViewModel)
                 reviewViewModel.showSearch[1] -> PillUsage(searchViewModel)
                 reviewViewModel.showSearch[2] -> PillWarning(searchViewModel)
-                reviewViewModel.showSearch[3] -> PillReview()
+                reviewViewModel.showSearch[3] -> PillReview(
+                    selectedPill,
+                    reviewViewModel,
+                    navController,
+                    userViewModel,
+                    searchViewModel
+                )
             }
         }
     }
