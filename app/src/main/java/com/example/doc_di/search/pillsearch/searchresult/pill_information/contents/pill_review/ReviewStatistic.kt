@@ -17,22 +17,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.doc_di.domain.RetrofitInstance
-import com.example.doc_di.domain.model.Pill
-import com.example.doc_di.domain.pill.RateInfo
 import com.example.doc_di.domain.review.ReviewData
-import kotlinx.coroutines.launch
 
 @Composable
-fun ReviewStatistic(selectedPill: Pill, reviewList: List<ReviewData>) {
+fun ReviewStatistic(reviewList: List<ReviewData>) {
     val starColor = Color(0xFFFFC000)
     val barGraphColor = Color(0xFF4157FF)
     val statisticTextColor = Color.Gray
@@ -58,23 +52,6 @@ fun ReviewStatistic(selectedPill: Pill, reviewList: List<ReviewData>) {
     }
 
     val averageRate = reviewList.sumOf { it.rate.toInt() } / totalReviewNum.toDouble()
-
-    val rateInfo = RateInfo(
-        name = selectedPill.itemName,
-        rateTotal = reviewList.sumOf { review -> review.rate.toInt() },
-        rateAmount = reviewList.size
-    )
-
-    val coroutineScope = rememberCoroutineScope()
-    LaunchedEffect(reviewList) {
-        coroutineScope.launch {
-            try {
-                RetrofitInstance.pillApi.modifyRateInfo(rateInfo)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

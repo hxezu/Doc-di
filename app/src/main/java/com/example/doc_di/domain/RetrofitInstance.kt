@@ -4,6 +4,7 @@ import com.example.doc_di.domain.account.AccountApi
 import com.example.doc_di.domain.login.LoginApi
 import com.example.doc_di.domain.pill.PillApi
 import com.example.doc_di.domain.register.RegisterApi
+import com.example.doc_di.domain.reminder.ReminderApi
 import com.example.doc_di.domain.review.ReviewApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -40,6 +41,13 @@ object RetrofitInstance {
         .client(client)
         .build()
         .create(RegisterApi::class.java)
+
+    val reminderApi: ReminderApi = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl(BASE_URL)
+        .client(client)
+        .build()
+        .create(ReminderApi::class.java)
 
     val loginApi: LoginApi = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
