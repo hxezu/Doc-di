@@ -74,10 +74,10 @@ class SearchViewModel(
         }
     }
 
-    fun setPillInfo(name: String) {
+    fun setPillInfo(itemSeq: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            pillsSearchRepository.getPillInfo(name).collectLatest { result ->
+            pillsSearchRepository.getPillInfo(itemSeq).collectLatest { result ->
                 _isLoading.value = false
                 when (result) {
                     is Result.Error -> {

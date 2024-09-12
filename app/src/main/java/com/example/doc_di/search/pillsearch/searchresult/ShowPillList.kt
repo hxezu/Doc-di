@@ -61,7 +61,7 @@ fun ShowPillList(
                         reviewViewModel.showSearch[2] = false
                         reviewViewModel.showSearch[3] = false
                         searchViewModel.setSelectedPill(pill)
-                        searchViewModel.setPillInfo(pill.itemName)
+                        searchViewModel.setPillInfo(pill.itemSeq.toString())
                         reviewViewModel.fetchReviewInfo(
                             context,
                             navController,

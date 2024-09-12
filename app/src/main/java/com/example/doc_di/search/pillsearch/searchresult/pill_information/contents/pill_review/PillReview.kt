@@ -35,7 +35,7 @@ fun PillReview(
     val reviewList by reviewViewModel.reviewList.observeAsState()
 
     val rateInfo = RateInfo(
-        name = selectedPill.itemName,
+        itemSeq = selectedPill.itemSeq.toString(),
         rateTotal =  reviewList?.sumOf { review -> review.rate.toInt() } ?: 0,
         rateAmount = reviewList?.size ?: 0,
     )

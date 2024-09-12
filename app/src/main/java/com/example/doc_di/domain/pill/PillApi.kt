@@ -14,7 +14,7 @@ interface PillApi {
     suspend fun getPillSearchList(@Body options: Map<String, String>): Pills
 
     @GET("medicine/info")
-    suspend fun getPillInfo(@Query("name") name: String): PillInfos
+    suspend fun getPillInfo(@Query("itemSeq") itemSeq: String): PillInfos
 
     @PUT("medicine/statistics")
     suspend fun modifyRateInfo(@Body rateInfo: RateInfo): Response<Unit>
