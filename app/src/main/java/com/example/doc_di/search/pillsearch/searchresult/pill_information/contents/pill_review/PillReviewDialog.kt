@@ -86,110 +86,105 @@ fun PillReviewDialog(
                 .fillMaxSize()
         ) {
             Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.75f)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White)
+                    .padding(horizontal = 40.dp)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly,
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 40.dp)
+                        .fillMaxWidth()
                 ) {
-                    Box(
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "닫기",
                         modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "닫기",
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clickable { onDismiss() }
-                                .align(Alignment.CenterStart)
+                            .size(24.dp)
+                            .clickable { onDismiss() }
+                            .align(Alignment.CenterStart)
+                    )
+                    Text(
+                        text = "후기 작성",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.align(
+                            Alignment.Center
                         )
-                        Text(
-                            text = "후기 작성",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.align(
-                                Alignment.Center
-                            )
-                        )
-                    }
+                    )
+                }
 
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 1..5) {
-                            Icon(
-                                imageVector = Icons.Rounded.Star,
-                                contentDescription = "평점",
-                                tint = if (curStarRating >= i.toShort()) starYellow else starGray,
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clickable { curStarRating = i.toShort() }
-                            )
-                            if (i in 1..4) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                            }
+                Row(horizontalArrangement = Arrangement.Center) {
+                    for (i in 1..5) {
+                        Icon(
+                            imageVector = Icons.Rounded.Star,
+                            contentDescription = "평점",
+                            tint = if (curStarRating >= i.toShort()) starYellow else starGray,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clickable { curStarRating = i.toShort() }
+                        )
+                        if (i in 1..4) {
+                            Spacer(modifier = Modifier.width(8.dp))
                         }
                     }
+                }
 
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "상세 리뷰",
-                            color = Color(0xFF9CA4AB),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = reviewText,
-                            onValueChange = { reviewText = it },
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = buttonColor,
-                                cursorColor = buttonColor,
-                                unfocusedBorderColor = buttonColor
-                            ),
-                            shape = RoundedCornerShape(24.dp),
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                imeAction = ImeAction.Done,
-                                keyboardType = KeyboardType.Text
-                            ),
-                            maxLines = 4,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(136.dp)
-                                .padding(horizontal = 20.dp)
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                reviewImpl.createReview(
-                                    userInfo,
-                                    selectedPill,
-                                    reviewText,
-                                    curStarRating,
-                                    context,
-                                    navController,
-                                    userViewModel,
-                                    reviewViewModel,
-                                    onDismiss
-                                )
-                            }
-                        },
-                        shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.buttonColors(buttonColor),
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "상세 리뷰",
+                        color = Color(0xFF9CA4AB),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = reviewText,
+                        onValueChange = { reviewText = it },
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = buttonColor,
+                            cursorColor = buttonColor,
+                            unfocusedBorderColor = buttonColor
+                        ),
+                        shape = RoundedCornerShape(24.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Text
+                        ),
+                        maxLines = 4,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp)
-                    ) {
-                        Text(text = "작성 완료", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                    }
+                            .height(136.dp)
+                            .padding(horizontal = 20.dp)
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        scope.launch {
+                            reviewImpl.createReview(
+                                userInfo,
+                                selectedPill,
+                                reviewText,
+                                curStarRating,
+                                context,
+                                navController,
+                                userViewModel,
+                                reviewViewModel,
+                                onDismiss
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(buttonColor),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ) {
+                    Text(text = "작성 완료", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         }

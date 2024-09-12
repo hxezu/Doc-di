@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.UserViewModel
-import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.review.ReviewData
+import com.example.doc_di.domain.review.ReviewImpl
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import kotlinx.coroutines.launch
@@ -59,6 +59,7 @@ fun Review(
     var expanded by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val reviewImpl = ReviewImpl()
 
     Card(
         shape = MaterialTheme.shapes.small,
@@ -135,20 +136,13 @@ fun Review(
                             onClick = {
                                 expanded = false
                                 scope.launch {
-                                    val accessToken =
-                                        userViewModel.checkAccessAndReissue(context, navController)
-                                    val deleteResponse = RetrofitInstance.reviewApi.deleteReview(
-                                        accessToken!!,
-                                        review.id
+                                    reviewImpl.deleteReview(
+                                        review,
+                                        context,
+                                        navController,
+                                        userViewModel,
+                                        reviewViewModel
                                     )
-                                    if (deleteResponse.isSuccessful) {
-                                        reviewViewModel.fetchReviewInfo(
-                                            context,
-                                            navController,
-                                            userViewModel,
-                                            review.medicineName
-                                        )
-                                    }
                                 }
                             },
                         ) {

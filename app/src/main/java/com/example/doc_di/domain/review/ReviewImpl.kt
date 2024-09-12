@@ -56,4 +56,59 @@ class ReviewImpl {
             }
         }
     }
+
+    suspend fun deleteReview(
+        review: ReviewData,
+        context: Context,
+        navController: NavController,
+        userViewModel: UserViewModel,
+        reviewViewModel: ReviewViewModel,
+    ) {
+        val accessToken = userViewModel.checkAccessAndReissue(context, navController)
+        val deleteResponse = RetrofitInstance.reviewApi.deleteReview(accessToken!!, review.id)
+        if (deleteResponse.isSuccessful) {
+            reviewViewModel.fetchReviewInfo(
+                context,
+                navController,
+                userViewModel,
+                review.medicineName
+            )
+        }
+    }
+
+    suspend fun editReview(
+        review: ReviewData,
+        selectedPill: Pill,
+        reviewText: String,
+        curStarRating: Short,
+        context: Context,
+        navController: NavController,
+        userViewModel: UserViewModel,
+        reviewViewModel: ReviewViewModel,
+        onDismiss: () -> Unit,
+    ) {
+        val accessToken = userViewModel.checkAccessAndReissue(context, navController)
+
+        val currentDate = LocalDate.now().toString()
+        val reviewData = ReviewData(
+            id = review.id,
+            email = review.email,
+            name = review.name,
+            medicineName = selectedPill.itemName,
+            statistic = reviewText,
+            date = currentDate,
+            rate = curStarRating
+        )
+
+        val editResponse = RetrofitInstance.reviewApi.editReview(accessToken!!, reviewData)
+        if (editResponse.isSuccessful) {
+            reviewViewModel.fetchReviewInfo(
+                context,
+                navController,
+                userViewModel,
+                review.medicineName
+            )
+            onDismiss()
+        }
+    }
 }
