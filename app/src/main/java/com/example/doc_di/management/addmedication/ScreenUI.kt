@@ -153,13 +153,13 @@ fun AddMedicationScreenUI(
                     if (isSaveButtonEnabled) {
                         scope.launch {
                             reminderImpl.createReminder(
-                                " ",
-                                " ",
-                                " ",
-                                1,
-                                1,
-                                1,
-                                " ",
+                                "test@example.com",
+                                "Aspirin",
+                                "mg",
+                                2,
+                                3,
+                                7,
+                                "2024-09-15",
                                 context,
                                 isSaveButtonEnabled,
                                 isSaveButtonEnabled,
