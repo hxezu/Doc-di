@@ -155,11 +155,11 @@ fun AddMedicationScreenUI(
                             reminderImpl.createReminder(
                                 "test@example.com",
                                 "Aspirin",
-                                "mg",
                                 2,
-                                3,
-                                7,
+                                "daily",
                                 "2024-09-15",
+                                "11:00",
+                                "false",
                                 context,
                                 isSaveButtonEnabled,
                                 isSaveButtonEnabled,
@@ -314,7 +314,6 @@ fun AddMedicationScreenUI(
 
 
 @Preview(showBackground = true)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMedicationScreenUIPreview( ){
     val navController = rememberNavController()

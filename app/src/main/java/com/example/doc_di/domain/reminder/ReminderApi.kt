@@ -5,7 +5,7 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface ReminderApi {
-    @POST("reminder/create")
+    @POST("reminder/medicine/create")
     suspend fun createReminder(
         @Body reminderDto: ReminderDTO,
     ): Response<Unit>

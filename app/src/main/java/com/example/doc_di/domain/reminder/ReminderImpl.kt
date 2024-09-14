@@ -16,11 +16,11 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
     suspend fun createReminder(
         email: String,
         medicineName: String,
-        medicineUnit: String,
-        oneTimeAmount: Short,
-        oneTimeCount: Short,
-        eatingDays: Short,
-        eatingStartDate: String,
+        dosage: Short,
+        recurrence: String,
+        endDate: String,
+        medicationTime: String,
+        medicationTaken: String,
         context: Context,
         isAllWritten: Boolean,
         isAllAvailable: Boolean,
@@ -31,11 +31,11 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                 val reminderDTO = ReminderDTO(
                     email = email,
                     medicineName = medicineName,
-                    medicineUnit = medicineUnit,
-                    oneTimeAmount = oneTimeAmount,
-                    oneTimeCount = oneTimeCount,
-                    eatingDays = eatingDays,
-                    eatingStartDate = eatingStartDate,
+                    dosage = dosage,
+                    recurrence = recurrence,
+                    endDate = endDate,
+                    medicationTime = medicationTime,
+                    medicationTaken = medicationTaken,
                 )
 
                 val reminderResponse = reminderApi.createReminder(reminderDTO)
