@@ -9,8 +9,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.doc_di.R
-import com.example.doc_di.management.history.HistoryDestination
-import com.example.doc_di.management.home.navigation.HomeDestination
+import com.example.doc_di.reminder.history.HistoryDestination
+import com.example.doc_di.reminder.home.navigation.HomeDestination
 
 class DoseTopLevelNavigation(private val navController: NavHostController) {
 

@@ -28,6 +28,12 @@ object RetrofitInstance {
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
+    private val retrofit: Retrofit = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl(BASE_URL)
+        .client(client)
+        .build()
+
     val pillApi: PillApi = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
         .baseUrl(BASE_URL)

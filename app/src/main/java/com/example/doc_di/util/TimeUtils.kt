@@ -3,7 +3,7 @@ package com.example.doc_di.util
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.doc_di.R
-import com.example.doc_di.domain.model.Medication
+import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.extension.toFormattedDateString
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -11,13 +11,13 @@ import kotlin.math.abs
 
 const val HOUR_MINUTE_FORMAT = "h:mm a"
 @Composable
-fun getTimeRemaining(medication: Medication): String {
+fun getTimeRemaining(reminder: Reminder): String {
     val currentTime = Calendar.getInstance().time
-    val dateBefore = medication.medicationTime
+    val dateBefore = reminder.medicationTime
     val timeDiff = abs(currentTime.time - dateBefore.time)
 
     // If the medication is scheduled for a future date, display days remaining
-    if (medication.medicationTime.toFormattedDateString() != medication.endDate.toFormattedDateString()) {
+    if (reminder.medicationTime.toFormattedDateString() != reminder.endDate.toFormattedDateString()) {
         val daysRemaining = TimeUnit.DAYS.convert(timeDiff, TimeUnit.MILLISECONDS) + 1L
         return stringResource(id = R.string.time_remaining, daysRemaining, "days")
     }

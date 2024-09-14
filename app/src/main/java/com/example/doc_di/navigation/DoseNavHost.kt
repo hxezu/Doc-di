@@ -7,16 +7,16 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.doc_di.management.addmedication.navigation.addMedicationGraph
-import com.example.doc_di.management.calendar.navigation.calendarGraph
-import com.example.doc_di.management.history.historyGraph
-import com.example.doc_di.management.home.navigation.HomeDestination
-import com.example.doc_di.management.home.navigation.homeGraph
-import com.example.doc_di.management.medicationconfirm.navigation.MEDICATION
-import com.example.doc_di.management.medicationconfirm.navigation.MedicationConfirmDestination
-import com.example.doc_di.management.medicationconfirm.navigation.medicationConfirmGraph
-import com.example.doc_di.management.medicationdetail.MedicationDetailDestination
-import com.example.doc_di.management.medicationdetail.medicationDetailGraph
+import com.example.doc_di.reminder.addmedication.navigation.addMedicationGraph
+import com.example.doc_di.reminder.calendar.navigation.calendarGraph
+import com.example.doc_di.reminder.history.historyGraph
+import com.example.doc_di.reminder.home.navigation.HomeDestination
+import com.example.doc_di.reminder.home.navigation.homeGraph
+import com.example.doc_di.reminder.medicationconfirm.navigation.MEDICATION
+import com.example.doc_di.reminder.medicationconfirm.navigation.MedicationConfirmDestination
+import com.example.doc_di.reminder.medicationconfirm.navigation.medicationConfirmGraph
+import com.example.doc_di.reminder.medicationdetail.MedicationDetailDestination
+import com.example.doc_di.reminder.medicationdetail.medicationDetailGraph
 import com.example.doc_di.util.navigateSingleTop
 
 @Composable

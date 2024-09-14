@@ -22,9 +22,10 @@ import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
 import com.example.doc_di.login.ResetPage
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
-import com.example.doc_di.management.addmedication.AddMedicationScreenUI
-import com.example.doc_di.management.addschedule.AddScheduleScreenUI
-import com.example.doc_di.management.home.ManagementScreen
+import com.example.doc_di.reminder.addmedication.AddMedicationScreenUI
+import com.example.doc_di.reminder.addschedule.AddScheduleScreenUI
+import com.example.doc_di.reminder.home.ManagementScreen
+import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
@@ -47,6 +48,7 @@ fun NaviGraph(navController: NavHostController) {
     val btmBarViewModel: BtmBarViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
     val reviewViewModel: ReviewViewModel = viewModel()
+    val reminderViewModel: ReminderViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = Routes.login.route) {
 
@@ -137,7 +139,7 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.managementScreen.route) {
-            ManagementScreen(navController, btmBarViewModel)
+            ManagementScreen(navController, btmBarViewModel, reminderViewModel)
         }
 
         composable(route = Routes.addMedicationScreen.route) {

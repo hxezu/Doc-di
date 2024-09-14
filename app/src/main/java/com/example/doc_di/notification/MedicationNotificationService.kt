@@ -6,26 +6,26 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.example.doc_di.analytics.AnalyticsHelper
-import com.example.doc_di.domain.model.Medication
+import com.example.doc_di.domain.model.Reminder
 
 class MedicationNotificationService(
     private val context: Context
 ) {
 
-    fun scheduleNotification(medication: Medication, analyticsHelper: AnalyticsHelper) {
+    fun scheduleNotification(reminder: Reminder, analyticsHelper: AnalyticsHelper) {
         val intent = Intent(context, MedicationNotificationReceiver::class.java)
-        intent.putExtra(MEDICATION_INTENT, medication)
+        intent.putExtra(MEDICATION_INTENT, reminder)
 
         // TODO: Replace medication.hashCode() with medication.id when medication.id is fixed.
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            medication.hashCode(),
+            reminder.hashCode(),
             intent,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
         )
 
         val alarmService = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val time = medication.medicationTime.time
+        val time = reminder.medicationTime.time
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
@@ -39,7 +39,7 @@ class MedicationNotificationService(
             }
         }
 
-        analyticsHelper.trackNotificationScheduled(medication)
+        analyticsHelper.trackNotificationScheduled(reminder)
     }
 
     companion object {

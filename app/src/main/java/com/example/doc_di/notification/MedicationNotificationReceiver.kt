@@ -8,9 +8,8 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.doc_di.MainActivity
-import com.example.doc_di.R
 import com.example.doc_di.analytics.AnalyticsHelper
-import com.example.doc_di.domain.model.Medication
+import com.example.doc_di.domain.model.Reminder
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -25,13 +24,13 @@ class MedicationNotificationReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         context?.let {
-            intent?.getParcelableExtra<Medication>(MEDICATION_INTENT)?.let { medication ->
+            intent?.getParcelableExtra<Reminder>(MEDICATION_INTENT)?.let { medication ->
                 showNotification(it, medication)
             }
         }
     }
 
-    private fun showNotification(context: Context, medication: Medication) {
+    private fun showNotification(context: Context, reminder: Reminder) {
         val activityIntent = Intent(context, MainActivity::class.java)
         activityIntent.putExtra(MEDICATION_NOTIFICATION, true)
         val activityPendingIntent = PendingIntent.getActivity(
@@ -68,6 +67,6 @@ class MedicationNotificationReceiver : BroadcastReceiver() {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         //notificationManager.notify(medication.hashCode(), notification)
 
-        analyticsHelper.trackNotificationShown(medication)
+        analyticsHelper.trackNotificationShown(reminder)
     }
 }

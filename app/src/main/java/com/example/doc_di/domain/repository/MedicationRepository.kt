@@ -1,17 +1,17 @@
 package com.example.doc_di.domain.repository
 
-import com.example.doc_di.domain.model.Medication
+import com.example.doc_di.domain.model.Reminder
 import kotlinx.coroutines.flow.Flow
 
 interface MedicationRepository {
 
-    suspend fun insertMedications(medications: List<Medication>)
+    suspend fun insertMedications(reminders: List<Reminder>)
 
-    suspend fun deleteMedication(medication: Medication)
+    suspend fun deleteMedication(reminder: Reminder)
 
-    suspend fun updateMedication(medication: Medication)
+    suspend fun updateMedication(reminder: Reminder)
 
-    fun getAllMedications(): Flow<List<Medication>>
+    fun getAllMedications(): Flow<List<Reminder>>
 
-    fun getMedicationsForDate(date: String): Flow<List<Medication>>
+    fun getMedicationsForDate(date: String): Flow<List<Reminder>>
 }

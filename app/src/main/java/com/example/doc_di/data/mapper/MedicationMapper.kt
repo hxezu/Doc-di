@@ -1,10 +1,10 @@
 package com.example.doc_di.data.mapper
 
 import com.example.doc_di.data.entity.MedicationEntity
-import com.example.doc_di.domain.model.Medication
+import com.example.doc_di.domain.model.Reminder
 
-fun MedicationEntity.toMedication(): Medication {
-    return Medication(
+fun MedicationEntity.toMedication(): Reminder {
+    return Reminder(
         id = id,
         name = name,
         dosage = dosage,
@@ -15,7 +15,7 @@ fun MedicationEntity.toMedication(): Medication {
     )
 }
 
-fun Medication.toMedicationEntity(): MedicationEntity {
+fun Reminder.toMedicationEntity(): MedicationEntity {
     return MedicationEntity(
         id = id ?: 0L,
         name = name,

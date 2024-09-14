@@ -3,10 +3,14 @@ package com.example.doc_di.analytics
 import android.content.Context
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import com.example.doc_di.domain.model.Medication
+import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.extension.toFormattedDateString
+import com.example.doc_di.extension.toFormattedTime
+import com.example.doc_di.extension.toFormattedTimeString
 import com.google.firebase.analytics.FirebaseAnalytics
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 private const val MEDICATION_TIME = "medication_time"
 private const val MEDICATION_END_DATE = "medication_end_date"
@@ -17,19 +21,19 @@ class AnalyticsHelper(
 ) {
     private val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
-    fun trackNotificationShown(medication: Medication) {
+    fun trackNotificationShown(reminder: Reminder) {
         val params = bundleOf(
-            MEDICATION_TIME to medication.medicationTime.toFormattedDateString(),
-            MEDICATION_END_DATE to medication.endDate.toFormattedDateString(),
+            MEDICATION_TIME to reminder.medicationTime.toFormattedDateString(),
+            MEDICATION_END_DATE to reminder.endDate.toFormattedDateString(),
             NOTIFICATION_TIME to Date().toFormattedDateString()
         )
         logEvent(AnalyticsEvents.MEDICATION_NOTIFICATION_SHOWN, params)
     }
 
-    fun trackNotificationScheduled(medication: Medication) {
+    fun trackNotificationScheduled(reminder: Reminder) {
         val params = bundleOf(
-            MEDICATION_TIME to medication.medicationTime.toFormattedDateString(),
-            MEDICATION_END_DATE to medication.endDate.toFormattedDateString(),
+            MEDICATION_TIME to reminder.medicationTime.toFormattedDateString(),
+            MEDICATION_END_DATE to reminder.endDate.toFormattedDateString(),
             NOTIFICATION_TIME to Date().toFormattedDateString()
         )
         logEvent(AnalyticsEvents.MEDICATION_NOTIFICATION_SCHEDULED, params)

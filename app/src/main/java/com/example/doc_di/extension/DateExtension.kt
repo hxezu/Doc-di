@@ -15,6 +15,18 @@ fun Date.toFormattedMonthDateString(): String {
     return sdf.format(this)
 }
 
+fun String.toFormattedTime(): String {
+    val inputFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+    val outputFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+    return try {
+        val date = inputFormat.parse(this)
+        date?.let { outputFormat.format(it) } ?: this
+    } catch (e: Exception) {
+        // Handle parsing error
+        this
+    }
+}
+
 fun Date.toFormattedKoreanDateString(): String {
     val sdf = SimpleDateFormat("M월 d일", Locale.KOREA)
     return sdf.format(this)
