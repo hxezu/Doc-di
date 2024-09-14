@@ -14,5 +14,5 @@ interface ReminderApi {
     ): Response<Unit>
 
     @GET("reminder/medicine/find")
-    suspend fun findReminder(@Query("email") email: String) : Reminders
+    suspend fun findReminder(@Query("email") email: String) : ReminderResponse
 }
