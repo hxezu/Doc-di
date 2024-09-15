@@ -30,14 +30,8 @@ class ReminderViewModel @Inject constructor(
             try {
                 val response = reminderApi.findReminder(email)
                 Log.d("ReminderViewModel", "API Response: $response")
-
-                if (response.success) {
-                    val remindersList = response.data.mapNotNull { convertToReminder(it) }
-                    _reminders.value = remindersList
-                } else {
-                    // Handle failure case
-                    Log.e("ReminderViewModel", "Failed to fetch reminders")
-                }
+                val remindersList = response.data.mapNotNull { convertToReminder(it) }
+                _reminders.value = remindersList
             } catch (e: Exception) {
                 println("Failed to fetch reminders: ${e.message}")
             }
