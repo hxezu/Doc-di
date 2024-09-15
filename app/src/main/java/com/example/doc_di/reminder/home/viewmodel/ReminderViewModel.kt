@@ -1,5 +1,6 @@
 package com.example.doc_di.reminder.home.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,11 +28,15 @@ class ReminderViewModel @Inject constructor(
     fun getReminders(email: String) {
         viewModelScope.launch {
             try {
-                val remindersResponse: ReminderResponse = reminderApi.findReminder(email)
-                if (remindersResponse.success) {
-                    _reminders.value = remindersResponse.data.mapNotNull { convertToReminder(it) } // Update the state with the list of reminders
+                val response = reminderApi.findReminder(email)
+                Log.d("ReminderViewModel", "API Response: $response")
+
+                if (response.success) {
+                    val remindersList = response.data.mapNotNull { convertToReminder(it) }
+                    _reminders.value = remindersList
                 } else {
-                    println("No reminders found or operation unsuccessful")
+                    // Handle failure case
+                    Log.e("ReminderViewModel", "Failed to fetch reminders")
                 }
             } catch (e: Exception) {
                 println("Failed to fetch reminders: ${e.message}")
@@ -40,31 +45,23 @@ class ReminderViewModel @Inject constructor(
     }
 }
 
-// Extension function to parse time strings into Date
-fun String.toTimeDate(): Date? {
-    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-    return try {
-        timeFormat.parse(this)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
-}
-
 // ViewModel function to convert the DTO to domain model
 fun convertToReminder(dto: ReminderDTO): Reminder? {
-    val medicationTimeDate = dto.medicationTime.toTimeDate()
-    return if (medicationTimeDate != null) {
+    val medicationTimeDate = dto.medicationTime.toDate()
+    val endDateDate = dto.endDate.toDate()
+
+    return if (medicationTimeDate != null && endDateDate != null) {
         Reminder(
             id = null, // Set the id if available
             name = dto.medicineName,
             dosage = dto.dosage.toInt(),
             recurrence = dto.recurrence,
-            endDate = dto.endDate.toDate() ?: Date(), // Assuming endDate is in correct format
+            endDate = endDateDate, // Assuming endDate is in correct format
             medicationTaken = dto.medicationTaken.toBoolean(),
             medicationTime = medicationTimeDate
         )
     } else {
+        println("Conversion failed for DTO: $dto")
         null
     }
 }

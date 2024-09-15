@@ -8,6 +8,7 @@ import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.extension.toFormattedDateString
+import com.example.doc_di.extension.toFormattedDateTimeString
 import com.example.doc_di.extension.toFormattedTimeString
 import com.example.doc_di.reminder.addmedication.model.CalendarInformation
 import com.google.gson.Gson
@@ -51,13 +52,16 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                         for (medicationTime in medicationTimes) {
                             val medicationTimeDate = getMedicationTime(medicationTime, calendar)
 
+                            println("Medication Time Date: ${medicationTimeDate.toFormattedDateTimeString()}")
+
+
                             val reminderDTO = ReminderDTO(
                                 email = email,
                                 medicineName = medicineName,
                                 dosage = dosage,
                                 recurrence = recurrence,
-                                endDate = endDate.toFormattedDateString(), // Convert to formatted string
-                                medicationTime = medicationTimeDate.toFormattedTimeString(), // Format the time
+                                endDate = endDate.toFormattedDateString(),
+                                medicationTime = medicationTimeDate.toFormattedDateTimeString(),
                                 medicationTaken = "false"
                             )
 

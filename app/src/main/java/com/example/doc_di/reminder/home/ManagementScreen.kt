@@ -47,7 +47,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
-
+import java.util.Locale
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -61,7 +61,7 @@ fun ManagementScreen(
 
     // Trigger API call when the screen is first composed
     LaunchedEffect(Unit) {
-        reminderViewModel.getReminders("test@example.com") // Fetch reminders for the user
+        reminderViewModel.getReminders("q") // Fetch reminders for the user
     }
 
     Scaffold(
@@ -162,15 +162,24 @@ fun DailyMedications(
                 logEvent.invoke(AnalyticsEvents.HOME_NEW_DATE_SELECTED)
             }
         )
+        println(selectedDate)
 
-        // 선택된 날짜에 맞는 알림 필터링
+        val dateFormat = SimpleDateFormat("yy-MM-dd", Locale.getDefault())
+        println("Reminders Count: ${state.reminders.size}")
+
         val filteredReminders = state.reminders.filter { reminder ->
-            // reminder의 날짜와 선택된 날짜가 같은지 비교 (시간을 제외한 날짜만 비교)
-            val reminderDate = reminder.medicationTime.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate()
-            reminderDate == selectedDate
+            val medicationTimeFormatted = dateFormat.format(reminder.medicationTime)
+            val selectedDateFormatted = dateFormat.format(Date.from(selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+
+            // 변환된 값들을 출력
+            println("Medication Time Formatted: $medicationTimeFormatted")
+            println("Selected Date Formatted: $selectedDateFormatted")
+
+            medicationTimeFormatted == selectedDateFormatted
+
         }
+
+        println("Filtered Reminders: $filteredReminders")
 
         // Conditional content for medications
         if (filteredReminders.isEmpty()) {

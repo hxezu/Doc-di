@@ -35,7 +35,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -85,7 +84,7 @@ fun AddMedicationScreenUI(
     var name by rememberSaveable { mutableStateOf("") }
     var dose by rememberSaveable { mutableStateOf("") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
-    var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
+    var endDate by rememberSaveable { mutableStateOf(Date()) }
     val startDate = Calendar.getInstance().time
 
     var isNameEntered by remember { mutableStateOf(false) }
@@ -158,18 +157,13 @@ fun AddMedicationScreenUI(
 
                         scope.launch {
                             reminderImpl.createReminder(
-                                email = "test@example.com",
-                                medicineName = "Aspirin",
-                                dosage = 2,
+                                email = "q",
+                                medicineName = name,
+                                dosage = dose.toShort(),
                                 recurrence = "Weekly",
-                                startDate = Date(2024, 9, 15),
-                                endDate = Date(2024, 10, 6),
-                                medicationTimes = listOf(
-                                    CalendarInformation(Calendar.getInstance().apply {
-                                        set(Calendar.HOUR_OF_DAY, 11)
-                                        set(Calendar.MINUTE, 0)
-                                    })
-                                ),
+                                startDate = startDate,
+                                endDate = endDate,
+                                medicationTimes = selectedTimes,
                                 context = context,
                                 isAllWritten  = isSaveButtonEnabled,
                                 isAllAvailable  = isSaveButtonEnabled,
@@ -230,8 +224,9 @@ fun AddMedicationScreenUI(
 
             AddMedicationName(
                 isNameEntered = isNameEntered,
-                onNameChange = { name ->
-                    isNameEntered = name.isNotEmpty()
+                onNameChange = { nameValue ->
+                    name = nameValue
+                    isNameEntered = nameValue.isNotEmpty()
                 })
             Spacer(modifier = Modifier.padding(4.dp))
 
@@ -240,6 +235,7 @@ fun AddMedicationScreenUI(
                     isDoseEntered = isDoseEntered,
                     maxDose = 99,
                     onValueChange = { doseValue ->
+                        dose = doseValue
                         isDoseEntered = doseValue.isNotEmpty()
                     })
                 RecurrenceDropdownMenu (
@@ -252,8 +248,8 @@ fun AddMedicationScreenUI(
 
             Spacer(modifier = Modifier.padding(4.dp))
             EndDateTextField(
-                onDateSelected = { selectedEndDate ->
-                    endDate = selectedEndDate
+                onDateSelected = { timestamp ->
+                    endDate = Date(timestamp) // Convert the Long timestamp to a Date object
                     isEndDateSelected = true
                 },
                 isEndDateSelected = isEndDateSelected
