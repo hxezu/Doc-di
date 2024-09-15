@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +43,8 @@ import com.example.doc_di.reminder.home.utils.MultiFloatingActionButton
 import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
 import com.example.doc_di.ui.theme.MainBlue
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 
@@ -107,11 +110,6 @@ fun ManagementScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
-            val sampleState = ReminderState(
-                reminders = reminders, // Use reminders fetched from the API
-                lastSelectedDate = SimpleDateFormat("yyyy-MM-dd").format(Date()) // Current date as default
-            )
-
             val navigateToMedicationDetail: (Reminder) -> Unit = {}
             val onDateSelected: (CalendarModel.DateModel) -> Unit = {}
             val onSelectedDate: (Date) -> Unit = {}
@@ -120,7 +118,10 @@ fun ManagementScreen(
             Surface(color = Color.Transparent) {
                 DailyMedications(
                     navController = navController,
-                    state = sampleState,
+                    state = ReminderState(
+                        reminders = reminders, // Use reminders fetched from the API
+                        lastSelectedDate = SimpleDateFormat("yyyy-MM-dd").format(Date()) // Current date as default
+                    ),
                     navigateToMedicationDetail = navigateToMedicationDetail,
                     onDateSelected = onDateSelected,
                     onSelectedDate = onSelectedDate,
@@ -141,6 +142,8 @@ fun DailyMedications(
     onDateSelected: (CalendarModel.DateModel) -> Unit,
     logEvent: (String) -> Unit
 ) {
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -151,14 +154,26 @@ fun DailyMedications(
         DatesHeader(
             lastSelectedDate = state.lastSelectedDate,
             logEvent = { logEvent.invoke(it) },
-            onDateSelected = { selectedDate ->
-                onSelectedDate(selectedDate.date)
+            onDateSelected = { selectedDateModel ->
+                selectedDate = selectedDateModel.date.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                onSelectedDate(selectedDateModel.date)
                 logEvent.invoke(AnalyticsEvents.HOME_NEW_DATE_SELECTED)
             }
         )
 
+        // 선택된 날짜에 맞는 알림 필터링
+        val filteredReminders = state.reminders.filter { reminder ->
+            // reminder의 날짜와 선택된 날짜가 같은지 비교 (시간을 제외한 날짜만 비교)
+            val reminderDate = reminder.medicationTime.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+            reminderDate == selectedDate
+        }
+
         // Conditional content for medications
-        if (state.reminders.isEmpty()) {
+        if (filteredReminders.isEmpty()) {
             EmptyCard(
                 navController = navController,
                 logEvent = { logEvent.invoke(it) }
@@ -168,7 +183,7 @@ fun DailyMedications(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
-                    items = state.reminders,
+                    items = filteredReminders,
                     itemContent = {
                         MedicationCard(
                             reminder = it,

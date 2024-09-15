@@ -64,8 +64,10 @@ import com.example.doc_di.reminder.addmedication.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Recurrence
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 
 //현재 앱 실행 때 뜨는 화면
@@ -80,8 +82,11 @@ fun AddMedicationScreenUI(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    var name by rememberSaveable { mutableStateOf("") }
+    var dose by rememberSaveable { mutableStateOf("") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
     var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
+    val startDate = Calendar.getInstance().time
 
     var isNameEntered by remember { mutableStateOf(false) }
     var isDoseEntered by remember { mutableStateOf(false) }
@@ -150,19 +155,25 @@ fun AddMedicationScreenUI(
                     color = Color.White )},
                 onClick = {
                     if (isSaveButtonEnabled) {
+
                         scope.launch {
                             reminderImpl.createReminder(
-                                "test@example.com",
-                                "Aspirin",
-                                2,
-                                "daily",
-                                "2024-09-15",
-                                "11:00",
-                                "false",
-                                context,
-                                isSaveButtonEnabled,
-                                isSaveButtonEnabled,
-                                navController
+                                email = "test@example.com",
+                                medicineName = "Aspirin",
+                                dosage = 2,
+                                recurrence = "Weekly",
+                                startDate = Date(2024, 9, 15),
+                                endDate = Date(2024, 10, 6),
+                                medicationTimes = listOf(
+                                    CalendarInformation(Calendar.getInstance().apply {
+                                        set(Calendar.HOUR_OF_DAY, 11)
+                                        set(Calendar.MINUTE, 0)
+                                    })
+                                ),
+                                context = context,
+                                isAllWritten  = isSaveButtonEnabled,
+                                isAllAvailable  = isSaveButtonEnabled,
+                                navController = navController
                             )
                         }
                         navController.navigate(Routes.managementScreen.route)
