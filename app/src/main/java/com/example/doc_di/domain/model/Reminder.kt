@@ -6,8 +6,8 @@ import java.util.Date
 
 @Parcelize
 data class Reminder(
-    val id: Long?,
     val name: String,
+    val id: Long?,
     val dosage: Int,
     val recurrence: String,
     val endDate: Date,

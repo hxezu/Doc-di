@@ -48,6 +48,17 @@ fun String.toDate(): Date? {
     }
 }
 
+// Convert String to Date object (e.g., "2024-10-06" to Date)
+fun String.toDateTime(): Date? {
+    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+    return try {
+        sdf.parse(this)
+    } catch (e: ParseException) {
+        e.printStackTrace()
+        null
+    }
+}
+
 // Convert Date to a formatted string for Korean display (e.g., "11월 06일")
 fun Date.toFormattedKoreanDateString(): String {
     val sdf = SimpleDateFormat("M월 d일", Locale.KOREA)

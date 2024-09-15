@@ -179,7 +179,6 @@ fun DailyMedications(
             medicationTimeFormatted == selectedDateFormatted
         }
 
-        println("Filtered Reminders: $filteredReminders")
 
         // Conditional content for medications
         if (filteredReminders.isEmpty()) {

@@ -52,8 +52,6 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                         for (medicationTime in medicationTimes) {
                             val medicationTimeDate = getMedicationTime(medicationTime, calendar)
 
-                            println("Medication Time Date: ${medicationTimeDate.toFormattedDateTimeString()}")
-
 
                             val reminderDTO = ReminderDTO(
                                 email = email,

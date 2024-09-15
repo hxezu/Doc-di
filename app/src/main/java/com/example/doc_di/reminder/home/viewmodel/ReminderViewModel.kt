@@ -13,6 +13,7 @@ import javax.inject.Inject
 import androidx.compose.runtime.*
 import com.example.doc_di.domain.reminder.ReminderResponse
 import com.example.doc_di.extension.toDate
+import com.example.doc_di.extension.toDateTime
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -56,7 +57,7 @@ class ReminderViewModel @Inject constructor(
 
 // ViewModel function to convert the DTO to domain model
 fun convertToReminder(dto: ReminderDTO): Reminder? {
-    val medicationTimeDate = dto.medicationTime.toDate()
+    val medicationTimeDate = dto.medicationTime.toDateTime()
     val endDateDate = dto.endDate.toDate()
 
     return if (medicationTimeDate != null && endDateDate != null) {

@@ -54,7 +54,6 @@ fun MedicationCard(
             .padding(vertical = 10.dp, horizontal = 20.dp),
 
     ) {
-        println(reminder.medicationTime.toFormattedTimeString())
 
         Text(
             reminder.medicationTime.toFormattedTimeString(),
