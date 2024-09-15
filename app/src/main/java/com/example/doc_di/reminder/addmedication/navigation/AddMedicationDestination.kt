@@ -6,7 +6,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.doc_di.domain.model.Reminder
-import com.example.doc_di.reminder.addmedication.AddMedicationRoute
 import com.example.doc_di.reminder.home.navigation.ASK_ALARM_PERMISSION
 import com.example.doc_di.reminder.home.navigation.ASK_NOTIFICATION_PERMISSION
 import com.example.doc_di.navigation.DoseNavigationDestination
@@ -29,6 +28,6 @@ fun NavGraphBuilder.addMedicationGraph(navController: NavController, bottomBarVi
         navController.previousBackStackEntry?.savedStateHandle.apply {
             this?.set(ASK_ALARM_PERMISSION, true)
         }
-        AddMedicationRoute(onBackClicked, navigateToMedicationConfirm)
+        //AddMedicationRoute(onBackClicked, navigateToMedicationConfirm)
     }
 }

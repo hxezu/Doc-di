@@ -37,9 +37,9 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
             CoroutineScope(Dispatchers.IO).launch {
                 try{
                     val interval = when (recurrence) {
-                        "Daily" -> 1
-                        "Weekly" -> 7
-                        "Monthly" -> 30
+                        "매일" -> 1
+                        "매주" -> 7
+                        "매달" -> 30
                         else -> throw IllegalArgumentException("Invalid recurrence: $recurrence")
                     }
                     val oneDayInMillis = 86400 * 1000 // Number of milliseconds in one day

@@ -110,12 +110,12 @@ fun MedicationLazyColumn(sortedMedicationList: List<MedicationListItem>, navigat
                         )
                     }
                     is MedicationListItem.MedicationItem -> {
-                        MedicationCard(
-                            reminder = it.reminder,
-                            navigateToMedicationDetail = { medication ->
-                                navigateToMedicationDetail(medication)
-                            }
-                        )
+//                        MedicationCard(
+//                            reminder = it.reminder,
+//                            navigateToMedicationDetail = { medication ->
+//                                navigateToMedicationDetail(medication)
+//                            }
+//                        )
                     }
                 }
             }

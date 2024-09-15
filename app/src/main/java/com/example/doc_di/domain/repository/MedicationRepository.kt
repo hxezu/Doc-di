@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface MedicationRepository {
 
-    suspend fun insertMedications(reminders: List<Reminder>)
+    suspend fun insertMedications(medications: List<Reminder>)
 
-    suspend fun deleteMedication(reminder: Reminder)
+    suspend fun deleteMedication(medication: Reminder)
 
-    suspend fun updateMedication(reminder: Reminder)
+    suspend fun updateMedication(medication: Reminder)
 
     fun getAllMedications(): Flow<List<Reminder>>
 

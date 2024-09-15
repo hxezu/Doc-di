@@ -13,10 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,13 +38,15 @@ import com.example.doc_di.analytics.AnalyticsEvents
 import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.extension.toFormattedTimeString
 import com.example.doc_di.reminder.addmedication.navigation.AddMedicationDestination
+import com.example.doc_di.ui.theme.MainBlue
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicationCard(
     reminder: Reminder,
-    navigateToMedicationDetail: (Reminder) -> Unit
+    navigateToMedicationDetail: (Reminder) -> Unit,
+    deleteReminder: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -48,6 +54,7 @@ fun MedicationCard(
             .padding(vertical = 10.dp, horizontal = 20.dp),
 
     ) {
+        println(reminder.medicationTime.toFormattedTimeString())
 
         Text(
             reminder.medicationTime.toFormattedTimeString(),
@@ -62,7 +69,7 @@ fun MedicationCard(
                     border = BorderStroke(width = 0.5.dp, color = Color(0xFFECEDEF)), // Black border with 2.dp width
                     shape = RoundedCornerShape(30.dp) // Same shape as the card
                 ),
-            onClick = { navigateToMedicationDetail(reminder) },
+            //onClick = { navigateToMedicationDetail(reminder) },
             shape = RoundedCornerShape(30.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White,
@@ -105,49 +112,69 @@ fun MedicationCard(
                 }
 
                 Text(
-                    text = reminder.recurrence + " 일간",
+                    text = reminder.recurrence,
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
                         .weight(1.5f)
                 )
+
+                // Trash can icon button
+                IconButton(
+                    onClick = {
+                        println("Delete")
+                        println("Reminder ID: ${reminder.id}")
+                        reminder.id?.let {
+                            println("Delete icon clicked for reminder ID: $it")
+                            deleteReminder(it.toInt())
+                        } },
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete",
+                        tint = MainBlue
+                    )
+                }
             }
         }
     }
 
 }
 
-@Preview
-@Composable
-private fun MedicationCardTakeNowPreview() {
-    MedicationCard(
-        Reminder(
-            id = 123L,
-            name = "오메가 3",
-            dosage = 1,
-            recurrence = "2",
-            endDate = Date(),
-            medicationTime = Date(),
-            medicationTaken = false
-        )
-    ) { }
-}
-
-@Preview
-@Composable
-private fun MedicationCardTakenPreview() {
-    MedicationCard(
-        Reminder(
-            id = 123L,
-            name = "소염제",
-            dosage = 1,
-            recurrence = "2",
-            endDate = Date(),
-            medicationTime = Date(),
-            medicationTaken = true
-        )
-    ) { }
-}
+//@Preview
+//@Composable
+//private fun MedicationCardTakeNowPreview() {
+//    MedicationCard(
+//        Reminder(
+//            id = 123L,
+//            name = "오메가 3",
+//            dosage = 1,
+//            recurrence = "매일",
+//            endDate = Date(),
+//            medicationTime = Date(),
+//            medicationTaken = false
+//        )
+//    ) { }
+//}
+//
+//@Preview
+//@Composable
+//private fun MedicationCardTakenPreview() {
+//    MedicationCard(
+//        Reminder(
+//            id = 123L,
+//            name = "소염제",
+//            dosage = 1,
+//            recurrence = "매주",
+//            endDate = Date(),
+//            medicationTime = Date(),
+//            medicationTaken = true
+//        )
+//    ) { }
+//}
 
 @Composable
 fun EmptyCard(

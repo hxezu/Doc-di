@@ -13,6 +13,7 @@ import javax.inject.Inject
 import androidx.compose.runtime.*
 import com.example.doc_di.domain.reminder.ReminderResponse
 import com.example.doc_di.extension.toDate
+import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -37,6 +38,20 @@ class ReminderViewModel @Inject constructor(
             }
         }
     }
+    fun deleteReminder(reminderId: Int) {
+        viewModelScope.launch {
+            try {
+                val response: Response<Unit> = reminderApi.deleteReminder(reminderId)
+                if (response.isSuccessful) {
+                    _reminders.value = _reminders.value.filterNot { it.id?.toInt() == reminderId }
+                } else {
+                    println("Failed to delete reminder: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                println("Failed to delete reminders: ${e.message}")
+            }
+        }
+    }
 }
 
 // ViewModel function to convert the DTO to domain model
@@ -46,7 +61,7 @@ fun convertToReminder(dto: ReminderDTO): Reminder? {
 
     return if (medicationTimeDate != null && endDateDate != null) {
         Reminder(
-            id = null, // Set the id if available
+            id = generateNewId(), // Set the id if available
             name = dto.medicineName,
             dosage = dto.dosage.toInt(),
             recurrence = dto.recurrence,
@@ -58,4 +73,8 @@ fun convertToReminder(dto: ReminderDTO): Reminder? {
         println("Conversion failed for DTO: $dto")
         null
     }
+}
+
+fun generateNewId(): Long {
+    return System.currentTimeMillis() // Example placeholder
 }

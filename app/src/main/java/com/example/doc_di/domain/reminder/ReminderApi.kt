@@ -1,8 +1,10 @@
 package com.example.doc_di.domain.reminder
 
+import androidx.room.Delete
 import com.example.doc_di.domain.model.Reminders
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -17,4 +19,9 @@ interface ReminderApi {
     suspend fun findReminder(
         @Query("email") email: String
     ) : ReminderResponse
+
+    @DELETE("reminder/medicine/delete")
+    suspend fun deleteReminder(
+        @Query("id") id: Int
+    ): Response<Unit>
 }

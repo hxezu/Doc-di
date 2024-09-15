@@ -1,10 +1,14 @@
 package com.example.doc_di.reminder.home
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,12 +20,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -42,6 +47,7 @@ import com.example.doc_di.reminder.home.utils.MultiFabItem
 import com.example.doc_di.reminder.home.utils.MultiFloatingActionButton
 import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
 import com.example.doc_di.ui.theme.MainBlue
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -49,11 +55,10 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ManagementScreen(
-    navController: NavController, 
+    navController: NavController,
     btmBarViewModel: BtmBarViewModel,
     reminderViewModel: ReminderViewModel = hiltViewModel()
 ) {
@@ -125,7 +130,8 @@ fun ManagementScreen(
                     navigateToMedicationDetail = navigateToMedicationDetail,
                     onDateSelected = onDateSelected,
                     onSelectedDate = onSelectedDate,
-                    logEvent = logEvent
+                    logEvent = logEvent,
+                    reminderViewModel = reminderViewModel
                 )
             }
         }
@@ -140,7 +146,8 @@ fun DailyMedications(
     navigateToMedicationDetail: (Reminder) -> Unit,
     onSelectedDate: (Date) -> Unit,
     onDateSelected: (CalendarModel.DateModel) -> Unit,
-    logEvent: (String) -> Unit
+    logEvent: (String) -> Unit,
+    reminderViewModel: ReminderViewModel
 ) {
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
@@ -165,39 +172,32 @@ fun DailyMedications(
         println(selectedDate)
 
         val dateFormat = SimpleDateFormat("yy-MM-dd", Locale.getDefault())
-        println("Reminders Count: ${state.reminders.size}")
 
         val filteredReminders = state.reminders.filter { reminder ->
             val medicationTimeFormatted = dateFormat.format(reminder.medicationTime)
             val selectedDateFormatted = dateFormat.format(Date.from(selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-
-            // 변환된 값들을 출력
-            println("Medication Time Formatted: $medicationTimeFormatted")
-            println("Selected Date Formatted: $selectedDateFormatted")
-
             medicationTimeFormatted == selectedDateFormatted
-
         }
 
         println("Filtered Reminders: $filteredReminders")
 
         // Conditional content for medications
         if (filteredReminders.isEmpty()) {
-            EmptyCard(
-                navController = navController,
-                logEvent = { logEvent.invoke(it) }
-            )
+
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
                     items = filteredReminders,
-                    itemContent = {
+                    itemContent = { reminder ->
                         MedicationCard(
-                            reminder = it,
+                            reminder = reminder,
                             navigateToMedicationDetail = { medication ->
                                 navigateToMedicationDetail(medication)
+                            },
+                            deleteReminder = { reminderId ->
+                                reminderViewModel.deleteReminder(reminderId)
                             }
                         )
                     }
