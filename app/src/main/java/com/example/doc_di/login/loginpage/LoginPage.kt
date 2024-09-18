@@ -107,9 +107,9 @@ fun LoginPage(navController: NavController, userViewModel: UserViewModel) {
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
-            TextButton(onClick = { navController.navigate(Routes.reset.route) }) {
+            TextButton(onClick = { navController.navigate(Routes.resetPassword.route) }) {
                 Text(
-                    text = "아이디/비밀번호 찾기",
+                    text = "비밀번호 찾기",
                     color = LightBlue,
                     letterSpacing = 1.sp,
                     style = MaterialTheme.typography.labelLarge,

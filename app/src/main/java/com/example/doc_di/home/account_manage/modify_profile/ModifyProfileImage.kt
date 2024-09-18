@@ -12,9 +12,7 @@ import androidx.activity.result.launch
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,9 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.doc_di.R
 
 @RequiresApi(Build.VERSION_CODES.P)
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -42,15 +38,6 @@ fun ModifyProfileImage(
     bitmap: MutableState<Bitmap?>,
     context: Context,
 ) {
-
-    if (imageBitmap.value == null) {
-        val basicImageBitmap = ImageDecoder.decodeBitmap(
-            ImageDecoder.createSource(context.resources, R.drawable.basic_image)
-        )
-        bitmap.value = basicImageBitmap
-        imageBitmap.value = basicImageBitmap.asImageBitmap()
-    }
-
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -74,32 +61,17 @@ fun ModifyProfileImage(
 
     var showImagePickerDialog by rememberSaveable { mutableStateOf(false) }
 
-    Box(
+    Image(
+        bitmap = bitmap.value!!.asImageBitmap(),
+        contentDescription = "프로필 기본 사진",
+        contentScale = ContentScale.Crop,
         modifier = Modifier
             .size(96.dp)
             .clickable {
                 showImagePickerDialog = true
             }
             .clip(RoundedCornerShape(24.dp))
-    ) {
-        if (imageBitmap.value != null) {
-            Image(
-                bitmap = imageBitmap.value!!,
-                contentDescription = "프로필 사진",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
-        } else {
-            Image(
-                painter = painterResource(id = R.drawable.basic_image),
-                contentDescription = "프로필 기본 사진",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
-        }
-    }
+    )
 
     if (showImagePickerDialog) {
         ImagePickerDialog(

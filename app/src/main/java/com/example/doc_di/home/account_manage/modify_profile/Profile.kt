@@ -1,7 +1,6 @@
 package com.example.doc_di.home.account_manage.modify_profile
 
 import ModifyName
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -38,24 +37,26 @@ import com.example.doc_di.UserViewModel
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.account.AccountImpl
 import com.example.doc_di.etc.GoBack
+import com.example.doc_di.etc.observeAsState
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun Profile(navController: NavController, userViewModel: UserViewModel) {
     val context = LocalContext.current
-    val userInfo by remember { mutableStateOf(userViewModel.userInfo.value!!) }
+    val userImage by userViewModel.userImage.observeAsState()
+    val userInfo by userViewModel.userInfo.observeAsState()
     val accountImpl = AccountImpl(RetrofitInstance.accountApi)
 
-    val isNameAvailable = rememberSaveable { mutableStateOf(false) }
+    val isNameAvailable = rememberSaveable { mutableStateOf(true) }
     val isPasswordAvailable = rememberSaveable { mutableStateOf(false) }
 
-    val name = rememberSaveable { mutableStateOf("") }
+    val name = rememberSaveable { mutableStateOf(userInfo!!.name) }
     val password = rememberSaveable { mutableStateOf("") }
     val passwordCheck = rememberSaveable { mutableStateOf("") }
     val imageUri = remember { mutableStateOf<Uri?>(null) }
     val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
-    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
+    val bitmap = remember { mutableStateOf(userImage) }
 
     val isAllWritten by remember {
         derivedStateOf {
@@ -94,7 +95,7 @@ fun Profile(navController: NavController, userViewModel: UserViewModel) {
             onClick = {
                 scope.launch {
                     accountImpl.modifyProfile(
-                        userInfo.email,
+                        userInfo!!.email,
                         password.value,
                         name.value,
                         context,

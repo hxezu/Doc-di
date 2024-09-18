@@ -19,9 +19,9 @@ import com.example.doc_di.home.Home
 import com.example.doc_di.home.account_manage.ModifyLogoutAccountDelete
 import com.example.doc_di.home.account_manage.modify_profile.Profile
 import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
-import com.example.doc_di.login.ResetPage
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
+import com.example.doc_di.login.resetpassword.ResetPassword
 import com.example.doc_di.reminder.addmedication.AddMedicationScreenUI
 import com.example.doc_di.reminder.addschedule.AddScheduleScreenUI
 import com.example.doc_di.reminder.home.ManagementScreen
@@ -60,8 +60,8 @@ fun NaviGraph(navController: NavHostController) {
             RegisterPage(navController)
         }
 
-        composable(Routes.reset.route) {
-            ResetPage(navController)
+        composable(Routes.resetPassword.route) {
+            ResetPassword(navController)
         }
 
         composable(route = Routes.home.route) {

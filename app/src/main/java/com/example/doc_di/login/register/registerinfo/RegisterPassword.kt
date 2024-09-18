@@ -66,6 +66,7 @@ fun RegisterPassword(
                 )
             }
         },
+        singleLine = true,
         modifier = Modifier.fillMaxWidth(0.8f)
     )
 
@@ -101,6 +102,7 @@ fun RegisterPassword(
                 )
             }
         },
+        singleLine = true,
         modifier = Modifier.fillMaxWidth(0.8f)
     )
     if (password.value.isNotEmpty() && passwordCheck.value.isNotEmpty()) {
