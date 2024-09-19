@@ -1,6 +1,8 @@
 package com.example.doc_di.login.register.registerinfo
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
@@ -67,7 +69,10 @@ fun RegisterPassword(
             }
         },
         singleLine = true,
-        modifier = Modifier.fillMaxWidth(0.8f)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 40.dp)
+            .height(64.dp)
     )
 
     OutlinedTextField(
@@ -103,7 +108,11 @@ fun RegisterPassword(
             }
         },
         singleLine = true,
-        modifier = Modifier.fillMaxWidth(0.8f)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 40.dp)
+            .height(64.dp)
+
     )
     if (password.value.isNotEmpty() && passwordCheck.value.isNotEmpty()) {
         if (password.value == passwordCheck.value) {

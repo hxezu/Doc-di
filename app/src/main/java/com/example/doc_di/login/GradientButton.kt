@@ -24,16 +24,15 @@ fun GradientButton(
     gradientColors: List<Color>,
     cornerRadius: Dp,
     roundedCornerShape: RoundedCornerShape,
-    buttonName: String
+    buttonName: String,
+    modifier: Modifier
 ) {
     Button(
         onClick = onClick,
         contentPadding = PaddingValues(),
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(cornerRadius),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 32.dp, end = 32.dp)
+        modifier = modifier
     ) {
         Box(
             contentAlignment = Alignment.Center,

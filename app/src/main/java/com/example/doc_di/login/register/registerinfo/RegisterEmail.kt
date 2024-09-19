@@ -1,6 +1,8 @@
 package com.example.doc_di.login.register.registerinfo
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
@@ -25,7 +27,7 @@ fun RegisterEmail(email: MutableState<String>) {
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                "이메일 입력",
+                text = "이메일 입력",
                 color = Color.Black,
                 style = MaterialTheme.typography.labelMedium,
             )
@@ -42,6 +44,9 @@ fun RegisterEmail(email: MutableState<String>) {
         ),
         singleLine = true,
         modifier = Modifier
-            .fillMaxWidth(0.8f)
+            .fillMaxWidth()
+            .padding(horizontal = 40.dp)
+            .height(64.dp)
+
     )
 }

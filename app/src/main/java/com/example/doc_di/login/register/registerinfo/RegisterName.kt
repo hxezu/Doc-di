@@ -1,6 +1,7 @@
 package com.example.doc_di.login.register.registerinfo
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -66,8 +67,10 @@ fun RegisterName(name: MutableState<String>, isNameAvailable: MutableState<Boole
         ),
         singleLine = true,
         modifier = Modifier
-            .fillMaxWidth(0.8f)
+            .fillMaxWidth()
+            .padding(horizontal = 40.dp)
             .padding(top = 4.dp)
+            .height(64.dp)
     )
     if (!userNameError.isNullOrEmpty()) {
         Text(text = userNameError!!, color = Color.Red)

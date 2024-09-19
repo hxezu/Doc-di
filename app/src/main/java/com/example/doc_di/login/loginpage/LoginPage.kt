@@ -95,7 +95,10 @@ fun LoginPage(navController: NavController, userViewModel: UserViewModel) {
                 gradientColors = gradientColor,
                 cornerRadius = cornerRadius,
                 roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
-                buttonName = "로그인"
+                buttonName = "로그인",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 32.dp, end = 32.dp)
             )
             Spacer(modifier = Modifier.height(20.dp))
             TextButton(onClick = { navController.navigate(Routes.register.route) }) {

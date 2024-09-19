@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -57,7 +58,10 @@ fun ResetPassword(navController: NavController) {
             gradientColors = gradientColor,
             cornerRadius = cornerRadius,
             roundedCornerShape = RoundedCornerShape(topStart = 30.dp, bottomEnd = 30.dp),
-            buttonName = "제출"
+            buttonName = "제출",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 32.dp, end = 32.dp)
         )
         TextButton(
             onClick = {
