@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.addmedication
+package com.example.doc_di.reminder.medication_reminder
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -17,23 +17,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.FabPosition
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -45,52 +46,60 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
-import com.example.doc_di.UserViewModel
-import com.example.doc_di.domain.RetrofitInstance
-import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.etc.observeAsState
-import com.example.doc_di.reminder.addmedication.model.CalendarInformation
+import com.example.doc_di.extension.toDate
+import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
+import com.example.doc_di.reminder.medication_reminder.utils.AddMedicationName
+import com.example.doc_di.reminder.medication_reminder.utils.DoseInputField
+import com.example.doc_di.reminder.medication_reminder.utils.EndDateTextField
+import com.example.doc_di.reminder.medication_reminder.utils.RecurrenceDropdownMenu
+import com.example.doc_di.reminder.medication_reminder.utils.TimerTextField
 import com.example.doc_di.ui.theme.MainBlue
-import com.example.doc_di.util.Recurrence
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-
-//현재 앱 실행 때 뜨는 화면
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddMedicationScreenUI(
+fun EditMedicationScreen(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
-    userViewModel: UserViewModel
-){
-    val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
-    val userEmail = userViewModel.userInfo.value?.email ?: ""
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    reminderViewModel: ReminderViewModel = hiltViewModel(),
+    reminderId: Int?
+) {
+    val reminder by remember(reminderId) {
+        mutableStateOf(reminderId?.let { reminderViewModel.getReminderById(it) })
+    }
 
-    var name by rememberSaveable { mutableStateOf("") }
-    var dose by rememberSaveable { mutableStateOf("") }
-    var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
-    var endDate by rememberSaveable { mutableStateOf(Date()) }
-    val startDate = Calendar.getInstance().time
+    var name by remember { mutableStateOf("") }
+    var dose by remember { mutableStateOf("") }
+    var recurrence by remember { mutableStateOf("") }
+    var endDate by remember { mutableStateOf(Date()) }
+
+    // 데이터 로드 후 상태 초기화
+    LaunchedEffect(reminder) {
+        reminder?.let {
+            name = it.medicineName
+            println("name :" + name)
+            dose = it.dosage.toString()
+            recurrence = it.recurrence
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            endDate = dateFormat.parse(it.endDate) ?: Date()
+        }
+    }
 
     var isNameEntered by remember { mutableStateOf(false) }
     var isDoseEntered by remember { mutableStateOf(false) }
@@ -100,13 +109,8 @@ fun AddMedicationScreenUI(
     val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
     var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
     var lastSelectedIndex by remember { mutableStateOf<Int?>(null) }
-
     fun setTimeSelected(index: Int, isSelected: Boolean) {
-        selectedTimeIndices = if (isSelected) {
-            selectedTimeIndices + index
-        } else {
-            selectedTimeIndices - index
-        }
+        selectedTimeIndices = if (isSelected) { selectedTimeIndices + index } else { selectedTimeIndices - index }
         lastSelectedIndex = if (isSelected) index else lastSelectedIndex
     }
 
@@ -114,10 +118,8 @@ fun AddMedicationScreenUI(
 
     fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
 
-    // Check if the last TimerTextField is selected
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
     val isSaveButtonEnabled = isNameEntered && isDoseEntered && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
-
 
 
     Scaffold(
@@ -150,34 +152,31 @@ fun AddMedicationScreenUI(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = { Text("저장",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White )},
+                text = {
+                    Text(
+                        "수정 완료",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White
+                    )
+                },
                 onClick = {
                     if (isSaveButtonEnabled) {
-
-                        scope.launch {
-                            reminderImpl.createReminder(
-                                email = userEmail,
-                                medicineName = name,
-                                dosage = dose.toShort(),
-                                recurrence = recurrence,
-                                startDate = startDate,
-                                endDate = endDate,
-                                medicationTimes = selectedTimes,
-                                context = context,
-                                isAllWritten  = isSaveButtonEnabled,
-                                isAllAvailable  = isSaveButtonEnabled,
-                                navController = navController
-                            )
-                        }
+//                        reminderViewModel.editReminder (
+//                            medicineName = name,
+//                            dosage = dose.toShort(),
+//                            recurrence = recurrence,
+//                            endDate = endDate,
+//                            medicationTimes = selectedTimes
+//                        )
                         navController.navigate(Routes.managementScreen.route)
                     }
                 },
                 icon = {
-                    Icon(imageVector = Icons.Default.Check,
+                    Icon(
+                        imageVector = Icons.Default.Check,
                         contentDescription = "Add",
-                        tint = Color.White)
+                        tint = Color.White
+                    )
                 },
                 containerColor = if (isSaveButtonEnabled) MainBlue else Color.Gray,
                 elevation = FloatingActionButtonDefaults.elevation(
@@ -216,7 +215,7 @@ fun AddMedicationScreenUI(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = "복용 약 추가",
+                    text = "복용 약 수정",
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color.Black,
@@ -316,14 +315,4 @@ fun AddMedicationScreenUI(
             Spacer(modifier = Modifier.weight(1f))
         }
     }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun AddMedicationScreenUIPreview( ){
-    val navController = rememberNavController()
-    val btmBarViewModel: BtmBarViewModel = viewModel()
-    AddMedicationScreenUI(navController = navController, btmBarViewModel = btmBarViewModel, userViewModel = UserViewModel())
 }

@@ -1,9 +1,8 @@
-package com.example.doc_di.reminder.addmedication.viewmodel
+package com.example.doc_di.reminder.medication_reminder.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.doc_di.analytics.AnalyticsHelper
-import com.example.doc_di.domain.model.Reminder
-import com.example.doc_di.reminder.addmedication.model.CalendarInformation
+import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Calendar
 import java.util.Date

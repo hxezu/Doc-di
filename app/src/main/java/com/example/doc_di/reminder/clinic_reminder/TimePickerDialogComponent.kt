@@ -1,9 +1,9 @@
-package com.example.doc_di.reminder.addmedication
+package com.example.doc_di.reminder.clinic_reminder
 
 import android.app.TimePickerDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.example.doc_di.reminder.addmedication.model.CalendarInformation
+import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import java.util.Calendar
 
 @Composable

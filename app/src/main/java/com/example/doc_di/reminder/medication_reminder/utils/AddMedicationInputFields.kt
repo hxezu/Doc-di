@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.addmedication
+package com.example.doc_di.reminder.medication_reminder.utils
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -42,7 +42,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.doc_di.extension.toFormattedDateString
-import com.example.doc_di.reminder.addmedication.model.CalendarInformation
+import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Recurrence
 import com.example.doc_di.util.getRecurrenceList

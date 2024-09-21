@@ -17,6 +17,7 @@ sealed class Routes(val route: String) {
     object chatScreen: Routes("ChatScreen")
     object managementScreen: Routes("ManagementScreen")
     object addMedicationScreen: Routes("AddMedicationScreen")
+    object editMedicationScreen: Routes("EditMedicationScreen")
     object addScheduleScreen: Routes("AddScheduleScreen")
     object profile: Routes("profile")
     object modifyLogoutAccountDelete: Routes("ModifyLogoutAccountDelete")

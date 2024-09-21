@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.addmedication.navigation
+package com.example.doc_di.reminder.medication_reminder.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState

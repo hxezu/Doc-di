@@ -2,14 +2,11 @@ package com.example.doc_di.domain.reminder
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.extension.toFormattedDateTimeString
-import com.example.doc_di.extension.toFormattedTimeString
-import com.example.doc_di.reminder.addmedication.model.CalendarInformation
-import com.google.gson.Gson
+import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

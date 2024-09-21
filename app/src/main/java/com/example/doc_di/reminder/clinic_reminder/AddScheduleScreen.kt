@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.addschedule
+package com.example.doc_di.reminder.clinic_reminder
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -54,7 +54,7 @@ import com.example.doc_di.R
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.reminder.addmedication.model.CalendarInformation
+import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Department
 import java.util.Calendar

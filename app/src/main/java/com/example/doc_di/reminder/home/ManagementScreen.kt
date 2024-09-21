@@ -40,7 +40,6 @@ import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.reminder.home.model.CalendarModel
 import com.example.doc_di.reminder.home.utils.DatesHeader
 import com.example.doc_di.reminder.home.viewmodel.ReminderState
-import com.example.doc_di.reminder.home.utils.EmptyCard
 import com.example.doc_di.reminder.home.utils.FabIcon
 import com.example.doc_di.reminder.home.utils.FabOption
 import com.example.doc_di.reminder.home.utils.MedicationCard
@@ -205,7 +204,8 @@ fun DailyMedications(
                             },
                             deleteReminder = { reminderId ->
                                 reminderViewModel.deleteReminder(reminderId)
-                            }
+                            },
+                            navController = navController
                         )
                     }
                 )
@@ -214,12 +214,6 @@ fun DailyMedications(
     }
 }
 
-
-sealed class MedicationListItem {
-    data class OverviewItem(val medicationsToday: List<Reminder>, val isMedicationListEmpty: Boolean) : MedicationListItem()
-    data class MedicationItem(val reminder: Reminder) : MedicationListItem()
-    data class HeaderItem(val headerText: String) : MedicationListItem()
-}
 
 @Preview(showBackground = true)
 @Composable

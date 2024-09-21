@@ -31,6 +31,11 @@ class ReminderViewModel @Inject constructor(
             }
         }
     }
+
+    fun getReminderById(id: Int): Reminder? {
+        return _reminders.value.find { it.id == id }
+    }
+
     fun deleteReminder(reminderId: Int) {
         viewModelScope.launch {
             try {
@@ -41,33 +46,28 @@ class ReminderViewModel @Inject constructor(
                     Log.e("ReminderViewModel", "알림 삭제 실패: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
-                Log.e("ReminderViewModel", "알림 삭제 중 오류 발생: ${e.message}")
+                println("Failed to delete reminders: ${e.message}")
+            }
+        }
+    }
+
+    fun editReminder(reminder: Reminder) {
+        viewModelScope.launch {
+            try {
+                val response: Response<Unit> = reminderApi.editReminder(reminder)
+                if (response.isSuccessful) {
+                    _reminders.value = _reminders.value.map {
+                        if (it.id == reminder.id) reminder else it
+                    }
+                    Log.d("ReminderViewModel", "알림 수정 성공")
+                } else {
+                    Log.e("ReminderViewModel", "알림 수정 실패: ${response.errorBody()?.string()}")
+                }
+
+            }catch (e: Exception){
+                println("Failed to edit reminders: ${e.message}")
             }
         }
     }
 }
 
-//ViewModel function to convert the DTO to domain model
-//fun convertToReminder(dto: ReminderDTO): Reminder? {
-//    val medicationTimeDate = dto.medicationTime.toDateTime()
-//    val endDateDate = dto.endDate.toDate()
-//
-//    return if (medicationTimeDate != null && endDateDate != null) {
-//        Reminder(
-//            id = null,
-//            name = dto.medicineName,
-//            dosage = dto.dosage.toInt(),
-//            recurrence = dto.recurrence,
-//            endDate = endDateDate, // Assuming endDate is in correct format
-//            medicationTaken = dto.medicationTaken.toBoolean(),
-//            medicationTime = medicationTimeDate
-//        )
-//    } else {
-//        println("Conversion failed for DTO: $dto")
-//        null
-//    }
-//}
-
-fun generateNewId(): Long {
-    return System.currentTimeMillis() // Example placeholder
-}

@@ -22,10 +22,11 @@ import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.login.resetpassword.ResetPassword
-import com.example.doc_di.reminder.addmedication.AddMedicationScreenUI
-import com.example.doc_di.reminder.addschedule.AddScheduleScreenUI
+import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
+import com.example.doc_di.reminder.clinic_reminder.AddScheduleScreenUI
 import com.example.doc_di.reminder.home.ManagementScreen
 import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.medication_reminder.EditMedicationScreen
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
@@ -144,6 +145,11 @@ fun NaviGraph(navController: NavHostController) {
 
         composable(route = Routes.addMedicationScreen.route) {
             AddMedicationScreenUI(navController, btmBarViewModel, userViewModel)
+        }
+
+        composable(route = "editMedicationScreen/{reminderId}") { backStackEntry ->
+            val reminderId = backStackEntry.arguments?.getString("reminderId")?.toIntOrNull()
+            EditMedicationScreen(navController, btmBarViewModel, reminderViewModel, reminderId)
         }
 
         composable(route = Routes.addScheduleScreen.route) {

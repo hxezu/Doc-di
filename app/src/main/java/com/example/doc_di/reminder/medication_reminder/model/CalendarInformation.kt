@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.addmedication.model
+package com.example.doc_di.reminder.medication_reminder.model
 
 import androidx.compose.runtime.saveable.Saver
 import java.text.SimpleDateFormat
