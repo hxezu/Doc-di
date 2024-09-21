@@ -59,8 +59,11 @@ import com.example.doc_di.etc.Routes
 import com.example.doc_di.extension.toDate
 import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
-import com.example.doc_di.reminder.medication_reminder.utils.AddMedicationName
-import com.example.doc_di.reminder.medication_reminder.utils.DoseInputField
+import com.example.doc_di.reminder.medication_reminder.utils.EditDoseInput
+import com.example.doc_di.reminder.medication_reminder.utils.EditEndDate
+import com.example.doc_di.reminder.medication_reminder.utils.EditMedicationName
+import com.example.doc_di.reminder.medication_reminder.utils.EditRecurrence
+import com.example.doc_di.reminder.medication_reminder.utils.EditTimerText
 import com.example.doc_di.reminder.medication_reminder.utils.EndDateTextField
 import com.example.doc_di.reminder.medication_reminder.utils.RecurrenceDropdownMenu
 import com.example.doc_di.reminder.medication_reminder.utils.TimerTextField
@@ -80,12 +83,10 @@ fun EditMedicationScreen(
     reminderViewModel: ReminderViewModel = hiltViewModel(),
     reminderId: Int?
 ) {
-    val reminder by remember(reminderId) {
-        mutableStateOf(reminderId?.let { reminderViewModel.getReminderById(it) })
-    }
+    val reminder by remember(reminderId) { mutableStateOf(reminderId?.let { reminderViewModel.getReminderById(it) }) }
 
     var name by remember { mutableStateOf("") }
-    var dose by remember { mutableStateOf("") }
+    var dose by remember { mutableStateOf(0) }
     var recurrence by remember { mutableStateOf("") }
     var endDate by remember { mutableStateOf(Date()) }
 
@@ -93,8 +94,7 @@ fun EditMedicationScreen(
     LaunchedEffect(reminder) {
         reminder?.let {
             name = it.medicineName
-            println("name :" + name)
-            dose = it.dosage.toString()
+            dose = it.dosage
             recurrence = it.recurrence
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             endDate = dateFormat.parse(it.endDate) ?: Date()
@@ -222,8 +222,9 @@ fun EditMedicationScreen(
                 )
             }
 
-            AddMedicationName(
-                isNameEntered = isNameEntered,
+            EditMedicationName(
+                medicationName = name,
+                isNameEntered = true,
                 onNameChange = { nameValue ->
                     name = nameValue
                     isNameEntered = nameValue.isNotEmpty()
@@ -231,28 +232,31 @@ fun EditMedicationScreen(
             Spacer(modifier = Modifier.padding(4.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                DoseInputField(
-                    isDoseEntered = isDoseEntered,
+                EditDoseInput(
+                    dose = dose,
+                    isDoseEntered = true,
                     maxDose = 99,
                     onValueChange = { doseValue ->
                         dose = doseValue
-                        isDoseEntered = doseValue.isNotEmpty()
+                        isDoseEntered = doseValue > 0
                     })
-                RecurrenceDropdownMenu (
+                EditRecurrence (
+                    selectedRecurrence = recurrence,
                     recurrence = { selectedRecurrence ->
                         recurrence = selectedRecurrence
                         isRecurrenceSelected = true
                     },
-                    isRecurrenceSelected = isRecurrenceSelected)
+                    isRecurrenceSelected = true)
             }
 
             Spacer(modifier = Modifier.padding(4.dp))
-            EndDateTextField(
+            EditEndDate(
+                endDate = endDate,
                 onDateSelected = { timestamp ->
                     endDate = Date(timestamp) // Convert the Long timestamp to a Date object
                     isEndDateSelected = true
                 },
-                isEndDateSelected = isEndDateSelected
+                isEndDateSelected = true
             )
 
             Spacer(modifier = Modifier.padding(4.dp))
@@ -264,7 +268,7 @@ fun EditMedicationScreen(
             )
 
             for (index in selectedTimes.indices) {
-                TimerTextField(
+                EditTimerText(
                     isLastItem = selectedTimes.lastIndex == index,
                     isOnlyItem = selectedTimes.size == 1,
                     time = {
