@@ -139,11 +139,11 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.managementScreen.route) {
-            ManagementScreen(navController, btmBarViewModel, reminderViewModel)
+            ManagementScreen(navController, btmBarViewModel, reminderViewModel, userViewModel)
         }
 
         composable(route = Routes.addMedicationScreen.route) {
-            AddMedicationScreenUI(navController, btmBarViewModel)
+            AddMedicationScreenUI(navController, btmBarViewModel, userViewModel)
         }
 
         composable(route = Routes.addScheduleScreen.route) {

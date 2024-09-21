@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
+import com.example.doc_di.UserViewModel
 import com.example.doc_di.analytics.AnalyticsEvents
 import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.BottomNavigationBar
@@ -60,13 +61,20 @@ import java.util.Locale
 fun ManagementScreen(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
-    reminderViewModel: ReminderViewModel = hiltViewModel()
+    reminderViewModel: ReminderViewModel = hiltViewModel(),
+    userViewModel: UserViewModel
 ) {
     val reminders by reminderViewModel.reminders
+    val userEmail = userViewModel.userInfo.value?.email ?: ""
 
-    // Trigger API call when the screen is first composed
     LaunchedEffect(Unit) {
-        reminderViewModel.getReminders("q") // Fetch reminders for the user
+        if (userEmail.isNotEmpty()) {
+            println("Fetching reminders for user: $userEmail")
+            reminderViewModel.getReminders(userEmail) // Fetch reminders for the logged-in user
+        } else {
+            // Handle the case where the user's email is missing (e.g., show an error or fallback)
+            println("User email is missing, cannot fetch reminders")
+        }
     }
 
     Scaffold(
@@ -218,5 +226,5 @@ sealed class MedicationListItem {
 fun ManagementScreenPreview() {
     val navController = rememberNavController()
     val btmBarViewModel: BtmBarViewModel = viewModel()
-    ManagementScreen(navController = navController, btmBarViewModel = btmBarViewModel)
+    ManagementScreen(navController = navController, btmBarViewModel = btmBarViewModel, userViewModel = UserViewModel())
 }

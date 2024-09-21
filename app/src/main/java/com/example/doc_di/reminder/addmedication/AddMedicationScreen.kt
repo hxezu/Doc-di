@@ -50,15 +50,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
+import com.example.doc_di.UserViewModel
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.reminder.addmedication.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Recurrence
@@ -75,9 +78,11 @@ import java.util.Locale
 @Composable
 fun AddMedicationScreenUI(
     navController: NavController,
-    btmBarViewModel: BtmBarViewModel
+    btmBarViewModel: BtmBarViewModel,
+    userViewModel: UserViewModel
 ){
     val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
+    val userEmail = userViewModel.userInfo.value?.email ?: ""
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -105,13 +110,9 @@ fun AddMedicationScreenUI(
         lastSelectedIndex = if (isSelected) index else lastSelectedIndex
     }
 
-    fun addTime(time: CalendarInformation) {
-        selectedTimes.add(time)
-    }
+    fun addTime(time: CalendarInformation) { selectedTimes.add(time) }
 
-    fun removeTime(time: CalendarInformation) {
-        selectedTimes.remove(time)
-    }
+    fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
 
     // Check if the last TimerTextField is selected
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
@@ -157,7 +158,7 @@ fun AddMedicationScreenUI(
 
                         scope.launch {
                             reminderImpl.createReminder(
-                                email = "q",
+                                email = userEmail,
                                 medicineName = name,
                                 dosage = dose.toShort(),
                                 recurrence = recurrence,
@@ -324,5 +325,5 @@ fun AddMedicationScreenUI(
 fun AddMedicationScreenUIPreview( ){
     val navController = rememberNavController()
     val btmBarViewModel: BtmBarViewModel = viewModel()
-    AddMedicationScreenUI(navController = navController, btmBarViewModel = btmBarViewModel)
+    AddMedicationScreenUI(navController = navController, btmBarViewModel = btmBarViewModel, userViewModel = UserViewModel())
 }
