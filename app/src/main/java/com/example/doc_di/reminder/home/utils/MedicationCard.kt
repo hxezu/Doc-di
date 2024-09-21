@@ -54,9 +54,14 @@ fun MedicationCard(
             .padding(vertical = 10.dp, horizontal = 20.dp),
 
     ) {
+        // medicationTime null 체크 및 포맷팅
+        val formattedMedicationTime = reminder.medicationTime?.let {
+            it.split(" ")[1] // "yyyy-MM-dd" 부분만 추출
+        } ?: "시간 없음" // 기본값 설정
+
 
         Text(
-            reminder.medicationTime.toFormattedTimeString(),
+            text = formattedMedicationTime,
             color = Color.Black, // 검정색 설정
             fontWeight = FontWeight.Bold )
         Card(
@@ -97,7 +102,7 @@ fun MedicationCard(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = reminder.name,
+                        text = reminder.medicineName,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleSmall
                     )

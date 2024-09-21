@@ -1,8 +1,6 @@
 package com.example.doc_di.domain.reminder
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.net.http.InlineExecutionProhibitedException
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController

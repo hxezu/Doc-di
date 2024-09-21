@@ -1,7 +1,5 @@
 package com.example.doc_di.domain.reminder
 
-import androidx.room.Delete
-import com.example.doc_di.domain.model.Reminders
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -13,7 +11,7 @@ interface ReminderApi {
     @POST("reminder/medicine/create")
     suspend fun createReminder(
         @Body reminderDto: ReminderDTO,
-    ): Response<Unit>
+    ):  Response<Unit>
 
     @GET("reminder/medicine/find")
     suspend fun findReminder(

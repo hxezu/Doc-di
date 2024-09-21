@@ -6,11 +6,11 @@ import java.util.Date
 
 @Parcelize
 data class Reminder(
-    val name: String,
+    val medicineName: String,
     val id: Long?,
     val dosage: Int,
     val recurrence: String,
-    val endDate: Date,
+    val endDate: String,
     val medicationTaken: Boolean,
-    val medicationTime: Date
+    val medicationTime: String
 ) : Parcelable

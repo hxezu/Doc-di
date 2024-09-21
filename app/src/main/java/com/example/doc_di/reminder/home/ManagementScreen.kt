@@ -72,7 +72,6 @@ fun ManagementScreen(
             println("Fetching reminders for user: $userEmail")
             reminderViewModel.getReminders(userEmail) // Fetch reminders for the logged-in user
         } else {
-            // Handle the case where the user's email is missing (e.g., show an error or fallback)
             println("User email is missing, cannot fetch reminders")
         }
     }
@@ -182,11 +181,12 @@ fun DailyMedications(
         val dateFormat = SimpleDateFormat("yy-MM-dd", Locale.getDefault())
 
         val filteredReminders = state.reminders.filter { reminder ->
-            val medicationTimeFormatted = dateFormat.format(reminder.medicationTime)
-            val selectedDateFormatted = dateFormat.format(Date.from(selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-            medicationTimeFormatted == selectedDateFormatted
+            reminder.medicationTime?.let {
+                val medicationTimeFormatted = dateFormat.format(dateFormat.parse(it))
+                val selectedDateFormatted = dateFormat.format(Date.from(selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                medicationTimeFormatted == selectedDateFormatted
+            } ?: false // medicationTime이 null인 경우 false 반환
         }
-
 
         // Conditional content for medications
         if (filteredReminders.isEmpty()) {

@@ -21,23 +21,23 @@ class AnalyticsHelper(
 ) {
     private val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
 
-    fun trackNotificationShown(reminder: Reminder) {
-        val params = bundleOf(
-            MEDICATION_TIME to reminder.medicationTime.toFormattedDateString(),
-            MEDICATION_END_DATE to reminder.endDate.toFormattedDateString(),
-            NOTIFICATION_TIME to Date().toFormattedDateString()
-        )
-        logEvent(AnalyticsEvents.MEDICATION_NOTIFICATION_SHOWN, params)
-    }
-
-    fun trackNotificationScheduled(reminder: Reminder) {
-        val params = bundleOf(
-            MEDICATION_TIME to reminder.medicationTime.toFormattedDateString(),
-            MEDICATION_END_DATE to reminder.endDate.toFormattedDateString(),
-            NOTIFICATION_TIME to Date().toFormattedDateString()
-        )
-        logEvent(AnalyticsEvents.MEDICATION_NOTIFICATION_SCHEDULED, params)
-    }
+//    fun trackNotificationShown(reminder: Reminder) {
+//        val params = bundleOf(
+//            MEDICATION_TIME to reminder.medicationTime.toFormattedDateString(),
+//            MEDICATION_END_DATE to reminder.endDate.toFormattedDateString(),
+//            NOTIFICATION_TIME to Date().toFormattedDateString()
+//        )
+//        logEvent(AnalyticsEvents.MEDICATION_NOTIFICATION_SHOWN, params)
+//    }
+//
+//    fun trackNotificationScheduled(reminder: Reminder) {
+//        val params = bundleOf(
+//            MEDICATION_TIME to reminder.medicationTime.toFormattedDateString(),
+//            MEDICATION_END_DATE to reminder.endDate.toFormattedDateString(),
+//            NOTIFICATION_TIME to Date().toFormattedDateString()
+//        )
+//        logEvent(AnalyticsEvents.MEDICATION_NOTIFICATION_SCHEDULED, params)
+//    }
 
     fun logEvent(eventName: String, params: Bundle? = null) {
         firebaseAnalytics.logEvent(eventName, params)
