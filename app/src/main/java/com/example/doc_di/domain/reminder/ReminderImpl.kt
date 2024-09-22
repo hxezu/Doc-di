@@ -146,7 +146,7 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
         doctorName: String,
         subject: String,
         startDate: Date,
-        bookTimes:  List<CalendarInformation>,
+        bookTimes: List<CalendarInformation>,
         context: Context,
         isAllWritten: Boolean,
         isAllAvailable: Boolean,

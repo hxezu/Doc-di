@@ -39,6 +39,7 @@ import com.example.doc_di.analytics.AnalyticsEvents
 import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.reminder.ReminderItem
 import com.example.doc_di.reminder.home.model.CalendarModel
 import com.example.doc_di.reminder.home.utils.BookedCard
 import com.example.doc_di.reminder.home.utils.DatesHeader
@@ -189,53 +190,74 @@ fun DailyMedications(
 
         val dateFormat = SimpleDateFormat("yy-MM-dd", Locale.getDefault())
 
+        // Filter medication reminders
         val filteredReminders = state.reminders.filter { reminder ->
             reminder.medicationTime?.let {
                 val medicationTimeFormatted = dateFormat.format(dateFormat.parse(it))
                 val selectedDateFormatted = dateFormat.format(Date.from(selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-                medicationTimeFormatted == selectedDateFormatted
-            } ?: false // medicationTime이 null인 경우 false 반환
-        }
-
-        val filteredBookedReminders = bookedState.bookedReminders.filter { booked ->
-            booked.bookTime?.let {
-                val medicationTimeFormatted = dateFormat.format(dateFormat.parse(it))
-                val selectedDateFormatted = dateFormat.format(Date.from(selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-                medicationTimeFormatted == selectedDateFormatted
+                medicationTimeFormatted.startsWith(selectedDateFormatted) // 날짜 일치 확인
             } ?: false
         }
 
-        if (filteredReminders.isNotEmpty() || filteredBookedReminders.isNotEmpty()) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                // Display medication reminders first
-                items(filteredReminders) { reminder ->
-                    MedicationCard(
-                        reminder = reminder,
-                        navigateToMedicationDetail = { medication -> navigateToMedicationDetail(medication) },
-                        deleteReminder = { reminderId -> reminderViewModel.deleteReminder(reminderId) },
-                        navController = navController
-                    )
-                }
+        // Filter booked reminders
+        val filteredBookedReminders = bookedState.bookedReminders.filter { booked ->
+            booked.bookTime?.let {
+                val bookedTimeFormatted = dateFormat.format(dateFormat.parse(it))
+                val selectedDateFormatted = dateFormat.format(Date.from(selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                bookedTimeFormatted.startsWith(selectedDateFormatted) // 날짜 일치 확인
+            } ?: false
+        }
 
-                // Spacer between two sections (optional)
-                if (filteredReminders.isNotEmpty() && filteredBookedReminders.isNotEmpty()) {
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp)) // Adjust the height as needed
+        // Combine filtered reminders
+        val combinedReminders = (filteredReminders.map { ReminderItem.ReminderType.Medication(it) } +
+                filteredBookedReminders.map { ReminderItem.ReminderType.Clinic(it) })
+            .sortedWith(compareBy<ReminderItem> {
+                when (it) {
+                    is ReminderItem.ReminderType.Medication -> {
+                        it.reminder.medicationTime?.let { timeStr ->
+                            val time = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).parse(timeStr)?.time
+                            time ?: Long.MAX_VALUE
+                        } ?: Long.MAX_VALUE
+                    }
+                    is ReminderItem.ReminderType.Clinic -> {
+                        it.booked.bookTime?.let { timeStr ->
+                            val time = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).parse(timeStr)?.time
+                            time ?: Long.MAX_VALUE
+                        } ?: Long.MAX_VALUE
+                    }
+                }
+            })
+
+
+        if (combinedReminders.isNotEmpty()) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(combinedReminders) { reminderItem ->
+                    when (reminderItem) {
+                        is ReminderItem.ReminderType.Medication -> {
+                            MedicationCard(
+                                reminder = reminderItem.reminder,
+                                navigateToMedicationDetail = { medication -> navigateToMedicationDetail(medication) },
+                                deleteReminder = { reminderId -> reminderViewModel.deleteReminder(reminderId) },
+                                navController = navController
+                            )
+                        }
+                        is ReminderItem.ReminderType.Clinic -> {
+                            BookedCard(
+                                booked = reminderItem.booked,
+                                navigateToMedicationDetail = { bookedDetail -> /* Navigate to booked detail */ },
+                                deleteBookedReminder = { bookedId -> reminderViewModel.deleteBookedReminder(bookedId) },
+                                navController = navController
+                            )
+                        }
                     }
                 }
 
-                // Display booked reminders next
-                items(filteredBookedReminders) { booked ->
-                    BookedCard(
-                        booked = booked,
-                        navigateToMedicationDetail = { bookedDetail -> /* Navigate to booked detail */ },
-                        deleteBookedReminder = { bookedId -> reminderViewModel.deleteBookedReminder(bookedId) },
-                        navController = navController
-                    )
+                item {
+                    Spacer(modifier = Modifier.height(80.dp)) // This should create space at the bottom
                 }
             }
         }
-
+        
     }
 }
 
