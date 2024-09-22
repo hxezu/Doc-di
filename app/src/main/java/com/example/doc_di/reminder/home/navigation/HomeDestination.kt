@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.doc_di.domain.model.Reminder
-import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.navigation.DoseNavigationDestination
 
 const val ASK_NOTIFICATION_PERMISSION = "notification_permission"

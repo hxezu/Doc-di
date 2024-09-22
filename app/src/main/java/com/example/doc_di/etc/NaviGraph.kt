@@ -26,7 +26,7 @@ import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
 import com.example.doc_di.reminder.booked_reminder.AddScheduleScreenUI
 import com.example.doc_di.reminder.booked_reminder.EditScheduleScreen
 import com.example.doc_di.reminder.home.ManagementScreen
-import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.reminder.medication_reminder.EditMedicationScreen
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchViewModel

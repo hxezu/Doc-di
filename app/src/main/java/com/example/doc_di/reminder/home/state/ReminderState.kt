@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.home.viewmodel
+package com.example.doc_di.reminder.home.state
 
 import com.example.doc_di.domain.model.Reminder
 

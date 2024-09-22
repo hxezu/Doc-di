@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder
+package com.example.doc_di.reminder.data
 
 import com.example.doc_di.domain.model.Booked
 import com.example.doc_di.domain.model.Reminder

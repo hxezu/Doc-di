@@ -59,7 +59,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.extension.toFormattedDateString
-import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.reminder.medication_reminder.utils.EditDoseInput
 import com.example.doc_di.reminder.medication_reminder.utils.EditEndDate
