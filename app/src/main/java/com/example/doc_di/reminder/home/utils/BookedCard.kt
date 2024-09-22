@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,8 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.domain.model.Booked
-import com.example.doc_di.domain.model.Reminder
-import com.example.doc_di.etc.Routes
 
 @Composable
 fun BookedCard(
@@ -55,13 +52,13 @@ fun BookedCard(
 
     ) {
         // medicationTime null 체크 및 포맷팅
-        val formattedMedicationTime = booked.bookTime?.let {
+        val formattedBookTime = booked.bookTime?.let {
             it.split(" ")[1]
         } ?: "시간 없음" // 기본값 설정
 
 
         Text(
-            text = formattedMedicationTime,
+            text = formattedBookTime,
             color = Color.Black, // 검정색 설정
             fontWeight = FontWeight.Bold )
         Card(
@@ -142,7 +139,7 @@ fun BookedCard(
                     DropdownMenuItem(
                         onClick = {
                             expanded = false
-                            navController.navigate("editMedicationScreen/${booked.id}")
+                            navController.navigate("editScheduleScreen/${booked.id}")
                         }
                     ) {
                         Text("수정")

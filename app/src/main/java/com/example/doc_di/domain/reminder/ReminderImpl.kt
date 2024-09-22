@@ -3,6 +3,7 @@ package com.example.doc_di.domain.reminder
 import android.content.Context
 import android.widget.Toast
 import androidx.navigation.NavController
+import com.example.doc_di.domain.model.Booked
 import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.extension.toFormattedDateString
@@ -119,6 +120,9 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
             }
         }
     }
+
+
+
     private fun getMedicationTime(medicationTime: CalendarInformation, calendar: Calendar): Date {
         calendar.set(Calendar.HOUR_OF_DAY, medicationTime.dateInformation.hour)
         calendar.set(Calendar.MINUTE, medicationTime.dateInformation.minute)
@@ -167,6 +171,37 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
             }
         } else {
             Toast.makeText(context, "모든 정보를 정확히 기입해 주세요.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    suspend fun editBookedReminder(
+        booked: Booked,
+        context: Context,
+        isAllWritten: Boolean,
+        isAllAvailable: Boolean,
+        navController: NavController
+    ) {
+        try {
+            withContext(Dispatchers.IO) {
+                val editBookedResponse = reminderApi.editBookedReminder(booked)
+
+                if (editBookedResponse.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "진료 알림 수정 성공", Toast.LENGTH_SHORT).show()
+                        navController.navigate(Routes.managementScreen.route) {
+                            navController.popBackStack()
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "진료 알림 수정 실패: ${editBookedResponse.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "오류 발생: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

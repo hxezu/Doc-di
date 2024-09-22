@@ -1,5 +1,6 @@
 package com.example.doc_di.domain.reminder
 
+import com.example.doc_di.domain.model.Booked
 import com.example.doc_di.domain.model.Reminder
 import retrofit2.Response
 import retrofit2.http.Body
@@ -44,4 +45,9 @@ interface ReminderApi {
     suspend fun deleteBookedReminder(
         @Query("id") id: Int
     ): Response<Unit>
+
+    @PUT("reminder/booked/edit")
+    suspend fun editBookedReminder(
+        @Body booked: Booked
+    ):Response<Unit>
 }

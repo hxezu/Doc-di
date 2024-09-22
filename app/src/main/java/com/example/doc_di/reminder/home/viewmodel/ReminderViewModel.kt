@@ -20,9 +20,15 @@ class ReminderViewModel @Inject constructor(
 
     private val _reminders = mutableStateOf<List<Reminder>>(emptyList())
     val reminders: State<List<Reminder>> = _reminders
+    fun getReminderById(id: Int): Reminder? {
+        return _reminders.value.find { it.id == id }
+    }
 
     private val _bookedReminders = mutableStateOf<List<Booked>>(emptyList())
     val bookedReminders: State<List<Booked>> = _bookedReminders
+    fun getBookedReminderById(id: Int): Booked? {
+        return _bookedReminders.value.find { it.id == id }
+    }
 
     fun getReminders(email: String) {
         viewModelScope.launch {
@@ -36,9 +42,6 @@ class ReminderViewModel @Inject constructor(
         }
     }
 
-    fun getReminderById(id: Int): Reminder? {
-        return _reminders.value.find { it.id == id }
-    }
 
     fun deleteReminder(reminderId: Int) {
         viewModelScope.launch {

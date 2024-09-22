@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.booked_reminder
+package com.example.doc_di.reminder.booked_reminder.utils
 
 import android.app.TimePickerDialog
 import androidx.compose.runtime.Composable
