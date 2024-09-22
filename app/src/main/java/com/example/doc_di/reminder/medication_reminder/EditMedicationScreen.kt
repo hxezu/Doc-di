@@ -51,7 +51,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.domain.RetrofitInstance
@@ -59,7 +58,6 @@ import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.extension.toDate
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation

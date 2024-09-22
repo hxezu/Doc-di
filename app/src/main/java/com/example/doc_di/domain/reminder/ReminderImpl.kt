@@ -125,4 +125,49 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
         return calendar.time
     }
 
+    suspend fun createBookedReminder(
+        email: String,
+        hospitalName: String,
+        doctorName: String,
+        subject: String,
+        bookTime: Date,
+        context: Context,
+        isAllWritten: Boolean,
+        isAllAvailable: Boolean,
+        navController: NavController
+    ) {
+        if (isAllWritten && isAllAvailable) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try{
+                    val bookedDTO = BookedDTO(
+                        email = email,
+                        hospitalName = hospitalName,
+                        doctorName = doctorName,
+                        subject = subject,
+                        bookTime = bookTime.toFormattedDateTimeString() // 적절한 포맷으로 변환
+                    )
+                    val bookedResponse = reminderApi.createBookedReminder(bookedDTO)
+
+                    if (bookedResponse.isSuccessful) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "예약 등록 성공", Toast.LENGTH_SHORT).show()
+                            navController.navigate(Routes.managementScreen.route) {
+                                navController.popBackStack()
+                            }
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "예약 등록 실패: ${bookedResponse.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                }catch (e:Exception){
+
+                }
+            }
+        } else {
+            Toast.makeText(context, "모든 정보를 정확히 기입해 주세요.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 }

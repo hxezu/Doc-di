@@ -66,6 +66,8 @@ fun ManagementScreen(
     val reminders by reminderViewModel.reminders
     val userEmail = userViewModel.userInfo.value?.email ?: ""
 
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+
     LaunchedEffect(Unit) {
         if (userEmail.isNotEmpty()) {
             println("Fetching reminders for user: $userEmail")
@@ -97,11 +99,13 @@ fun ManagementScreen(
                         iconRes = R.drawable.pillemoji,
                         label = "복용 약 추가",
                         labelColor = Color.Black,
+                        selectedDate = selectedDate
                     ),
                     MultiFabItem(
                         iconRes = R.drawable.hospitalemoji,
                         label = "진료 일정 추가",
-                        labelColor = Color.Black
+                        labelColor = Color.Black,
+                        selectedDate = selectedDate
                     ),
                 ),
                 onFabItemClicked = { println(it) },
@@ -121,11 +125,6 @@ fun ManagementScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
-            val navigateToMedicationDetail: (Reminder) -> Unit = {}
-            val onDateSelected: (CalendarModel.DateModel) -> Unit = {}
-            val onSelectedDate: (Date) -> Unit = {}
-            val logEvent: (String) -> Unit = {}
-
             Surface(color = Color.Transparent) {
                 DailyMedications(
                     navController = navController,
@@ -133,11 +132,11 @@ fun ManagementScreen(
                         reminders = reminders, // Use reminders fetched from the API
                         lastSelectedDate = SimpleDateFormat("yyyy-MM-dd").format(Date()) // Current date as default
                     ),
-                    navigateToMedicationDetail = navigateToMedicationDetail,
-                    onDateSelected = onDateSelected,
-                    onSelectedDate = onSelectedDate,
-                    logEvent = logEvent,
-                    reminderViewModel = reminderViewModel
+                    navigateToMedicationDetail = { },
+                    onSelectedDate = { newDate -> selectedDate = newDate }, // Updated this line
+                    logEvent = { /* 필요 시 추가 처리 */ },
+                    reminderViewModel = reminderViewModel,
+                    selectedDate = selectedDate
                 )
             }
         }
@@ -150,12 +149,11 @@ fun DailyMedications(
     navController: NavController,
     state: ReminderState,
     navigateToMedicationDetail: (Reminder) -> Unit,
-    onSelectedDate: (Date) -> Unit,
-    onDateSelected: (CalendarModel.DateModel) -> Unit,
+    onSelectedDate: (LocalDate) -> Unit,
     logEvent: (String) -> Unit,
-    reminderViewModel: ReminderViewModel
+    reminderViewModel: ReminderViewModel,
+    selectedDate: LocalDate
 ) {
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
     Column(
         modifier = Modifier
@@ -168,14 +166,11 @@ fun DailyMedications(
             lastSelectedDate = state.lastSelectedDate,
             logEvent = { logEvent.invoke(it) },
             onDateSelected = { selectedDateModel ->
-                selectedDate = selectedDateModel.date.toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate()
-                onSelectedDate(selectedDateModel.date)
+                val newDate = selectedDateModel.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() // LocalDate로 변환
+                onSelectedDate(newDate) // LocalDate 전달
                 logEvent.invoke(AnalyticsEvents.HOME_NEW_DATE_SELECTED)
             }
         )
-        println(selectedDate)
 
         val dateFormat = SimpleDateFormat("yy-MM-dd", Locale.getDefault())
 

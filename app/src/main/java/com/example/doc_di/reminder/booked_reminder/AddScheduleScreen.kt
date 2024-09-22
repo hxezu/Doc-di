@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.clinic_reminder
+package com.example.doc_di.reminder.booked_reminder
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -46,17 +46,23 @@ import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
+import com.example.doc_di.UserViewModel
+import com.example.doc_di.domain.RetrofitInstance
+import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Department
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 
@@ -65,28 +71,33 @@ import java.util.Date
 @Composable
 fun AddScheduleScreenUI(
     navController: NavController,
-    btmBarViewModel: BtmBarViewModel
+    btmBarViewModel: BtmBarViewModel,
+    userViewModel: UserViewModel
 ){
+    val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
+    val userEmail = userViewModel.userInfo.value?.email ?: ""
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    var clinicName by rememberSaveable { mutableStateOf("") }
+    var doctorName by rememberSaveable { mutableStateOf("") }
     var isRecurring by rememberSaveable { mutableStateOf(false) }  // Add state for toggle
     var department by rememberSaveable { mutableStateOf(Department.InternalMedicine.name) }
     var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
-    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(
-        CalendarInformation(
-            Calendar.getInstance())
-    ) }
+    var bookTime by rememberSaveable { mutableStateOf(Date()) }
+    val selectedDate = Calendar.getInstance().time
+    println("Selected Date :" + selectedDate)
 
-    var isHospitalEntered by remember { mutableStateOf(false) }
+    var isClinicEntered by remember { mutableStateOf(false) }
     var isDoctorEntered by remember { mutableStateOf(false) }
     var isDepartmentSelected by remember { mutableStateOf(false) }
     var isTimeSelected by remember { mutableStateOf(false) }
     var isEndDateSelected by remember { mutableStateOf(false) }
 
-    fun addTime(time: CalendarInformation) {
-        selectedTimes.add(time)
-    }
-    fun removeTime(time: CalendarInformation) {
-        selectedTimes.remove(time)
-    }
+    //var selectedTime by rememberSaveable(saver = CalendarInformationSaver) { mutableStateOf(CalendarInformation(Calendar.getInstance())) }
+    val isSaveButtonEnabled = isClinicEntered && isDoctorEntered && isDepartmentSelected && isTimeSelected
+
+
 
     Scaffold(
         backgroundColor = Color.Transparent,
@@ -122,14 +133,29 @@ fun AddScheduleScreenUI(
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White) },
                 onClick = {
-                    navController.navigate(Routes.addMedicationScreen.route)
+                    if (isSaveButtonEnabled) {
+                        scope.launch {
+                            reminderImpl.createBookedReminder(
+                                email = userEmail,
+                                hospitalName = clinicName,
+                                doctorName = doctorName,
+                                subject = department,
+                                bookTime = bookTime,
+                                context = context,
+                                isAllWritten  = isSaveButtonEnabled,
+                                isAllAvailable  = isSaveButtonEnabled,
+                                navController = navController
+                            )
+                        }
+                        navController.navigate(Routes.managementScreen.route)
+                    }
                 },
                 icon = {
                     Icon(imageVector = Icons.Default.Check,
                         contentDescription = "Add",
                         tint = Color.White)
                 },
-                containerColor = MainBlue,
+                containerColor = if (isSaveButtonEnabled) MainBlue else Color.Gray,
                 elevation = FloatingActionButtonDefaults.elevation(
                     defaultElevation = 10.dp,
                     pressedElevation = 0.dp,
@@ -174,9 +200,10 @@ fun AddScheduleScreenUI(
             }
 
             AddHospitalName(
-                isHospitalEntered = isHospitalEntered,
+                isHospitalEntered = isClinicEntered,
                 onHospitalChange = { hospital ->
-                    isHospitalEntered = hospital.isNotEmpty()
+                    clinicName = hospital
+                    isClinicEntered = hospital.isNotEmpty()
                 }
             )
             Spacer(modifier = Modifier.padding(4.dp))
@@ -184,6 +211,7 @@ fun AddScheduleScreenUI(
             AddDoctorName(
                 isDoctorEntered = isDoctorEntered,
                 onDoctorChange = { doctor ->
+                    doctorName = doctor
                     isDoctorEntered = doctor.isNotEmpty()
                 }
             )
@@ -204,23 +232,21 @@ fun AddScheduleScreenUI(
                 style = MaterialTheme.typography.bodyLarge
             )
 
-            for (index in selectedTimes.indices) {
-                TimerTextField(
-                    isLastItem = selectedTimes.lastIndex == index,
-                    isOnlyItem = selectedTimes.size == 1,
-                    time = {
-                        selectedTimes[index] = it
-                        isTimeSelected = true
-                    },
-                    onDeleteClick = {
-                        removeTime(selectedTimes[index])
-                    },
-                    logEvent = {
+            TimerTextField(
+                isLastItem = true,
+                isOnlyItem = true,
+                time = { selectedTimeValue ->
+                    //selectedTime = selectedTimeValue
+                    isTimeSelected = true
+                },
+                logEvent = {
                         //viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
                     },
-                    isTimeSelected = isTimeSelected
+                onDeleteClick = {
+                    // 삭제 로직 필요할 경우 작성
+                },
+                isTimeSelected = isTimeSelected
                 )
-            }
 
             Spacer(modifier = Modifier.padding(4.dp))
             Row(
@@ -262,10 +288,9 @@ fun AddScheduleScreenUI(
 
 
 @Preview(showBackground = true)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScheduleScreenUIPreview( ){
     val navController = rememberNavController()
     val btmBarViewModel: BtmBarViewModel = viewModel()
-    AddScheduleScreenUI(navController = navController, btmBarViewModel = btmBarViewModel)
+    AddScheduleScreenUI(navController = navController, btmBarViewModel = btmBarViewModel, userViewModel = UserViewModel())
 }

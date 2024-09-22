@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import java.time.LocalDate
 
 @Composable
 fun MultiFloatingActionButton(
@@ -66,6 +67,7 @@ fun MultiFloatingActionButton(
                         showLabel = miniFabOption.showLabels,
                         miniFabBackgroundColor = Color.White,
                         navController = navController,
+                        selectedDate = LocalDate.now(),
                         onFabItemClicked = { onFabItemClicked(item) })
                 }
 

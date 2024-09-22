@@ -29,4 +29,14 @@ interface ReminderApi {
     suspend fun editReminder(
         @Body reminder: Reminder
     ):Response<Unit>
+
+    @GET("reminder/booked/find")
+    suspend fun findBookedReminder(
+        @Query("email") email: String
+    ) : BookedResponse
+
+    @POST("reminder/booked/create")
+    suspend fun createBookedReminder(
+        @Body bookedDTO: BookedDTO,
+    ):  Response<Unit>
 }

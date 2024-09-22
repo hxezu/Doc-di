@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun MiniFabItem(
@@ -27,6 +29,7 @@ fun MiniFabItem(
     showLabel: Boolean,
     miniFabBackgroundColor: Color,
     navController: NavController,
+    selectedDate: LocalDate,
     onFabItemClicked: (item: MultiFabItem) -> Unit
 ) {
     Row(
@@ -37,9 +40,13 @@ fun MiniFabItem(
             modifier = Modifier.size(40.dp),
             onClick = {
                 onFabItemClicked(item)
+                println("Pre Button Selected Date: $selectedDate")
+                val formattedDate = selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                println("Button Selected Date: $formattedDate")
                 when (item.iconRes) {
-                    R.drawable.pillemoji -> navController.navigate(Routes.addMedicationScreen.route)
-                    R.drawable.hospitalemoji -> navController.navigate(Routes.addScheduleScreen.route)
+                    R.drawable.pillemoji -> navController.navigate("${Routes.addMedicationScreen.route}?selectedDate=$formattedDate")
+
+                    R.drawable.hospitalemoji -> navController.navigate("${Routes.addScheduleScreen.route}?selectedDate=$formattedDate")
                 }
                       },
             backgroundColor = miniFabBackgroundColor

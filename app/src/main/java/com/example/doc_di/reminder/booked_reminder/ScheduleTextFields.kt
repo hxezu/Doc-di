@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.clinic_reminder
+package com.example.doc_di.reminder.booked_reminder
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState

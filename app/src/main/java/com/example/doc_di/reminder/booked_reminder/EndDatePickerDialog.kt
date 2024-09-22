@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.clinic_reminder
+package com.example.doc_di.reminder.booked_reminder
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button

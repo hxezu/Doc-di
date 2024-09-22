@@ -23,7 +23,7 @@ import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.login.resetpassword.ResetPassword
 import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
-import com.example.doc_di.reminder.clinic_reminder.AddScheduleScreenUI
+import com.example.doc_di.reminder.booked_reminder.AddScheduleScreenUI
 import com.example.doc_di.reminder.home.ManagementScreen
 import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
 import com.example.doc_di.reminder.medication_reminder.EditMedicationScreen
@@ -153,7 +153,7 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.addScheduleScreen.route) {
-            AddScheduleScreenUI(navController, btmBarViewModel)
+            AddScheduleScreenUI(navController, btmBarViewModel, userViewModel)
         }
     }
 }
