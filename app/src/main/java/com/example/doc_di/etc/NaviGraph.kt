@@ -164,8 +164,14 @@ fun NaviGraph(navController: NavHostController) {
             EditScheduleScreen(navController, btmBarViewModel, reminderViewModel, reminderId)
         }
 
-        composable(route = Routes.addScheduleScreen.route) {
-            AddScheduleScreenUI(navController, btmBarViewModel, userViewModel)
+        composable(route ="addScheduleScreen?selectedDate={selectedDate}") {backStackEntry ->
+            val selectedDate = backStackEntry.arguments?.getString("selectedDate")
+            AddScheduleScreenUI(
+                navController = navController,
+                btmBarViewModel = btmBarViewModel,
+                userViewModel = userViewModel,
+                selectedDateString = selectedDate
+            )
         }
     }
 }

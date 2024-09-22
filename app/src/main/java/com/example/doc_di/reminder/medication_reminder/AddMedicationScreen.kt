@@ -136,9 +136,7 @@ fun AddMedicationScreenUI(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate(Routes.managementScreen.route) {
-                                navController.popBackStack()
-                            }
+                            navController.popBackStack()
                         },
                     ) {
                         Icon(

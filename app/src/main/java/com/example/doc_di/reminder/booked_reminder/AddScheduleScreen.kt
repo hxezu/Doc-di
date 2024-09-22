@@ -45,6 +45,7 @@ import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.platform.LocalContext
@@ -63,9 +64,12 @@ import com.example.doc_di.reminder.booked_reminder.utils.AddHospitalName
 import com.example.doc_di.reminder.booked_reminder.utils.DepartmentDropdownMenu
 import com.example.doc_di.reminder.booked_reminder.utils.EndDateTextField
 import com.example.doc_di.reminder.booked_reminder.utils.TimerTextField
+import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Department
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 
@@ -75,7 +79,8 @@ import java.util.Date
 fun AddScheduleScreenUI(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    selectedDateString: String?
 ){
     val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
     val userEmail = userViewModel.userInfo.value?.email ?: ""
@@ -87,9 +92,6 @@ fun AddScheduleScreenUI(
     var isRecurring by rememberSaveable { mutableStateOf(false) }  // Add state for toggle
     var department by rememberSaveable { mutableStateOf(Department.InternalMedicine.name) }
     var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
-    var bookTime by rememberSaveable { mutableStateOf(Date()) }
-    val selectedDate = Calendar.getInstance().time
-    println("Selected Date :" + selectedDate)
 
     var isClinicEntered by remember { mutableStateOf(false) }
     var isDoctorEntered by remember { mutableStateOf(false) }
@@ -97,10 +99,27 @@ fun AddScheduleScreenUI(
     var isTimeSelected by remember { mutableStateOf(false) }
     var isEndDateSelected by remember { mutableStateOf(false) }
 
-    //var selectedTime by rememberSaveable(saver = CalendarInformationSaver) { mutableStateOf(CalendarInformation(Calendar.getInstance())) }
-    val isSaveButtonEnabled = isClinicEntered && isDoctorEntered && isDepartmentSelected && isTimeSelected
+
+    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
+    var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
+    var lastSelectedIndex by remember { mutableStateOf<Int?>(null) }
+
+    val selectedDate = selectedDateString?.let { LocalDate.parse(it) }
+    val bookDate = selectedDate?.let {
+        Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
+    } ?: Date()
 
 
+    fun setTimeSelected(index: Int, isSelected: Boolean) {
+        selectedTimeIndices = if (isSelected) {
+            selectedTimeIndices + index
+        } else {
+            selectedTimeIndices - index
+        }
+        lastSelectedIndex = if (isSelected) index else lastSelectedIndex
+    }
+
+    val isSaveButtonEnabled = isClinicEntered && isDoctorEntered && isDepartmentSelected
 
     Scaffold(
         backgroundColor = Color.Transparent,
@@ -113,9 +132,8 @@ fun AddScheduleScreenUI(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate(Routes.managementScreen.route) {
-                                navController.popBackStack()
-                            }
+                            navController.popBackStack()
+
                         },
                     ) {
                         Icon(
@@ -143,7 +161,8 @@ fun AddScheduleScreenUI(
                                 hospitalName = clinicName,
                                 doctorName = doctorName,
                                 subject = department,
-                                bookTime = bookTime,
+                                startDate = bookDate,
+                                bookTimes = selectedTimes,
                                 context = context,
                                 isAllWritten  = isSaveButtonEnabled,
                                 isAllAvailable  = isSaveButtonEnabled,
@@ -234,23 +253,23 @@ fun AddScheduleScreenUI(
                 text = "진료 시간",
                 style = MaterialTheme.typography.bodyLarge
             )
-
-            TimerTextField(
-                isLastItem = true,
-                isOnlyItem = true,
-                time = { selectedTimeValue ->
-                    //selectedTime = selectedTimeValue
-                    isTimeSelected = true
-                },
-                logEvent = {
+            for (index in selectedTimes.indices) {
+                TimerTextField(
+                    isLastItem = true,
+                    isOnlyItem = true,
+                    time = {
+                        selectedTimes[index] = it
+                        setTimeSelected(index, true)
+                    },
+                    logEvent = {
                         //viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
                     },
-                onDeleteClick = {
-                    // 삭제 로직 필요할 경우 작성
-                },
-                isTimeSelected = isTimeSelected
+                    onDeleteClick = {
+                        // 삭제 로직 필요할 경우 작성
+                    },
+                    isTimeSelected = selectedTimeIndices.contains(index)
                 )
-
+            }
             Spacer(modifier = Modifier.padding(4.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -276,6 +295,7 @@ fun AddScheduleScreenUI(
 
             if (isRecurring) {
                 EndDateTextField (
+                    bookDate = bookDate.time,
                     onDateSelected = { selectedEndDate ->
                     endDate = selectedEndDate
                     isEndDateSelected = true
@@ -286,14 +306,4 @@ fun AddScheduleScreenUI(
             }
         }
     }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun AddScheduleScreenUIPreview( ){
-    val navController = rememberNavController()
-    val btmBarViewModel: BtmBarViewModel = viewModel()
-    AddScheduleScreenUI(navController = navController, btmBarViewModel = btmBarViewModel, userViewModel = UserViewModel())
 }

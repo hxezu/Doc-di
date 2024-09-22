@@ -129,12 +129,24 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
         return calendar.time
     }
 
+    private fun getFormattedBookTime(bookTime: CalendarInformation): String {
+        // Create a Calendar instance for the desired time
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, bookTime.dateInformation.hour)
+            set(Calendar.MINUTE, bookTime.dateInformation.minute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        return calendar.time.toFormattedDateTimeString() // Adjust as necessary
+    }
+
     suspend fun createBookedReminder(
         email: String,
         hospitalName: String,
         doctorName: String,
         subject: String,
-        bookTime: Date,
+        startDate: Date,
+        bookTimes:  List<CalendarInformation>,
         context: Context,
         isAllWritten: Boolean,
         isAllAvailable: Boolean,
@@ -143,25 +155,30 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
         if (isAllWritten && isAllAvailable) {
             CoroutineScope(Dispatchers.IO).launch {
                 try{
-                    val bookedDTO = BookedDTO(
-                        email = email,
-                        hospitalName = hospitalName,
-                        doctorName = doctorName,
-                        subject = subject,
-                        bookTime = bookTime.toFormattedDateTimeString() // 적절한 포맷으로 변환
-                    )
-                    val bookedResponse = reminderApi.createBookedReminder(bookedDTO)
+                    val calendar = Calendar.getInstance().apply { time = startDate }
+                    for (bookTime in bookTimes) {
+                        val bookTimeDate = getMedicationTime(bookTime, calendar)
 
-                    if (bookedResponse.isSuccessful) {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "예약 등록 성공", Toast.LENGTH_SHORT).show()
-                            navController.navigate(Routes.managementScreen.route) {
-                                navController.popBackStack()
+                        val bookedDTO = BookedDTO(
+                            email = email,
+                            hospitalName = hospitalName,
+                            doctorName = doctorName,
+                            subject = subject,
+                            bookTime = bookTimeDate.toFormattedDateTimeString()
+                        )
+                        val bookedResponse = reminderApi.createBookedReminder(bookedDTO)
+
+                        if (!bookedResponse.isSuccessful) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "예약 등록 실패: ${bookedResponse.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                                return@withContext
                             }
                         }
-                    } else {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "예약 등록 실패: ${bookedResponse.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                    }
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "예약 등록 성공", Toast.LENGTH_SHORT).show()
+                        navController.navigate(Routes.managementScreen.route) {
+                            navController.popBackStack()
                         }
                     }
 
