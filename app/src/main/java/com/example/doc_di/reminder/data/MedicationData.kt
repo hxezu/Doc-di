@@ -1,4 +1,4 @@
-package com.example.doc_di.reminder.calendar.navigation
+package com.example.doc_di.reminder.data
 
 data class MedicationData(
     val name: String,

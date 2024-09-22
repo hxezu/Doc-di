@@ -13,8 +13,9 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.doc_di.domain.model.Booked
-import com.example.doc_di.reminder.calendar.navigation.AppointmentData
-import com.example.doc_di.reminder.calendar.navigation.MedicationData
+import com.example.doc_di.domain.model.Pill
+import com.example.doc_di.reminder.data.AppointmentData
+import com.example.doc_di.reminder.data.MedicationData
 import com.example.doc_di.reminder.data.getClassName
 import com.example.doc_di.reminder.data.getRating
 import com.example.doc_di.reminder.data.toAppointmentData
@@ -62,7 +63,7 @@ class ReminderViewModel @Inject constructor(
                 val response = reminderApi.findReminder(email)
                 Log.d("MedicationReminderViewModel", "API Response: $response")
                 _reminders.value = response.data
-                updateMedicationsForToday(response.data)
+                updateMedicationsForToday(response.data ?: emptyList(), emptyList())
             } catch (e: Exception) {
                 println("Failed to fetch Medication reminders: ${e.message}")
             }
@@ -153,9 +154,9 @@ class ReminderViewModel @Inject constructor(
     }
 
     // Helper method to update medications for today
-    fun updateMedicationsForToday(reminders: List<Reminder>) {
+    fun updateMedicationsForToday(reminders: List<Reminder>, pills: List<Pill>) {
         val currentDateString = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        val timeFormat = SimpleDateFormat("a hh:mm", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("a hh:mm", Locale("ko", "KR"))
         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) // medicationTime 형식에 맞춰 조정
 
         val todayMedications = reminders.filter { reminder ->
@@ -173,8 +174,8 @@ class ReminderViewModel @Inject constructor(
             MedicationData(
                 name = it.medicineName,
                 time = timeFormat.format(dateFormat.parse(it.medicationTime) ?: Date()), // 기본값 설정
-                efficacy = it.getClassName(),
-                rating = String.format("%.1f", it.getRating())
+                efficacy = it.getClassName(pills),
+                rating = String.format("%.1f", it.getRating(pills))
             )
         }
 

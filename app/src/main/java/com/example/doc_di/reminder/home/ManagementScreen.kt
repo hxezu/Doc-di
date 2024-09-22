@@ -69,7 +69,7 @@ fun ManagementScreen(
         if (userEmail.isNotEmpty()) {
             println("Fetching reminders for user: $userEmail")
             reminderViewModel.getBookedReminders(userEmail)
-            reminderViewModel.getReminders(userEmail) // Fetch reminders for the logged-in user
+            reminderViewModel.getReminders(userEmail ) // Fetch reminders for the logged-in user
         } else {
             println("User email is missing, cannot fetch reminders")
         }
