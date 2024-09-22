@@ -46,6 +46,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.platform.LocalContext
@@ -56,18 +57,18 @@ import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.UserViewModel
 import com.example.doc_di.domain.RetrofitInstance
-import com.example.doc_di.domain.model.Booked
-import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.reminder.booked_reminder.utils.AddDoctorName
-import com.example.doc_di.reminder.booked_reminder.utils.AddHospitalName
-import com.example.doc_di.reminder.booked_reminder.utils.DepartmentDropdownMenu
-import com.example.doc_di.reminder.booked_reminder.utils.EndDateTextField
-import com.example.doc_di.reminder.booked_reminder.utils.TimerTextField
+import com.example.doc_di.reminder.booked_reminder.utils.EditDepartment
+import com.example.doc_di.reminder.booked_reminder.utils.EditDoctorName
+import com.example.doc_di.reminder.booked_reminder.utils.EditTimerTextField
+import com.example.doc_di.reminder.booked_reminder.utils.EditEndDate
+import com.example.doc_di.reminder.booked_reminder.utils.EditHospitalName
 import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
+import com.example.doc_di.reminder.medication_reminder.utils.EditTimerText
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Department
 import kotlinx.coroutines.launch
@@ -95,15 +96,26 @@ fun EditScheduleScreen(
     var isRecurring by rememberSaveable { mutableStateOf(false) }  // Add state for toggle
     var department by rememberSaveable { mutableStateOf(Department.InternalMedicine.name) }
     var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
+    var existingDate by remember { mutableStateOf(Date()) }
     var bookTime by rememberSaveable { mutableStateOf("") }
 
-    var isClinicEntered by remember { mutableStateOf(false) }
-    var isDoctorEntered by remember { mutableStateOf(false) }
-    var isDepartmentSelected by remember { mutableStateOf(false) }
-    var isTimeSelected by remember { mutableStateOf(false) }
+    var isClinicEntered by remember { mutableStateOf(true) }
+    var isDoctorEntered by remember { mutableStateOf(true) }
+    var isDepartmentSelected by remember { mutableStateOf(true) }
+    var isTimeSelected by remember { mutableStateOf(true) }
     var isEndDateSelected by remember { mutableStateOf(false) }
 
-    var selectedTimeValue by rememberSaveable { mutableStateOf("") }
+    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
+    var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
+    var lastSelectedIndex by remember { mutableStateOf<Int?>(null) }
+
+    fun setTimeSelected(index: Int, isSelected: Boolean) {
+        selectedTimeIndices = if (isSelected) { selectedTimeIndices + index } else { selectedTimeIndices - index }
+        lastSelectedIndex = if (isSelected) index else lastSelectedIndex
+    }
+
+    fun addTime(time: CalendarInformation) { selectedTimes.add(time) }
+    fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
     val isSaveButtonEnabled = isClinicEntered && isDoctorEntered && isDepartmentSelected && isTimeSelected
 
     LaunchedEffect(booked) {
@@ -113,6 +125,9 @@ fun EditScheduleScreen(
             department = it.subject
             bookTime = it.bookTime
 
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val parts = it.bookTime.split(" ")
+            existingDate = dateFormat.parse(parts[0]) ?: Date() // 기존 날짜 추출
         }
     }
 
@@ -152,36 +167,42 @@ fun EditScheduleScreen(
                     color = Color.White) },
                 onClick = {
                     if (isSaveButtonEnabled) {
-                        val existingDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-                        val existingDate: Date? = existingDateFormat.parse(bookTime)
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
-                        val calendar = Calendar.getInstance().apply {
-                            existingDate?.let {
-                                time = it // Set existing date
-
-                                val selectedTimeParts = selectedTimeValue.split(":")
-                                if (selectedTimeParts.size == 2) {
-                                    set(Calendar.HOUR_OF_DAY, selectedTimeParts[0].toInt())
-                                    set(Calendar.MINUTE, selectedTimeParts[1].toInt())
-                                }
-                            }
+                        // 기존 날짜에서 Calendar 객체 생성
+                        val existingCalendar = Calendar.getInstance().apply {
+                            time = existingDate // 기존 날짜를 설정
                         }
-                        val updatedReminder = Booked(
-                            id = reminderId!!, // assuming booked has the existing ID
+
+                        val updatedTimes = selectedTimes.map { calendarInfo ->
+                            val calendar = calendarInfo.getCalendar()
+                            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                            val minute = calendar.get(Calendar.MINUTE)
+
+                            // 기존 날짜의 시간 부분을 새로운 시간으로 업데이트
+                            existingCalendar.set(Calendar.HOUR_OF_DAY, hour)
+                            existingCalendar.set(Calendar.MINUTE, minute)
+
+                            // 최종적으로 포맷팅하여 문자열로 변환
+                            dateFormat.format(existingCalendar.time)
+                        }
+                        val updatedReminder = booked?.copy(
                             hospitalName = clinicName,
                             doctorName = doctorName,
                             subject = department,
-                            bookTime = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(calendar.time),
+                            bookTime = updatedTimes.joinToString(", ")
                         )
 
-                        scope.launch {
-                            reminderImpl.editBookedReminder(
-                                booked = updatedReminder,
-                                context = context,
-                                isAllWritten = isSaveButtonEnabled,
-                                isAllAvailable = isSaveButtonEnabled,
-                                navController = navController
-                            )
+                        updatedReminder?.let {
+                            scope.launch {
+                                reminderImpl.editBookedReminder(
+                                    booked = it,
+                                    context = context,
+                                    isAllWritten = isSaveButtonEnabled,
+                                    isAllAvailable = isSaveButtonEnabled,
+                                    navController = navController
+                                )
+                            }
                         }
                         navController.navigate(Routes.managementScreen.route)
                     }
@@ -235,7 +256,8 @@ fun EditScheduleScreen(
                 )
             }
 
-            AddHospitalName(
+            EditHospitalName(
+                hospitalName = clinicName,
                 isHospitalEntered = isClinicEntered,
                 onHospitalChange = { hospital ->
                     clinicName = hospital
@@ -244,7 +266,8 @@ fun EditScheduleScreen(
             )
             Spacer(modifier = Modifier.padding(4.dp))
 
-            AddDoctorName(
+            EditDoctorName(
+                doctorName = doctorName,
                 isDoctorEntered = isDoctorEntered,
                 onDoctorChange = { doctor ->
                     doctorName = doctor
@@ -253,7 +276,8 @@ fun EditScheduleScreen(
             )
             Spacer(modifier = Modifier.padding(4.dp))
 
-            DepartmentDropdownMenu(
+            EditDepartment(
+                selectedDepartment = department,
                 department = { selectedDepartment ->
                     department = selectedDepartment
                     isDepartmentSelected = true
@@ -268,21 +292,22 @@ fun EditScheduleScreen(
                 style = MaterialTheme.typography.bodyLarge
             )
 
-            TimerTextField(
-                isLastItem = true,
-                isOnlyItem = true,
-                time = { selectedTimeValue ->
-                    //selectedTime = selectedTimeValue
-                    isTimeSelected = true
-                },
-                logEvent = {
+            for (index in selectedTimes.indices) {
+                EditTimerTextField(
+                    isLastItem = selectedTimes.lastIndex == index,
+                    isOnlyItem = selectedTimes.size == 1,
+                    time = {
+                        selectedTimes[index] = it
+                        setTimeSelected(index, true)
+                    },
+                    onDeleteClick = {
+                    },
+                    logEvent = {
                         //viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
                     },
-                onDeleteClick = {
-                    // 삭제 로직 필요할 경우 작성
-                },
-                isTimeSelected = isTimeSelected
+                    isTimeSelected = true
                 )
+            }
 
             Spacer(modifier = Modifier.padding(4.dp))
             Row(
@@ -308,7 +333,7 @@ fun EditScheduleScreen(
             Spacer(modifier = Modifier.padding(4.dp))
 
             if (isRecurring) {
-                EndDateTextField (
+                EditEndDate (
                     onDateSelected = { selectedEndDate ->
                     endDate = selectedEndDate
                     isEndDateSelected = true

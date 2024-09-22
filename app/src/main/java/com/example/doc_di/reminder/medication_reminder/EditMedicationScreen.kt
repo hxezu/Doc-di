@@ -111,10 +111,10 @@ fun EditMedicationScreen(
         }
     }
 
-    var isNameEntered by remember { mutableStateOf(false) }
-    var isDoseEntered by remember { mutableStateOf(false) }
-    var isRecurrenceSelected by remember { mutableStateOf(false) }
-    var isEndDateSelected by remember { mutableStateOf(false) }
+    var isNameEntered by remember { mutableStateOf(true) }
+    var isDoseEntered by remember { mutableStateOf(true) }
+    var isRecurrenceSelected by remember { mutableStateOf(true) }
+    var isEndDateSelected by remember { mutableStateOf(true) }
 
     val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
     var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
@@ -267,7 +267,7 @@ fun EditMedicationScreen(
 
             EditMedicationName(
                 medicationName = name,
-                isNameEntered = true,
+                isNameEntered = isNameEntered,
                 onNameChange = { nameValue ->
                     name = nameValue
                     isNameEntered = nameValue.isNotEmpty()
@@ -277,7 +277,7 @@ fun EditMedicationScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 EditDoseInput(
                     dose = dose,
-                    isDoseEntered = true,
+                    isDoseEntered = isDoseEntered,
                     maxDose = 99,
                     onValueChange = { doseValue ->
                         dose = doseValue
@@ -289,7 +289,7 @@ fun EditMedicationScreen(
                         recurrence = selectedRecurrence
                         isRecurrenceSelected = true
                     },
-                    isRecurrenceSelected = true)
+                    isRecurrenceSelected = isRecurrenceSelected)
             }
 
             Spacer(modifier = Modifier.padding(4.dp))
@@ -299,7 +299,7 @@ fun EditMedicationScreen(
                     endDate = Date(timestamp) // Convert the Long timestamp to a Date object
                     isEndDateSelected = true
                 },
-                isEndDateSelected = true
+                isEndDateSelected = isEndDateSelected
             )
 
             Spacer(modifier = Modifier.padding(4.dp))

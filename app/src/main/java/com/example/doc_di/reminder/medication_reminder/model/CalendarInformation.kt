@@ -58,6 +58,21 @@ class CalendarInformation(private val calendar: Calendar) {
     }
 
     companion object {
+        fun parseBookTimeToCalendarInformation(bookTime: String): CalendarInformation? {
+            return try {
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                val date = inputFormat.parse(bookTime)
+                if (date != null) {
+                    val calendar = Calendar.getInstance().apply { time = date }
+                    CalendarInformation(calendar) // Return CalendarInformation instance
+                } else {
+                    null // Return null if parsing fails
+                }
+            } catch (e: Exception) {
+                null // Return null if there's an exception
+            }
+        }
+
         fun getStateSaver() = Saver<CalendarInformation, Calendar>(
             save = { state ->
                 state.calendar
