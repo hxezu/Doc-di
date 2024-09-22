@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.runtime.*
+import com.example.doc_di.domain.model.Booked
 import retrofit2.Response
 
 @HiltViewModel
@@ -19,6 +20,9 @@ class ReminderViewModel @Inject constructor(
 
     private val _reminders = mutableStateOf<List<Reminder>>(emptyList())
     val reminders: State<List<Reminder>> = _reminders
+
+    private val _bookedReminders = mutableStateOf<List<Booked>>(emptyList())
+    val bookedReminders: State<List<Booked>> = _bookedReminders
 
     fun getReminders(email: String) {
         viewModelScope.launch {
@@ -43,7 +47,7 @@ class ReminderViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     _reminders.value = _reminders.value.filterNot { it.id?.toInt() == reminderId }
                 } else {
-                    Log.e("ReminderViewModel", "알림 삭제 실패: ${response.errorBody()?.string()}")
+                    Log.e("ReminderViewModel", "복용 알림 삭제 실패: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
                 println("Failed to delete reminders: ${e.message}")
@@ -51,21 +55,30 @@ class ReminderViewModel @Inject constructor(
         }
     }
 
-    fun editReminder(reminder: Reminder) {
+
+    fun getBookedReminders(email: String) {
         viewModelScope.launch {
             try {
-                val response: Response<Unit> = reminderApi.editReminder(reminder)
-                if (response.isSuccessful) {
-                    _reminders.value = _reminders.value.map {
-                        if (it.id == reminder.id) reminder else it
-                    }
-                    Log.d("ReminderViewModel", "알림 수정 성공")
-                } else {
-                    Log.e("ReminderViewModel", "알림 수정 실패: ${response.errorBody()?.string()}")
-                }
+                val response = reminderApi.findBookedReminder(email)
+                Log.d("ReminderViewModel", "API Response: $response")
+                _bookedReminders.value = response.data
+            } catch (e: Exception) {
+                println("Failed to fetch reminders: ${e.message}")
+            }
+        }
+    }
 
-            }catch (e: Exception){
-                println("Failed to edit reminders: ${e.message}")
+    fun deleteBookedReminder(boookedReminderId: Int) {
+        viewModelScope.launch {
+            try {
+                val response: Response<Unit> = reminderApi.deleteBookedReminder(boookedReminderId)
+                if (response.isSuccessful) {
+                    _bookedReminders.value = _bookedReminders.value.filterNot { it.id?.toInt() == boookedReminderId }
+                } else {
+                    Log.e("ReminderViewModel", "진료 알림 삭제 실패: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                println("Failed to delete Booked reminders: ${e.message}")
             }
         }
     }

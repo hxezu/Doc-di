@@ -39,4 +39,9 @@ interface ReminderApi {
     suspend fun createBookedReminder(
         @Body bookedDTO: BookedDTO,
     ):  Response<Unit>
+
+    @DELETE("reminder/booked/delete")
+    suspend fun deleteBookedReminder(
+        @Query("id") id: Int
+    ): Response<Unit>
 }

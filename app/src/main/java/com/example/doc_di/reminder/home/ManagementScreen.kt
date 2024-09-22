@@ -7,8 +7,10 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,6 +40,7 @@ import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.reminder.home.model.CalendarModel
+import com.example.doc_di.reminder.home.utils.BookedCard
 import com.example.doc_di.reminder.home.utils.DatesHeader
 import com.example.doc_di.reminder.home.viewmodel.ReminderState
 import com.example.doc_di.reminder.home.utils.FabIcon
@@ -45,6 +48,7 @@ import com.example.doc_di.reminder.home.utils.FabOption
 import com.example.doc_di.reminder.home.utils.MedicationCard
 import com.example.doc_di.reminder.home.utils.MultiFabItem
 import com.example.doc_di.reminder.home.utils.MultiFloatingActionButton
+import com.example.doc_di.reminder.home.viewmodel.BookedReminderState
 import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
 import com.example.doc_di.ui.theme.MainBlue
 import kotlinx.coroutines.launch
@@ -64,6 +68,7 @@ fun ManagementScreen(
     userViewModel: UserViewModel
 ) {
     val reminders by reminderViewModel.reminders
+    val bookedReminders by reminderViewModel.bookedReminders
     val userEmail = userViewModel.userInfo.value?.email ?: ""
 
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
@@ -71,6 +76,7 @@ fun ManagementScreen(
     LaunchedEffect(Unit) {
         if (userEmail.isNotEmpty()) {
             println("Fetching reminders for user: $userEmail")
+            reminderViewModel.getBookedReminders(userEmail)
             reminderViewModel.getReminders(userEmail) // Fetch reminders for the logged-in user
         } else {
             println("User email is missing, cannot fetch reminders")
@@ -132,6 +138,10 @@ fun ManagementScreen(
                         reminders = reminders, // Use reminders fetched from the API
                         lastSelectedDate = SimpleDateFormat("yyyy-MM-dd").format(Date()) // Current date as default
                     ),
+                    bookedState = BookedReminderState(
+                        bookedReminders = bookedReminders ,
+                        lastSelectedDate = SimpleDateFormat("yyyy-MM-dd").format(Date())
+                    ),
                     navigateToMedicationDetail = { },
                     onSelectedDate = { newDate -> selectedDate = newDate }, // Updated this line
                     logEvent = { /* 필요 시 추가 처리 */ },
@@ -148,6 +158,7 @@ fun ManagementScreen(
 fun DailyMedications(
     navController: NavController,
     state: ReminderState,
+    bookedState: BookedReminderState,
     navigateToMedicationDetail: (Reminder) -> Unit,
     onSelectedDate: (LocalDate) -> Unit,
     logEvent: (String) -> Unit,
@@ -182,30 +193,46 @@ fun DailyMedications(
             } ?: false // medicationTime이 null인 경우 false 반환
         }
 
-        // Conditional content for medications
-        if (filteredReminders.isEmpty()) {
+        val filteredBookedReminders = bookedState.bookedReminders.filter { booked ->
+            booked.bookTime?.let {
+                val medicationTimeFormatted = dateFormat.format(dateFormat.parse(it))
+                val selectedDateFormatted = dateFormat.format(Date.from(selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                medicationTimeFormatted == selectedDateFormatted
+            } ?: false
+        }
 
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(
-                    items = filteredReminders,
-                    itemContent = { reminder ->
-                        MedicationCard(
-                            reminder = reminder,
-                            navigateToMedicationDetail = { medication ->
-                                navigateToMedicationDetail(medication)
-                            },
-                            deleteReminder = { reminderId ->
-                                reminderViewModel.deleteReminder(reminderId)
-                            },
-                            navController = navController
-                        )
+        if (filteredReminders.isNotEmpty() || filteredBookedReminders.isNotEmpty()) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                // Display medication reminders first
+                items(filteredReminders) { reminder ->
+                    MedicationCard(
+                        reminder = reminder,
+                        navigateToMedicationDetail = { medication -> navigateToMedicationDetail(medication) },
+                        deleteReminder = { reminderId -> reminderViewModel.deleteReminder(reminderId) },
+                        navController = navController
+                    )
+                }
+
+                // Spacer between two sections (optional)
+                if (filteredReminders.isNotEmpty() && filteredBookedReminders.isNotEmpty()) {
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp)) // Adjust the height as needed
                     }
-                )
+                }
+
+                // Display booked reminders next
+                items(filteredBookedReminders) { booked ->
+                    BookedCard(
+                        booked = booked,
+                        navigateToMedicationDetail = { bookedDetail -> /* Navigate to booked detail */ },
+                        deleteBookedReminder = { bookedId -> reminderViewModel.deleteBookedReminder(bookedId)
+                        },
+                        navController = navController
+                    )
+                }
             }
         }
+
     }
 }
 
