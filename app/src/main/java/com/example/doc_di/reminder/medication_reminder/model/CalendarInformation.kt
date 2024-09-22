@@ -13,6 +13,11 @@ class CalendarInformation(private val calendar: Calendar) {
         minute = calendar.get(Calendar.MINUTE)
     )
 
+    fun getCalendar(): Calendar {
+        return calendar
+    }
+
+
     fun getTimeInMillis() = calendar.timeInMillis
 
 //    fun getDateFormatted(pattern: String): String {
@@ -22,6 +27,13 @@ class CalendarInformation(private val calendar: Calendar) {
 //            throw ex
 //        }
 //    }
+
+    fun formatTimesToString(selectedTimes: List<CalendarInformation>): String {
+        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        return selectedTimes.joinToString(separator = ", ") { calendarInfo ->
+            dateFormat.format(calendarInfo.getTimeInMillis())
+        }
+    }
 
     fun getDateFormatted(pattern: String): String {
         return try {

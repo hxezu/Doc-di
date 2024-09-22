@@ -3,6 +3,7 @@ package com.example.doc_di.domain.reminder
 import android.content.Context
 import android.widget.Toast
 import androidx.navigation.NavController
+import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.extension.toFormattedDateTimeString
@@ -46,8 +47,6 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                     for (i in 0 until numOccurrences) {
                         for (medicationTime in medicationTimes) {
                             val medicationTimeDate = getMedicationTime(medicationTime, calendar)
-
-
                             val reminderDTO = ReminderDTO(
                                 email = email,
                                 medicineName = medicineName,
@@ -59,7 +58,6 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                             )
 
                             val reminderResponse = reminderApi.createReminder(reminderDTO)
-
                             if (!reminderResponse.isSuccessful) {
                                 withContext(Dispatchers.Main) {
                                     println("알림 등록 실패")
@@ -88,6 +86,37 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
             }
         } else {
             Toast.makeText(context, "모든 정보를 정확히 기입해 주세요.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    suspend fun editReminder(
+        reminder: Reminder,
+        context: Context,
+        isAllWritten: Boolean,
+        isAllAvailable: Boolean,
+        navController: NavController
+    ) {
+        try {
+            withContext(Dispatchers.IO) {
+                val editResponse = reminderApi.editReminder(reminder)
+
+                if (editResponse.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "알림 수정 성공", Toast.LENGTH_SHORT).show()
+                        navController.navigate(Routes.managementScreen.route) {
+                            navController.popBackStack()
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "알림 수정 실패: ${editResponse.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "오류 발생: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
     private fun getMedicationTime(medicationTime: CalendarInformation, calendar: Calendar): Date {

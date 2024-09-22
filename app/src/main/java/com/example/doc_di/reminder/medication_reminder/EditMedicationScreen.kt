@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -53,10 +54,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.doc_di.R
+import com.example.doc_di.domain.RetrofitInstance
+import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.extension.toDate
+import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.home.viewmodel.ReminderViewModel
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.reminder.medication_reminder.utils.EditDoseInput
@@ -64,9 +68,6 @@ import com.example.doc_di.reminder.medication_reminder.utils.EditEndDate
 import com.example.doc_di.reminder.medication_reminder.utils.EditMedicationName
 import com.example.doc_di.reminder.medication_reminder.utils.EditRecurrence
 import com.example.doc_di.reminder.medication_reminder.utils.EditTimerText
-import com.example.doc_di.reminder.medication_reminder.utils.EndDateTextField
-import com.example.doc_di.reminder.medication_reminder.utils.RecurrenceDropdownMenu
-import com.example.doc_di.reminder.medication_reminder.utils.TimerTextField
 import com.example.doc_di.ui.theme.MainBlue
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -83,12 +84,18 @@ fun EditMedicationScreen(
     reminderViewModel: ReminderViewModel = hiltViewModel(),
     reminderId: Int?
 ) {
+
+    val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
     val reminder by remember(reminderId) { mutableStateOf(reminderId?.let { reminderViewModel.getReminderById(it) }) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     var name by remember { mutableStateOf("") }
     var dose by remember { mutableStateOf(0) }
     var recurrence by remember { mutableStateOf("") }
     var endDate by remember { mutableStateOf(Date()) }
+    var existingDate by remember { mutableStateOf(Date()) } // 기존 날짜 저장
+    var medicationTime by remember { mutableStateOf("") }
 
     // 데이터 로드 후 상태 초기화
     LaunchedEffect(reminder) {
@@ -96,7 +103,12 @@ fun EditMedicationScreen(
             name = it.medicineName
             dose = it.dosage
             recurrence = it.recurrence
+            medicationTime = it.medicationTime
+
+            // 날짜 추출 및 설정
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val parts = it.medicationTime.split(" ")
+            existingDate = dateFormat.parse(parts[0]) ?: Date() // 기존 날짜 추출
             endDate = dateFormat.parse(it.endDate) ?: Date()
         }
     }
@@ -109,13 +121,13 @@ fun EditMedicationScreen(
     val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
     var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
     var lastSelectedIndex by remember { mutableStateOf<Int?>(null) }
+
     fun setTimeSelected(index: Int, isSelected: Boolean) {
         selectedTimeIndices = if (isSelected) { selectedTimeIndices + index } else { selectedTimeIndices - index }
         lastSelectedIndex = if (isSelected) index else lastSelectedIndex
     }
 
     fun addTime(time: CalendarInformation) { selectedTimes.add(time) }
-
     fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
 
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
@@ -161,13 +173,46 @@ fun EditMedicationScreen(
                 },
                 onClick = {
                     if (isSaveButtonEnabled) {
-//                        reminderViewModel.editReminder (
-//                            medicineName = name,
-//                            dosage = dose.toShort(),
-//                            recurrence = recurrence,
-//                            endDate = endDate,
-//                            medicationTimes = selectedTimes
-//                        )
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+
+                        // 기존 날짜에서 Calendar 객체 생성
+                        val existingCalendar = Calendar.getInstance().apply {
+                            time = existingDate // 기존 날짜를 설정
+                        }
+
+                        val updatedTimes = selectedTimes.map { calendarInfo ->
+                            val calendar = calendarInfo.getCalendar()
+                            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                            val minute = calendar.get(Calendar.MINUTE)
+
+                            // 기존 날짜의 시간 부분을 새로운 시간으로 업데이트
+                            existingCalendar.set(Calendar.HOUR_OF_DAY, hour)
+                            existingCalendar.set(Calendar.MINUTE, minute)
+
+                            // 최종적으로 포맷팅하여 문자열로 변환
+                            dateFormat.format(existingCalendar.time)
+                        }
+
+                        val updatedReminder = reminder?.copy(
+                            medicineName = name,
+                            dosage = dose,
+                            recurrence = recurrence,
+                            endDate = endDate.toFormattedDateString(),
+                            medicationTime = updatedTimes.joinToString(", ") // 시간을 문자열로 결합
+                        )
+
+
+                        updatedReminder?.let {
+                            scope.launch {
+                                reminderImpl.editReminder(
+                                    reminder = it,
+                                    context = context,
+                                    isAllWritten  = isSaveButtonEnabled,
+                                    isAllAvailable  = isSaveButtonEnabled,
+                                    navController = navController
+                                )
+                            }
+                        }
                         navController.navigate(Routes.managementScreen.route)
                     }
                 },
