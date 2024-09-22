@@ -114,11 +114,13 @@ fun ManagementScreen(
                         selectedDate = selectedDate
                     ),
                 ),
-                onFabItemClicked = { println(it) },
+                onFabItemClicked = { println(it)
+                },
                 fabTitle = "MultiFloatActionButton",
                 showFabTitle = false,
                 navController = navController,
-                modifier = Modifier.padding(bottom = 20.dp)
+                modifier = Modifier.padding(bottom = 20.dp),
+                selectedDate = selectedDate
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
@@ -143,7 +145,9 @@ fun ManagementScreen(
                         lastSelectedDate = SimpleDateFormat("yyyy-MM-dd").format(Date())
                     ),
                     navigateToMedicationDetail = { },
-                    onSelectedDate = { newDate -> selectedDate = newDate }, // Updated this line
+                    onSelectedDate = { newDate ->
+                        selectedDate = newDate
+                                     }, // Updated this line
                     logEvent = { /* 필요 시 추가 처리 */ },
                     reminderViewModel = reminderViewModel,
                     selectedDate = selectedDate
@@ -178,7 +182,7 @@ fun DailyMedications(
             logEvent = { logEvent.invoke(it) },
             onDateSelected = { selectedDateModel ->
                 val newDate = selectedDateModel.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() // LocalDate로 변환
-                onSelectedDate(newDate) // LocalDate 전달
+                onSelectedDate(newDate)// LocalDate 전달
                 logEvent.invoke(AnalyticsEvents.HOME_NEW_DATE_SELECTED)
             }
         )
@@ -225,8 +229,7 @@ fun DailyMedications(
                     BookedCard(
                         booked = booked,
                         navigateToMedicationDetail = { bookedDetail -> /* Navigate to booked detail */ },
-                        deleteBookedReminder = { bookedId -> reminderViewModel.deleteBookedReminder(bookedId)
-                        },
+                        deleteBookedReminder = { bookedId -> reminderViewModel.deleteBookedReminder(bookedId) },
                         navController = navController
                     )
                 }

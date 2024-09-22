@@ -69,6 +69,8 @@ import com.example.doc_di.reminder.medication_reminder.utils.TimerTextField
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Recurrence
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 
@@ -78,7 +80,8 @@ import java.util.Date
 fun AddMedicationScreenUI(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    selectedDateString: String?
 ){
     val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
     val userEmail = userViewModel.userInfo.value?.email ?: ""
@@ -89,12 +92,17 @@ fun AddMedicationScreenUI(
     var dose by rememberSaveable { mutableStateOf("") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
     var endDate by rememberSaveable { mutableStateOf(Date()) }
-    val startDate = Calendar.getInstance().time
+
 
     var isNameEntered by remember { mutableStateOf(false) }
     var isDoseEntered by remember { mutableStateOf(false) }
     var isRecurrenceSelected by remember { mutableStateOf(false) }
     var isEndDateSelected by remember { mutableStateOf(false) }
+
+    val selectedDate = selectedDateString?.let { LocalDate.parse(it) }
+    val startDate = selectedDate?.let {
+        Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
+    } ?: Date()
 
     val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
     var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
@@ -116,8 +124,6 @@ fun AddMedicationScreenUI(
     // Check if the last TimerTextField is selected
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
     val isSaveButtonEnabled = isNameEntered && isDoseEntered && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
-
-
 
     Scaffold(
         backgroundColor = Color.Transparent,
@@ -248,6 +254,7 @@ fun AddMedicationScreenUI(
 
             Spacer(modifier = Modifier.padding(4.dp))
             EndDateTextField(
+                startDate = startDate.time,
                 onDateSelected = { timestamp ->
                     endDate = Date(timestamp) // Convert the Long timestamp to a Date object
                     isEndDateSelected = true
@@ -315,14 +322,4 @@ fun AddMedicationScreenUI(
             Spacer(modifier = Modifier.weight(1f))
         }
     }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun AddMedicationScreenUIPreview( ){
-    val navController = rememberNavController()
-    val btmBarViewModel: BtmBarViewModel = viewModel()
-    AddMedicationScreenUI(navController = navController, btmBarViewModel = btmBarViewModel, userViewModel = UserViewModel())
 }

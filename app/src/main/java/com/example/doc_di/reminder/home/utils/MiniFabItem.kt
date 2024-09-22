@@ -32,6 +32,7 @@ fun MiniFabItem(
     selectedDate: LocalDate,
     onFabItemClicked: (item: MultiFabItem) -> Unit
 ) {
+    println("Selected Date in MiniFabItem: $selectedDate")
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(end = 12.dp)
@@ -40,12 +41,10 @@ fun MiniFabItem(
             modifier = Modifier.size(40.dp),
             onClick = {
                 onFabItemClicked(item)
-                println("Pre Button Selected Date: $selectedDate")
                 val formattedDate = selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
                 println("Button Selected Date: $formattedDate")
                 when (item.iconRes) {
                     R.drawable.pillemoji -> navController.navigate("${Routes.addMedicationScreen.route}?selectedDate=$formattedDate")
-
                     R.drawable.hospitalemoji -> navController.navigate("${Routes.addScheduleScreen.route}?selectedDate=$formattedDate")
                 }
                       },

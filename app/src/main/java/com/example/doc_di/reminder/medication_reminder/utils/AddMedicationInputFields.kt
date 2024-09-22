@@ -191,6 +191,7 @@ fun TimerTextField(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EndDateTextField(
+    startDate: Long,
     onDateSelected: (Long) -> Unit,
     isEndDateSelected: Boolean
 ) {
@@ -207,17 +208,21 @@ fun EndDateTextField(
         shouldDisplay = true
     }
 
-    val today = Calendar.getInstance()
-    today.set(Calendar.HOUR_OF_DAY, 0)
-    today.set(Calendar.MINUTE, 0)
-    today.set(Calendar.SECOND, 0)
-    today.set(Calendar.MILLISECOND, 0)
-    val currentDayMillis = today.timeInMillis
+    val startCalendar = Calendar.getInstance().apply {
+        timeInMillis = startDate
+        add(Calendar.DAY_OF_MONTH, 1)
+    }
+    startCalendar.set(Calendar.HOUR_OF_DAY, 0)
+    startCalendar.set(Calendar.MINUTE, 0)
+    startCalendar.set(Calendar.SECOND, 0)
+    startCalendar.set(Calendar.MILLISECOND, 0)
+    val startDayMillis = startCalendar.timeInMillis
+
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = System.currentTimeMillis(),
+        initialSelectedDateMillis = startDayMillis,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis >= currentDayMillis
+                return utcTimeMillis >= startDayMillis // StartDate 이후의 날짜만 선택 가능
             }
         }
     )

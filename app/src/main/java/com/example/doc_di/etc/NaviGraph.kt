@@ -144,8 +144,14 @@ fun NaviGraph(navController: NavHostController) {
             ManagementScreen(navController, btmBarViewModel, reminderViewModel, userViewModel)
         }
 
-        composable(route = Routes.addMedicationScreen.route) {
-            AddMedicationScreenUI(navController, btmBarViewModel, userViewModel)
+        composable(route ="addMedicationScreen?selectedDate={selectedDate}") {backStackEntry ->
+            val selectedDate = backStackEntry.arguments?.getString("selectedDate")
+            AddMedicationScreenUI(
+                navController = navController,
+                btmBarViewModel = btmBarViewModel,
+                userViewModel = userViewModel,
+                selectedDateString = selectedDate
+            )
         }
 
         composable(route = "editMedicationScreen/{reminderId}") { backStackEntry ->

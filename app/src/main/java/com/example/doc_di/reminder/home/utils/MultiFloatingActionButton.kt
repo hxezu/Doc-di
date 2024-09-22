@@ -33,6 +33,7 @@ fun MultiFloatingActionButton(
     fabIcon: FabIcon,
     fabTitle: String?,
     showFabTitle: Boolean,
+    selectedDate: LocalDate,
     modifier: Modifier = Modifier,
     itemsMultiFab: List<MultiFabItem>,
     fabState: MutableState<MultiFabState> = rememberMultiFabState(),
@@ -67,7 +68,7 @@ fun MultiFloatingActionButton(
                         showLabel = miniFabOption.showLabels,
                         miniFabBackgroundColor = Color.White,
                         navController = navController,
-                        selectedDate = LocalDate.now(),
+                        selectedDate = selectedDate,
                         onFabItemClicked = { onFabItemClicked(item) })
                 }
 
