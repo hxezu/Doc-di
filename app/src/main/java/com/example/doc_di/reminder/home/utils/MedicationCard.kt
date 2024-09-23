@@ -29,13 +29,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -43,7 +41,6 @@ import com.example.doc_di.R
 import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.search.SearchViewModel
-import com.example.doc_di.search.pillsearch.searchresult.ShowPillList
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import com.example.doc_di.ui.theme.LightBlue
 
@@ -56,8 +53,6 @@ fun MedicationCard(
     searchViewModel: SearchViewModel,
     reviewViewModel: ReviewViewModel
 ) {
-    var nameSearch by rememberSaveable { mutableStateOf("") }
-    val option = mutableMapOf<String, String>()
 
     val pillList = searchViewModel.pills.collectAsState().value
     val isLoading = searchViewModel.isLoading.collectAsState().value
@@ -67,12 +62,6 @@ fun MedicationCard(
         searchViewModel.resetPills()
     }
 
-    fun doSearch() {
-        option["name"] = nameSearch
-        searchViewModel.setOptions(option)
-        searchViewModel.searchPillsByOptions()
-        navController.navigate(Routes.searchResult.route)
-    }
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -86,9 +75,6 @@ fun MedicationCard(
         val formattedMedicationTime = reminder.medicationTime?.let {
             it.split(" ")[1] // "yyyy-MM-dd" 부분만 추출
         } ?: "시간 없음" // 기본값 설정
-
-
-        nameSearch = reminder.medicineName
 
         Text(
             text = formattedMedicationTime,
