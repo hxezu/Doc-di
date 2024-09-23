@@ -104,7 +104,12 @@ fun MedicationCard(
                     shape = RoundedCornerShape(30.dp) // Same shape as the card
                 ),
             onClick = {
-                doSearch()
+                searchViewModel.setSelectedPillByPillName(reminder.medicineName)
+                if (pillList.isEmpty()) {
+                    println("pillList is empty")
+                } else {
+                    navController.navigate(Routes.pillInformation.route)
+                }
                       },
             shape = RoundedCornerShape(30.dp),
             colors = CardDefaults.cardColors(
