@@ -62,6 +62,8 @@ fun PillInformation(
 
     val isLoading = searchViewModel.isLoading.collectAsState().value
     val selectedPill = searchViewModel.getSelectedPill()
+
+
     val imageState = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
             .data(selectedPill.itemImage)

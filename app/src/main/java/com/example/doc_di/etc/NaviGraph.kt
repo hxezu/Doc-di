@@ -141,7 +141,13 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.managementScreen.route) {
-            ManagementScreen(navController, btmBarViewModel, reminderViewModel, userViewModel)
+            ManagementScreen(
+                navController,
+                btmBarViewModel,
+                reminderViewModel,
+                userViewModel,
+                searchViewModel,
+                reviewViewModel)
         }
 
         composable(route ="addMedicationScreen?selectedDate={selectedDate}") {backStackEntry ->

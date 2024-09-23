@@ -46,6 +46,7 @@ class SearchViewModel(
                 _isLoading.value = false
                 when (result) {
                     is Result.Error -> {
+                        Log.d("PillsViewModel", "Result.Error")
                         _showErrorToastChannel.send(true)
                     }
 
@@ -67,9 +68,11 @@ class SearchViewModel(
         searchPillsByOptions()
 
         val pillList = pills.value
+        println("pillList: $pillList")
         pillList.forEach { pill ->
             if (pill.itemName == pillName){
                 selectedPill.value = pill
+                println("Success to set Pill by Name")
             }
         }
     }

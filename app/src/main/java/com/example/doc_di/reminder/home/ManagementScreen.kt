@@ -15,6 +15,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,8 @@ import com.example.doc_di.reminder.home.utils.MultiFabItem
 import com.example.doc_di.reminder.home.utils.MultiFloatingActionButton
 import com.example.doc_di.reminder.home.state.BookedReminderState
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
+import com.example.doc_di.search.SearchViewModel
+import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import com.example.doc_di.ui.theme.MainBlue
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -57,7 +60,9 @@ fun ManagementScreen(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
     reminderViewModel: ReminderViewModel = hiltViewModel(),
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    searchViewModel: SearchViewModel,
+    reviewViewModel: ReviewViewModel
 ) {
     val reminders by reminderViewModel.reminders
     val bookedReminders by reminderViewModel.bookedReminders
@@ -142,7 +147,9 @@ fun ManagementScreen(
                                      }, // Updated this line
                     logEvent = { /* 필요 시 추가 처리 */ },
                     reminderViewModel = reminderViewModel,
-                    selectedDate = selectedDate
+                    selectedDate = selectedDate,
+                    searchViewModel = searchViewModel,
+                    reviewViewModel = reviewViewModel
                 )
             }
         }
@@ -159,7 +166,9 @@ fun DailyMedications(
     onSelectedDate: (LocalDate) -> Unit,
     logEvent: (String) -> Unit,
     reminderViewModel: ReminderViewModel,
-    selectedDate: LocalDate
+    selectedDate: LocalDate,
+    searchViewModel: SearchViewModel,
+    reviewViewModel: ReviewViewModel
 ) {
 
     Column(
@@ -229,7 +238,9 @@ fun DailyMedications(
                                 reminder = reminderItem.reminder,
                                 navigateToMedicationDetail = { medication -> navigateToMedicationDetail(medication) },
                                 deleteReminder = { reminderId -> reminderViewModel.deleteReminder(reminderId) },
-                                navController = navController
+                                navController = navController,
+                                searchViewModel = searchViewModel,
+                                reviewViewModel = reviewViewModel
                             )
                         }
                         is ReminderItem.ReminderType.Clinic -> {
@@ -250,13 +261,4 @@ fun DailyMedications(
         }
         
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun ManagementScreenPreview() {
-    val navController = rememberNavController()
-    val btmBarViewModel: BtmBarViewModel = viewModel()
-    ManagementScreen(navController = navController, btmBarViewModel = btmBarViewModel, userViewModel = UserViewModel())
 }
