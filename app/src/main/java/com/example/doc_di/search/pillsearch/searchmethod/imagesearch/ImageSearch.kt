@@ -4,10 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -41,35 +42,36 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.home.account_manage.modify_profile.ImagePickerDialog
+import com.example.doc_di.search.SearchViewModel
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ImageSearch(navController: NavController) {
+fun ImageSearch(navController: NavController, searchViewModel: SearchViewModel) {
     val context = LocalContext.current
     val mainSearchColor = Color(0xFF1892FA)
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
             imageUri = it
-            val source = if (Build.VERSION.SDK_INT < 28) {
-                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-            } else {
-                val source = ImageDecoder.createSource(context.contentResolver, uri)
-                ImageDecoder.decodeBitmap(source)
-            }
-            imageBitmap = source.asImageBitmap()
+            val source = ImageDecoder.createSource(context.contentResolver, uri)
+            val decodedSource = ImageDecoder.decodeBitmap(source)
+            bitmap = decodedSource
+            imageBitmap = decodedSource.asImageBitmap()
         }
     }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap: Bitmap? ->
-        bitmap?.let {
+    ) { tempBitmap: Bitmap? ->
+        tempBitmap?.let {
             imageBitmap = it.asImageBitmap()
+            bitmap = tempBitmap
         }
     }
 
@@ -89,8 +91,20 @@ fun ImageSearch(navController: NavController) {
         )
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Spacer(modifier = Modifier.weight(2f))
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = "정확한 인식을 위해 책상 위에 알약을 두고",
+            color = Color.Black,
+        )
+        Text(
+            text = "알약이 중앙에 오도록 촬영해주세요",
+            color = Color.Black,
+        )
+        Spacer(modifier = Modifier.weight(1f))
         Box(
             modifier = Modifier
                 .padding(horizontal = 40.dp)
@@ -138,7 +152,10 @@ fun ImageSearch(navController: NavController) {
         if (imageBitmap != null) {
             Spacer(modifier = Modifier.height(24.dp))
             Button(
-                onClick = { navController.navigate(Routes.searchResult.route) },
+                onClick = {
+                    searchViewModel.searchPillsByImage(context, bitmap!!)
+                    navController.navigate(Routes.searchResult.route)
+                },
                 colors = ButtonDefaults.textButtonColors(mainSearchColor),
                 modifier = Modifier
                     .fillMaxWidth()

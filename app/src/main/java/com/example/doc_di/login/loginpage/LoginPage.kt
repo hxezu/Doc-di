@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 fun LoginPage(navController: NavController, userViewModel: UserViewModel) {
     val loginImpl = LoginImpl(RetrofitInstance.loginApi)
 
-    val email = rememberSaveable { mutableStateOf("hhj5432@naver.com") }
+    val email = rememberSaveable { mutableStateOf("moderation2015@naver.com") }
     val password = rememberSaveable { mutableStateOf("1234") }
     val loginCheck = rememberSaveable { mutableStateOf(false) }
 

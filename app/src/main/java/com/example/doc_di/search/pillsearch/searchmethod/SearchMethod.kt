@@ -1,6 +1,8 @@
 package com.example.doc_di.search.pillsearch.searchmethod
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +25,7 @@ import com.example.doc_di.search.pillsearch.searchmethod.imagesearch.ImageSearch
 import com.example.doc_di.search.pillsearch.searchmethod.shapesearch.ShapeSearch
 import com.example.doc_di.search.pillsearch.searchmethod.textsearch.TextSearch
 
+@RequiresApi(Build.VERSION_CODES.P)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SearchMethod(
@@ -52,7 +55,7 @@ fun SearchMethod(
             when {
                 searchViewModel.showSearch[0] -> TextSearch(navController, searchViewModel)
                 searchViewModel.showSearch[1] -> ShapeSearch(navController, searchViewModel)
-                searchViewModel.showSearch[2] -> ImageSearch(navController)
+                searchViewModel.showSearch[2] -> ImageSearch(navController, searchViewModel)
             }
         }
     }

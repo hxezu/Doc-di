@@ -52,12 +52,13 @@ fun PillReview(
     }
     if (reviewList.isNullOrEmpty()) {
         Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 106.dp)
         ) {
             Text(
-                text = "기록된 리뷰가 없습니다.\n복용 후기를 작성해보세요!",
+                text = "  기록된 리뷰가 없습니다.\n복용 후기를 작성해보세요!",
                 color = Color.Gray,
                 modifier = Modifier.align(Alignment.Center)
             )

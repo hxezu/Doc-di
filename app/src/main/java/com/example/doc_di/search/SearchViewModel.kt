@@ -1,10 +1,13 @@
 package com.example.doc_di.search
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.model.Pill
 import com.example.doc_di.domain.model.PillInfo
 import com.example.doc_di.domain.pill.PillsSearchRepository
@@ -16,6 +19,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
+import java.io.FileOutputStream
 
 class SearchViewModel(
     private val pillsSearchRepository: PillsSearchRepository,
@@ -58,6 +66,25 @@ class SearchViewModel(
                     }
                 }
             }
+        }
+    }
+
+    fun searchPillsByImage(context: Context, bitmap: Bitmap){
+        viewModelScope.launch{
+            _isLoading.value = true
+            val pillImage = File(context.cacheDir, "pillImage.jpg")
+            FileOutputStream(pillImage).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            }
+            val requestFile = RequestBody.create("image/jpeg".toMediaTypeOrNull(), pillImage)
+            val imagePart = MultipartBody.Part.createFormData("image", pillImage.name, requestFile)
+
+            val imageSearchResponse = RetrofitInstance.pillApi.getPillListByImage(imagePart)
+            if (imageSearchResponse.code() == 200){
+                val pillList = imageSearchResponse.body()!!.data
+                _pills.update { pillList }
+            }
+            _isLoading.value = false
         }
     }
 
