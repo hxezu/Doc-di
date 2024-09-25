@@ -39,15 +39,36 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                         "매달" -> 30
                         else -> throw IllegalArgumentException("Invalid recurrence: $recurrence")
                     }
-                    val oneDayInMillis = 86400 * 1000 // Number of milliseconds in one day
-                    val numOccurrences = ((endDate.time + oneDayInMillis - startDate.time) / (interval * oneDayInMillis)).toInt() + 1
+                    val oneDayInMillis = 86400 * 1000
+                    val numOccurrences = ((endDate.time - startDate.time) / (interval * oneDayInMillis)).toInt() + 1
+
+                    val calendar = Calendar.getInstance().apply {
+                        time = startDate
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }
+
+                    val endCalendar = Calendar.getInstance().apply {
+                        time = endDate
+                        set(Calendar.HOUR_OF_DAY, 23)
+                        set(Calendar.MINUTE, 59)
+                        set(Calendar.SECOND, 59)
+                        set(Calendar.MILLISECOND, 99)
+                    }
 
                     // Create a Medication object for each occurrence
-                    val calendar = Calendar.getInstance().apply { time = startDate }
+                    //val calendar = Calendar.getInstance().apply { time = startDate }
 
                     for (i in 0 until numOccurrences) {
                         for (medicationTime in medicationTimes) {
                             val medicationTimeDate = getMedicationTime(medicationTime, calendar)
+
+                            if (calendar.timeInMillis >= endCalendar.timeInMillis) {
+                                continue
+                            }
+
                             val reminderDTO = ReminderDTO(
                                 email = email,
                                 medicineName = medicineName,

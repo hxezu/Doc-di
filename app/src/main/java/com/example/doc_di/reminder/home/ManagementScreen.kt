@@ -34,6 +34,7 @@ import com.example.doc_di.analytics.AnalyticsEvents
 import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.reminder.data.ReminderItem
 import com.example.doc_di.reminder.home.utils.BookedCard
 import com.example.doc_di.reminder.home.utils.DatesHeader
@@ -66,16 +67,16 @@ fun ManagementScreen(
 ) {
     val reminders by reminderViewModel.reminders
     val bookedReminders by reminderViewModel.bookedReminders
-    val userEmail = userViewModel.userInfo.value?.email ?: ""
+    val userInfo by userViewModel.userInfo.observeAsState()
 
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
     LaunchedEffect(Unit) {
-        if (userEmail.isNotEmpty()) {
-            println("Fetching reminders for user: $userEmail")
-            reminderViewModel.getBookedReminders(userEmail)
-            reminderViewModel.getReminders(userEmail ) // Fetch reminders for the logged-in user
-        } else {
+        if(userInfo != null){
+                println("Fetching reminders for user: ${userViewModel.userInfo.value!!.email}")
+                reminderViewModel.getBookedReminders(userViewModel.userInfo.value!!.email)
+                reminderViewModel.getReminders(userViewModel.userInfo.value!!.email) // Fetch reminders for the logged-in user
+        }else{
             println("User email is missing, cannot fetch reminders")
         }
     }

@@ -210,13 +210,14 @@ fun EndDateTextField(
 
     val startCalendar = Calendar.getInstance().apply {
         timeInMillis = startDate
-        add(Calendar.DAY_OF_MONTH, 1)
+        add(Calendar.DAY_OF_MONTH,0)
     }
     startCalendar.set(Calendar.HOUR_OF_DAY, 0)
     startCalendar.set(Calendar.MINUTE, 0)
     startCalendar.set(Calendar.SECOND, 0)
     startCalendar.set(Calendar.MILLISECOND, 0)
     val startDayMillis = startCalendar.timeInMillis
+    println("startDayMillis: $startDayMillis")
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = startDayMillis,

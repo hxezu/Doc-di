@@ -158,7 +158,6 @@ fun AddMedicationScreenUI(
                     color = Color.White )},
                 onClick = {
                     if (isSaveButtonEnabled) {
-
                         scope.launch {
                             reminderImpl.createReminder(
                                 email = userEmail,
