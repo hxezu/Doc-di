@@ -1,5 +1,6 @@
 package com.example.doc_di.reminder.home.utils
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,6 +58,10 @@ fun MedicationCard(
 
     val pillList = searchViewModel.pills.collectAsState().value
     val isLoading = searchViewModel.isLoading.collectAsState().value
+    val selectedPillLoaded by searchViewModel.selectedPillLoaded.collectAsState()
+
+    // State for popup message
+    val context = LocalContext.current
 
     LaunchedEffect(navController.currentBackStackEntry) {
         searchViewModel.resetPillInfo()
@@ -91,11 +97,6 @@ fun MedicationCard(
                 ),
             onClick = {
                 searchViewModel.setSelectedPillByPillName(reminder.medicineName)
-                if (pillList.isEmpty()) {
-                    println("pillList is empty")
-                } else {
-                    navController.navigate(Routes.pillInformation.route)
-                }
                       },
             shape = RoundedCornerShape(30.dp),
             colors = CardDefaults.cardColors(
@@ -103,7 +104,6 @@ fun MedicationCard(
             )
         ) {
             if(isLoading){
-                CircularProgressIndicator(color = LightBlue, modifier = Modifier.padding(16.dp))
             }else{
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -183,8 +183,16 @@ fun MedicationCard(
                     }
                 }
             }
+        }
 
-
+    }
+    LaunchedEffect(selectedPillLoaded) {
+        if (selectedPillLoaded) {
+            navController.navigate(Routes.pillInformation.route) {
+                // Clear the back stack if needed
+                popUpTo(Routes.pillInformation.route) { inclusive = true }
+            }
+            searchViewModel.setSelectedPillLoaded(false) // Reset after navigation
         }
     }
 
