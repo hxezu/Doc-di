@@ -3,7 +3,8 @@ package com.example.doc_di.util
 enum class Recurrence {
     Daily,
     Weekly,
-    Monthly
+    Monthly,
+    None
 }
 
 fun getRecurrenceList(): List<Recurrence> {
@@ -11,6 +12,7 @@ fun getRecurrenceList(): List<Recurrence> {
     recurrenceList.add(Recurrence.Daily)
     recurrenceList.add(Recurrence.Weekly)
     recurrenceList.add(Recurrence.Monthly)
+    recurrenceList.add(Recurrence.None)
 
     return recurrenceList
 }

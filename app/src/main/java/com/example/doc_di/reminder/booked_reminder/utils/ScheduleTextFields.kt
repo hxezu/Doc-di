@@ -42,7 +42,9 @@ import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Department
+import com.example.doc_di.util.Recurrence
 import com.example.doc_di.util.getDepartmentList
+import com.example.doc_di.util.getRecurrenceList
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -213,7 +215,7 @@ fun EndDateTextField(
 
     val startCalendar = Calendar.getInstance().apply {
         timeInMillis = bookDate
-        add(Calendar.DAY_OF_MONTH, 1)
+        add(Calendar.DAY_OF_MONTH, 0)
     }
     startCalendar.set(Calendar.HOUR_OF_DAY, 0)
     startCalendar.set(Calendar.MINUTE, 0)
@@ -377,5 +379,76 @@ fun AddHospitalName(isHospitalEntered: Boolean,
             }
         )
     )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppointmentRecurrenceDropdownMenu(recurrence: (String) -> Unit,
+                           isRecurrenceSelected: Boolean) {
+    val recurrenceMap = mapOf(
+        Recurrence.Daily to "매일",
+        Recurrence.Weekly to "매주",
+        Recurrence.Monthly to "매달"
+    )
+
+    val options = getRecurrenceList().map { recurrenceMap[it] ?: "" }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(options[0]) }
+    var isFocused by rememberSaveable { mutableStateOf(false) }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            color = Color.Black,
+            text = "복용 주기",
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+        ) {
+            OutlinedTextField(
+                value = selectedOptionText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        tint = Color.Black // 아이콘 색상 설정
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+                    .onFocusChanged { focusState ->
+                        isFocused = focusState.isFocused
+                    },
+                shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = if (isRecurrenceSelected) Color.Black else Color.Gray,
+                    focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
+                    unfocusedBorderColor = if (isRecurrenceSelected) MainBlue else Color.Gray
+                )
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                getRecurrenceList().forEach { recurrenceOption ->
+                    DropdownMenuItem(
+                        text = { Text(recurrenceMap[recurrenceOption] ?: "") },
+                        onClick = {
+                            selectedOptionText = recurrenceMap[recurrenceOption] ?: ""
+                            recurrence(selectedOptionText)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
 }

@@ -61,12 +61,15 @@ import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.reminder.booked_reminder.utils.AddDoctorName
 import com.example.doc_di.reminder.booked_reminder.utils.AddHospitalName
+import com.example.doc_di.reminder.booked_reminder.utils.AppointmentRecurrenceDropdownMenu
 import com.example.doc_di.reminder.booked_reminder.utils.DepartmentDropdownMenu
 import com.example.doc_di.reminder.booked_reminder.utils.EndDateTextField
 import com.example.doc_di.reminder.booked_reminder.utils.TimerTextField
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
+import com.example.doc_di.reminder.medication_reminder.utils.RecurrenceDropdownMenu
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Department
+import com.example.doc_di.util.Recurrence
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
@@ -89,13 +92,15 @@ fun AddScheduleScreenUI(
 
     var clinicName by rememberSaveable { mutableStateOf("") }
     var doctorName by rememberSaveable { mutableStateOf("") }
+    var recurrence by rememberSaveable { mutableStateOf(Recurrence.None.name) }
     var isRecurring by rememberSaveable { mutableStateOf(false) }  // Add state for toggle
     var department by rememberSaveable { mutableStateOf(Department.InternalMedicine.name) }
-    var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
+    var endDate by rememberSaveable { mutableStateOf(Date()) }
 
     var isClinicEntered by remember { mutableStateOf(false) }
     var isDoctorEntered by remember { mutableStateOf(false) }
     var isDepartmentSelected by remember { mutableStateOf(false) }
+    var isRecurrenceSelected by remember { mutableStateOf(false) }
     var isTimeSelected by remember { mutableStateOf(false) }
     var isEndDateSelected by remember { mutableStateOf(false) }
 
@@ -109,7 +114,6 @@ fun AddScheduleScreenUI(
         Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
     } ?: Date()
 
-
     fun setTimeSelected(index: Int, isSelected: Boolean) {
         selectedTimeIndices = if (isSelected) {
             selectedTimeIndices + index
@@ -117,10 +121,15 @@ fun AddScheduleScreenUI(
             selectedTimeIndices - index
         }
         lastSelectedIndex = if (isSelected) index else lastSelectedIndex
+
+        // Check if any time is selected
+        isTimeSelected = selectedTimeIndices.isNotEmpty()
     }
 
-    val isSaveButtonEnabled = isClinicEntered && isDoctorEntered && isDepartmentSelected
-
+    val isSaveButtonEnabled = when {
+        isRecurring -> isClinicEntered && isDoctorEntered && isDepartmentSelected && isRecurrenceSelected && isTimeSelected
+        else -> isClinicEntered && isDoctorEntered && isDepartmentSelected
+    }
     Scaffold(
         backgroundColor = Color.Transparent,
         topBar = {
@@ -162,6 +171,8 @@ fun AddScheduleScreenUI(
                                 doctorName = doctorName,
                                 subject = department,
                                 startDate = bookDate,
+                                recurrence = if (isRecurring) recurrence else "",
+                                endDate = if (isRecurring) endDate else Date(),
                                 bookTimes = selectedTimes,
                                 context = context,
                                 isAllWritten  = isSaveButtonEnabled,
@@ -294,10 +305,17 @@ fun AddScheduleScreenUI(
             Spacer(modifier = Modifier.padding(4.dp))
 
             if (isRecurring) {
+                AppointmentRecurrenceDropdownMenu (
+                    recurrence = { selectedRecurrence ->
+                        recurrence = selectedRecurrence
+                        isRecurrenceSelected = true
+                    },
+                    isRecurrenceSelected = isRecurrenceSelected)
+                Spacer(modifier = Modifier.padding(4.dp))
                 EndDateTextField (
                     bookDate = bookDate.time,
                     onDateSelected = { selectedEndDate ->
-                    endDate = selectedEndDate
+                    endDate = Date(selectedEndDate)
                     isEndDateSelected = true
                 },
                     isEndDateSelected = isEndDateSelected
