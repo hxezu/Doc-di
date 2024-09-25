@@ -22,12 +22,12 @@ import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.login.resetpassword.ResetPassword
-import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
 import com.example.doc_di.reminder.booked_reminder.AddScheduleScreenUI
 import com.example.doc_di.reminder.booked_reminder.EditScheduleScreen
 import com.example.doc_di.reminder.home.ManagementScreen
-import com.example.doc_di.reminder.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
 import com.example.doc_di.reminder.medication_reminder.EditMedicationScreen
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
@@ -66,11 +66,11 @@ fun NaviGraph(navController: NavHostController) {
             ResetPassword(navController)
         }
 
-        composable(route = Routes.home.route) {
-            Home(navController, btmBarViewModel, userViewModel)
+        composable(Routes.home.route) {
+            Home(navController, btmBarViewModel, userViewModel, reminderViewModel)
         }
 
-        composable(route = Routes.appointmentSchedule.route) {
+        composable(Routes.appointmentSchedule.route) {
             AppointmentSchedule(navController, btmBarViewModel)
         }
 
