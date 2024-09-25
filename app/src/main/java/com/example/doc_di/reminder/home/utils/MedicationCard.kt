@@ -55,7 +55,6 @@ fun MedicationCard(
     searchViewModel: SearchViewModel,
     reviewViewModel: ReviewViewModel
 ) {
-
     val pillList = searchViewModel.pills.collectAsState().value
     val isLoading = searchViewModel.isLoading.collectAsState().value
     val selectedPillLoaded by searchViewModel.selectedPillLoaded.collectAsState()
@@ -103,8 +102,8 @@ fun MedicationCard(
                 containerColor = Color.White,
             )
         ) {
-            if(isLoading){
-            }else{
+//            if(isLoading){
+//            }else{
                 Row(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment
@@ -182,7 +181,7 @@ fun MedicationCard(
                         }
                     }
                 }
-            }
+//            }
         }
 
     }
