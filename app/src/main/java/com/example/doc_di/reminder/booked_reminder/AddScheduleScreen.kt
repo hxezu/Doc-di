@@ -92,7 +92,7 @@ fun AddScheduleScreenUI(
 
     var clinicName by rememberSaveable { mutableStateOf("") }
     var doctorName by rememberSaveable { mutableStateOf("") }
-    var recurrence by rememberSaveable { mutableStateOf(Recurrence.None.name) }
+    var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
     var isRecurring by rememberSaveable { mutableStateOf(false) }  // Add state for toggle
     var department by rememberSaveable { mutableStateOf(Department.InternalMedicine.name) }
     var endDate by rememberSaveable { mutableStateOf(Date()) }
@@ -127,9 +127,16 @@ fun AddScheduleScreenUI(
     }
 
     val isSaveButtonEnabled = when {
-        isRecurring -> isClinicEntered && isDoctorEntered && isDepartmentSelected && isRecurrenceSelected && isTimeSelected
-        else -> isClinicEntered && isDoctorEntered && isDepartmentSelected
+        isRecurring -> isClinicEntered && isDoctorEntered && isDepartmentSelected && isRecurrenceSelected && isTimeSelected && isEndDateSelected
+        else -> isClinicEntered && isDoctorEntered && isDepartmentSelected && isTimeSelected
     }
+    val defaultDate = selectedDate?.let {
+        Calendar.getInstance().apply {
+            set(it.year, it.monthValue - 1, it.dayOfMonth, 23, 59, 59)
+            set(Calendar.MILLISECOND, 999) // 밀리초를 999로 설정
+        }.time
+    } ?: Date()
+
     Scaffold(
         backgroundColor = Color.Transparent,
         topBar = {
@@ -171,10 +178,11 @@ fun AddScheduleScreenUI(
                                 doctorName = doctorName,
                                 subject = department,
                                 startDate = bookDate,
-                                recurrence = if (isRecurring) recurrence else "",
-                                endDate = if (isRecurring) endDate else Date(),
+                                recurrence = recurrence,
+                                endDate = if (isRecurring) endDate else defaultDate,
                                 bookTimes = selectedTimes,
                                 context = context,
+                                isRecurring = isRecurring,
                                 isAllWritten  = isSaveButtonEnabled,
                                 isAllAvailable  = isSaveButtonEnabled,
                                 navController = navController

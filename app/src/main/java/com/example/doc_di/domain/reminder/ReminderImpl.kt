@@ -166,7 +166,8 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
         doctorName: String,
         subject: String,
         startDate: Date,
-        recurrence: String?,
+        recurrence: String,
+        isRecurring: Boolean,
         endDate: Date,
         bookTimes: List<CalendarInformation>,
         context: Context,
@@ -177,55 +178,11 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
         if (isAllWritten && isAllAvailable) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val interval = when (recurrence) {
-                        "매일" -> 1
-                        "매주" -> 7
-                        "매달" -> 30
-                        null -> 0  // recurrence가 null인 경우
-                        else -> throw IllegalArgumentException("Invalid recurrence: $recurrence")
-                    }
-
-                    // Ensure endDate is not null before performing calculations
-                    if (recurrence != null && endDate == null) {
-                        throw IllegalArgumentException("endDate cannot be null when recurrence is provided.")
-                    }
-
-                    val oneDayInMillis = 86400 * 1000 // Number of milliseconds in one day
-                    val numOccurrences = if (recurrence != null && endDate != null) {
-                        ((endDate.time - startDate.time) / (interval!! * oneDayInMillis)).toInt() + 1
-                    } else {
-                        1 // 기본적으로 1회 예약
-                    }
-
-
-                    val calendar = Calendar.getInstance().apply {
-                        time = startDate
-                        set(Calendar.HOUR_OF_DAY, 0)
-                        set(Calendar.MINUTE, 0)
-                        set(Calendar.SECOND, 0)
-                        set(Calendar.MILLISECOND, 0)
-                    }
-
-                    // 종료 날짜도 시간 부분을 0으로 설정
-                    val endCalendar = Calendar.getInstance().apply {
-                        time = endDate
-                        set(Calendar.HOUR_OF_DAY, 23)
-                        set(Calendar.MINUTE, 59)
-                        set(Calendar.SECOND, 59)
-                        set(Calendar.MILLISECOND, 99)
-                    }
-
-                    for (i in 0 until numOccurrences) {
-                        if(numOccurrences ==1)
-                            println("Not Recurring Appointment")
-                        else
-                            println("Recurring Appointment")
+                    if(!isRecurring){
                         for (bookTime in bookTimes) {
-                            val bookTimeDate = getReminderTime(bookTime, calendar)
-
-                            if (calendar.timeInMillis >= endCalendar.timeInMillis) {
-                                continue
-                            }
+                            val bookTimeDate = getReminderTime(bookTime, Calendar.getInstance().apply {
+                                time = startDate
+                            })
 
                             val bookedDTO = BookedDTO(
                                 email = email,
@@ -244,7 +201,62 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                                 }
                             }
                         }
-                        calendar.add(Calendar.DAY_OF_YEAR, interval)
+                    }else{
+                        val interval = when (recurrence) {
+                            "매일" -> 1
+                            "매주" -> 7
+                            "매달" -> 30
+                            else -> throw IllegalArgumentException("Invalid recurrence: $recurrence")
+                        }
+
+                        val oneDayInMillis = 86400 * 1000 // Number of milliseconds in one day
+                        val numOccurrences = ((endDate.time - startDate.time) / (interval * oneDayInMillis)).toInt() + 1
+
+
+                        val calendar = Calendar.getInstance().apply {
+                            time = startDate
+                            set(Calendar.HOUR_OF_DAY, 0)
+                            set(Calendar.MINUTE, 0)
+                            set(Calendar.SECOND, 0)
+                            set(Calendar.MILLISECOND, 0)
+                        }
+
+                        // 종료 날짜도 시간 부분을 0으로 설정
+                        val endCalendar = Calendar.getInstance().apply {
+                            time = endDate
+                            set(Calendar.HOUR_OF_DAY, 23)
+                            set(Calendar.MINUTE, 59)
+                            set(Calendar.SECOND, 59)
+                            set(Calendar.MILLISECOND, 99)
+                        }
+
+                        for (i in 0 until numOccurrences) {
+                            for (bookTime in bookTimes) {
+                                val bookTimeDate = getReminderTime(bookTime, calendar)
+
+                                if (calendar.timeInMillis >= endCalendar.timeInMillis) {
+                                    continue
+                                }
+
+                                val bookedDTO = BookedDTO(
+                                    email = email,
+                                    hospitalName = hospitalName,
+                                    doctorName = doctorName,
+                                    subject = subject,
+                                    bookTime = bookTimeDate.toFormattedDateTimeString()
+                                )
+
+                                val bookedResponse = reminderApi.createBookedReminder(bookedDTO)
+
+                                if (!bookedResponse.isSuccessful) {
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(context, "예약 등록 실패: ${bookedResponse.errorBody()?.string()}", Toast.LENGTH_SHORT).show()
+                                        return@withContext
+                                    }
+                                }
+                            }
+                            calendar.add(Calendar.DAY_OF_YEAR, interval)
+                        }
                     }
 
                     withContext(Dispatchers.Main) {
