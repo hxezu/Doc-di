@@ -28,6 +28,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
@@ -35,29 +37,42 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.doc_di.data.Person
+import com.example.doc_di.R
+import com.example.doc_di.UserViewModel
 import com.example.doc_di.data.personList
+import com.example.doc_di.domain.model.Chat
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.ui.theme.Line
 import com.example.doc_di.ui.theme.MainBlue
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChatListScreen(navController: NavController, btmBarViewModel: BtmBarViewModel) {
+fun ChatListScreen(
+    navController: NavController,
+    btmBarViewModel: BtmBarViewModel,
+    userViewModel: UserViewModel,
+    chatBotViewModel: ChatBotViewModel
+) {
+    val chatList by chatBotViewModel.chatList.observeAsState()
+    val nonNullChatList = chatList ?: emptyList()
+    val userInfo by userViewModel.userInfo.observeAsState()
+
+    LaunchedEffect(Unit) {
+        if(userInfo != null){
+            println("Fetching Chat for user: ${userViewModel.userInfo.value!!.email}")
+        }else{
+            println("User email is missing, cannot fetch Chat")
+        }
+    }
+
     Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
         Box(
             modifier = Modifier
@@ -85,17 +100,17 @@ fun ChatListScreen(navController: NavController, btmBarViewModel: BtmBarViewMode
                     LazyColumn(
                         modifier = Modifier.padding(bottom = 90.dp)
                     ) {
-                        items(personList, key = { it.id }) {
-                            UserEachRow(person = it){
-                                navController.currentBackStackEntry?.savedStateHandle?.set("data",it)
-                                navController.navigate(Routes.chatScreen.route)
-                            }
-                        }
+//                        items(nonNullChatList, key = { it.id }) { chat ->
+//                            ChatEachRow(chat = chat){
+//                                navController.currentBackStackEntry?.savedStateHandle?.set("data",it)
+//                                navController.navigate(Routes.chatScreen.route)
+//                            }
+//                        }
                     }
                 }
             }
             IconButton(
-                onClick = { /* Handle Add Chat Click */ },
+                onClick = { navController.navigate(Routes.chatScreen.route) },
                 modifier = Modifier
                     .align(BottomCenter)
                     .padding(16.dp, bottom = 150.dp)
@@ -114,8 +129,8 @@ fun ChatListScreen(navController: NavController, btmBarViewModel: BtmBarViewMode
 
 
 @Composable
-fun UserEachRow(
-    person: Person,
+fun ChatEachRow(
+    chat: Chat,
     onClick:()->Unit
 ) {
 
@@ -133,7 +148,7 @@ fun UserEachRow(
                 Row {
                     Spacer(modifier = Modifier.width(10.dp))
                     Icon(
-                        painter = painterResource(id = person.icon),
+                        painter = painterResource(id = R.drawable.icon),
                         contentDescription = "",
                         modifier = Modifier.size(40.dp),
                         tint = Color.Unspecified
@@ -142,12 +157,12 @@ fun UserEachRow(
                     Column(
                     ) {
                         Text(
-                            text = person.name, style = TextStyle(
+                            text = chat.id.toString(), style = TextStyle(
                                 color = Color.Black, fontSize = 15.sp
                             )
                         )
                         Spacer(modifier = Modifier.height(10.dp))
-                        androidx.compose.material.Text(
+                        Text(
                             text = "Okay", style = TextStyle(
                                 color = Gray, fontSize = 14.sp
                             )
@@ -155,7 +170,7 @@ fun UserEachRow(
                     }
 
                 }
-                androidx.compose.material.Text(
+                Text(
                     text = "12:23 PM", style = TextStyle(
                         color = Gray, fontSize = 12.sp
                     )
@@ -177,12 +192,4 @@ fun Modifier.noRippleEffect(onClick: () -> Unit) = composed {
     ) {
         onClick()
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ChatListScreenPreview(){
-    val navController = rememberNavController()
-    val btmBarViewModel: BtmBarViewModel = viewModel()
-    ChatListScreen(navController = navController, btmBarViewModel = btmBarViewModel)
 }

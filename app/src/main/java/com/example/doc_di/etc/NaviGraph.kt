@@ -12,8 +12,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.UserViewModel
+import com.example.doc_di.chatbot.ChatBotViewModel
 import com.example.doc_di.chatbot.ChatListScreen
+import com.example.doc_di.chatbot.ChatScreen
 import com.example.doc_di.domain.RetrofitInstance
+import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.pill.PillsSearchRepositoryImpl
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.account_manage.ModifyLogoutAccountDelete
