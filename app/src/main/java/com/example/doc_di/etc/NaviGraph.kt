@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,12 +26,12 @@ import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.login.resetpassword.ResetPassword
-import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
 import com.example.doc_di.reminder.booked_reminder.AddScheduleScreenUI
 import com.example.doc_di.reminder.booked_reminder.EditScheduleScreen
 import com.example.doc_di.reminder.home.ManagementScreen
-import com.example.doc_di.reminder.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
 import com.example.doc_di.reminder.medication_reminder.EditMedicationScreen
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
@@ -62,6 +63,9 @@ fun NaviGraph(navController: NavHostController) {
     val reviewViewModel: ReviewViewModel = viewModel()
     val reminderViewModel: ReminderViewModel = viewModel()
 
+    val pastAppointment by reminderViewModel.pastAppointments.observeAsState()
+    val upcomingAppointment by reminderViewModel.upcomingAppointments.observeAsState()
+
     NavHost(navController = navController, startDestination = Routes.login.route) {
 
         composable(Routes.login.route) {
@@ -77,11 +81,11 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.home.route) {
-            Home(navController, btmBarViewModel, userViewModel, reminderViewModel)
+            Home(upcomingAppointment, navController, btmBarViewModel, userViewModel)
         }
 
         composable(Routes.appointmentSchedule.route) {
-            AppointmentSchedule(navController, btmBarViewModel)
+            AppointmentSchedule(upcomingAppointment, pastAppointment, navController, btmBarViewModel)
         }
 
         composable(
