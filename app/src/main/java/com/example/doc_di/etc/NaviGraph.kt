@@ -12,8 +12,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.UserViewModel
+import com.example.doc_di.chatbot.ChatBotViewModel
 import com.example.doc_di.chatbot.ChatListScreen
+import com.example.doc_di.chatbot.ChatScreen
 import com.example.doc_di.domain.RetrofitInstance
+import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.pill.PillsSearchRepositoryImpl
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.account_manage.ModifyLogoutAccountDelete
@@ -44,6 +47,13 @@ fun NaviGraph(navController: NavHostController) {
     val searchViewModel: SearchViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SearchViewModel(PillsSearchRepositoryImpl(RetrofitInstance.pillApi)) as T
+        }
+    })
+
+    val chatBotViewModel: ChatBotViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            val chatBotImpl = ChatBotImpl(RetrofitInstance.chatBotApi) // Create instance of ChatBotImpl
+            return ChatBotViewModel(chatBotImpl) as T // Pass it to the ViewModel
         }
     })
 
@@ -137,7 +147,20 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.chatListScreen.route) {
-            ChatListScreen(navController, btmBarViewModel)
+            ChatListScreen(
+                navController,
+                btmBarViewModel,
+                userViewModel,
+                chatBotViewModel
+            )
+        }
+
+        composable(route = Routes.chatScreen.route) {
+            ChatScreen(
+                navController,
+                btmBarViewModel,
+                userViewModel,
+                chatBotViewModel)
         }
 
         composable(route = Routes.managementScreen.route) {
