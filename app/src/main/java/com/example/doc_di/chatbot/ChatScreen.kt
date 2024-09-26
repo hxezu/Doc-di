@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,14 +21,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.IconButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.Scaffold
+import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontVariation.weight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,11 +57,13 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.UserViewModel
 import com.example.doc_di.domain.model.Chat
+import com.example.doc_di.domain.model.Message
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.ui.theme.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ChatScreen(
@@ -64,7 +73,9 @@ fun ChatScreen(
     chatBotViewModel: ChatBotViewModel,
     chatId: Int? = null
 ) {
+
     val userInfo by userViewModel.userInfo.observeAsState()
+    val chat by chatBotViewModel.getChatById(userInfo?.email!!, chatId!!).observeAsState()
     val chatList by chatBotViewModel.chatList.observeAsState()
 
     var message by remember { mutableStateOf("") }
@@ -80,52 +91,69 @@ fun ChatScreen(
     }
 
 
-    Scaffold(bottomBar = {
+    Scaffold(
+        backgroundColor = Color.Transparent,
+        topBar = {
+            TopAppBar(
+                title = { },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                ),
+                navigationIcon = {
+                    androidx.compose.material3.IconButton(
+                        onClick = {
+                            navController.popBackStack()
+                        },
+                    ) {
+                        androidx.compose.material3.Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.Black
+                        )
+                    }
+                },
+            )
+        },
+        bottomBar = {
         BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
-    }) { paddingValues ->
+    },
+
+    ) { paddingValues ->
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(Color.Transparent)
                 .padding(paddingValues)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 100.dp)
+                    .background(Color.Transparent)
             ) {
                 ChatTitleRow(
-                    modifier = Modifier.padding(top = 30.dp, start = 20.dp, end = 20.dp)
+                    modifier = Modifier.padding( start = 20.dp, end = 20.dp)
                 )
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-                        .background(Color.White)
+                        .padding(top = 20.dp)
+                        .background(Color.Transparent)
                 ) {
-                    if (selectedChat != null) {
-                        // 선택된 채팅에 해당하는 메시지들 필터링
-                        val messages = chatList!!.filter { it.email == selectedChat.email }
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(start = 20.dp, top = 15.dp, end = 20.dp)
-                        ) {
-                            items(messages, key = { it.id }) { chat ->
-                                ChatRow(chat = chat)
-                            }
-                        }
-                    } else {
-                        // 새로운 대화일 경우 전체 메시지 표시
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(start = 20.dp, top = 15.dp, end = 20.dp)
-                        ) {
-                            items(chatList!!, key = { it.id }) { chat ->
-                                ChatRow(chat = chat)
-                            }
+                    val messages = if (selectedChat != null) {
+                    selectedChat.messages
+                } else {
+                    emptyList() // Show no messages when no chat is selected
+                }
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 20.dp, top = 15.dp, end = 20.dp)
+                    ) {
+                        items(messages, key = { it.id }) { message ->
+                            ChatRow(chat = message)
                         }
                     }
 
@@ -137,14 +165,16 @@ fun ChatScreen(
                 onSendClick ={
                     userInfo?.email?.let { email ->
                         if (message.isNotBlank()) {
-                            chatBotViewModel.sendMessage(email, message)
+                            chatBotViewModel.sendMessage(email, message, selectedChat!!.id)
                             message = ""
                         }
                     }
                 },
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 20.dp)
+                    .background(Color.Transparent)
                     .align(BottomCenter)
+                    .imePadding()
             )
 
         }
@@ -155,11 +185,13 @@ fun ChatScreen(
 
 @Composable
 fun ChatRow(
-    chat: Chat
+    chat: Message
 ) {
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Transparent),
         horizontalAlignment = if (chat.isUser) Alignment.End else Alignment.Start
     ) {
         Box(
@@ -171,7 +203,7 @@ fun ChatRow(
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
-                text = chat.message, style = TextStyle(
+                text = chat.content, style = TextStyle(
                     color = if(chat.isUser) Color.White else Color.Black,
                     fontSize = 15.sp
                 ),
@@ -207,7 +239,8 @@ fun CustomTextField(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .background(Color.Transparent)
+                .padding(vertical = 4.dp, horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
@@ -230,20 +263,25 @@ fun CustomTextField(
                     cursorColor = MainBlue,
                     textColor = Color.Black
                 ),
-                modifier = Modifier.weight(2f),
-                maxLines = 3
+                modifier = Modifier
+                    .background(Color.Transparent)
+                    .weight(2f),
+                maxLines = 1,
+                textStyle = TextStyle(fontSize = 14.sp)
             )
             IconButton(
                     onClick = onSendClick,
             modifier = Modifier
-                .size(30.dp)
+                .size(36.dp)
+                .padding(end = 10.dp)
                 .clip(CircleShape)
                 .background(MainBlue)
             ) {
             Icon(
                 imageVector = Icons.Default.Send,
                 contentDescription = "Send",
-                tint = Color.White
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
             )
             }
         }
@@ -272,7 +310,7 @@ fun ChatTitleRow(
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = stringResource(R.string.chatbot), style = TextStyle(
-                    color = MainBlue,
+                    color = Color.Black,
                     fontSize = 16.sp
                 )
             )
@@ -280,11 +318,12 @@ fun ChatTitleRow(
             Text(
                 text = stringResource(R.string.chatbot),
                 style = TextStyle(
-                    color = MainBlue,
+                    color = Color.Black,
                     fontSize = 14.sp
                 )
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
         IconButton(
             onClick = {}, modifier = Modifier
                 .size(24.dp)

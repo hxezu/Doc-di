@@ -1,6 +1,7 @@
 package com.example.doc_di.chatbot
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -63,11 +64,12 @@ fun ChatListScreen(
     val chatList by chatBotViewModel.chatList.observeAsState()
     val userInfo by userViewModel.userInfo.observeAsState()
 
-    LaunchedEffect(userInfo) {
+    LaunchedEffect(Unit) {
         if(userInfo != null){
             userInfo?.email?.let { email ->
                 chatBotViewModel.loadChats(email)
             }
+            Log.d("ChatListScreen", "Fetching Chat for user: ${userViewModel.userInfo.value!!.email}")
         }else{
             println("User email is missing, cannot fetch Chat")
         }
@@ -121,27 +123,26 @@ fun ChatListScreen(
                     .fillMaxSize()
                     .background(Color.Transparent)
             ) {
-                LazyColumn(
-                    modifier = Modifier.padding(bottom = 90.dp)
-                ) {
-                    chatList?.let { chats ->
-                        items(chats, key = { it.id }) { chat ->
+                if (chatList.isNullOrEmpty()) {
+                    // chatList가 null이거나 비어 있을 때 보여줄 메시지
+                    Text(
+                        text = "DDoc-Di 와의 대화 기록이 없습니다.",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                        color = Color.Gray
+                    )
+                } else {
+                    // chatList가 비어 있지 않을 때 LazyColumn을 사용하여 리스트를 표시
+                    LazyColumn(
+                        modifier = Modifier.padding(bottom = 90.dp)
+                    ) {
+                        items(chatList!!, key = { it.id }) { chat ->
                             ChatEachRow(chat = chat) {
                                 navController.navigate("chat_screen/${chat.id}") // 특정 채팅 상세 화면으로 이동
                             }
-                        }
-                    } ?: run {
-                        // chatList가 null일 때 보여줄 메시지
-                        item {
-                            Text(
-                                text = "채팅이 없습니다.",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge,
-                                textAlign = TextAlign.Center,
-                                color = Color.Gray
-                            )
                         }
                     }
                 }
@@ -156,6 +157,9 @@ fun ChatEachRow(
     chat: Chat,
     onClick:()->Unit
 ) {
+    val lastMessage = chat.messages.lastOrNull()
+    val lastMessageContent = lastMessage?.content?: "No messages yet"
+    val lastMessageTime = lastMessage?.time?: "No messages yet"
 
     Box(
         modifier = Modifier
@@ -180,13 +184,14 @@ fun ChatEachRow(
                     Column(
                     ) {
                         Text(
-                            text = chat.id.toString(), style = TextStyle(
+                            text = chat.id.toString() + "번째 대화", style = TextStyle(
                                 color = Color.Black, fontSize = 15.sp
                             )
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = "Okay", style = TextStyle(
+                            text = lastMessageContent,
+                            style = TextStyle(
                                 color = Gray, fontSize = 14.sp
                             )
                         )
@@ -194,7 +199,8 @@ fun ChatEachRow(
 
                 }
                 Text(
-                    text = "12:23 PM", style = TextStyle(
+                    text = lastMessageTime,
+                    style = TextStyle(
                         color = Gray, fontSize = 12.sp
                     )
                 )

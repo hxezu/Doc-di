@@ -11,6 +11,7 @@ import com.example.doc_di.domain.chatbot.ChatBotClientDto
 import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.chatbot.ChatRepository
 import com.example.doc_di.domain.chatbot.RasaDto
+import com.example.doc_di.domain.model.Message
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -27,18 +28,25 @@ class ChatBotViewModel(
 
     private var chatId = 0
 
+    fun getChatById(email: String, chatId: Int): LiveData<Chat?> {
+        val chat = MutableLiveData<Chat?>()
+        chat.value = chatRepository.getChatById(email, chatId)
+        return chat
+    }
+
     fun loadChats(email: String) {
         val chats = chatRepository.getChatsByUser(email)
         _chatList.value = chats
     }
 
-    fun createNewChat(email: String) {
+    fun createNewChat(email: String): String? {
         val newChat = chatRepository.createNewChat(email)
-        _chatList.value = chatRepository.getChatsByUser(email)
+        loadChats(email) // Reload chats after creating a new one
+        return newChat.id.toString()
     }
 
-    fun sendMessage(email: String, message: String) {
-        addChat(email, message, isUser = true)
+    fun sendMessage(email: String, message: String, chatId: Int) {
+        addChat(email, message, isUser = true, chatId)
 
         viewModelScope.launch {
             try {
@@ -55,41 +63,45 @@ class ChatBotViewModel(
                         when (rasaDto.action) {
                             "DB_SEARCH" -> {
                                 // DB 검색 관련 작업 처리
-                                addChat(email, "DB 검색 결과: ${rasaDto.data}", isUser = false)
+                                addChat(email, "DB 검색 결과: ${rasaDto.data}", isUser = false, chatId)
                             }
                             "PLAIN" -> {
                                 // 단순 메시지 응답 처리
-                                addChat(email, rasaDto.message, isUser = false)
+                                addChat(email, rasaDto.message, isUser = false, chatId)
                             }
                             else -> {
                                 // 기타 액션 처리
-                                addChat(email, "알 수 없는 액션: ${rasaDto.action}", isUser = false)
+                                addChat(email, "알 수 없는 액션: ${rasaDto.action}", isUser = false, chatId)
                             }
                         }
                     } else {
-                        addChat(email, "챗봇으로부터 응답이 없습니다.", isUser = false)
+                        addChat(email, "챗봇으로부터 응답이 없습니다.", isUser = false, chatId)
                     }
                 } else {
-                    addChat(email, "오류 발생: ${response.code()} - ${response.message()}", isUser = false)
+                    addChat(email, "오류 발생: ${response.code()} - ${response.message()}", isUser = false, chatId)
                     Log.e("ChatBotViewModel", "Error: ${response.code()} - ${response.message()}")
                 }
             } catch (e: Exception) {
-                addChat(email, "예외 발생: ${e.message}", isUser = false)
+                addChat(email, "예외 발생: ${e.message}", isUser = false, chatId)
                 Log.e("ChatBotViewModel", "Exception occurred: ${e.message}")
             }
         }
     }
 
-    private fun addChat(email: String, message: String, isUser: Boolean) {
-        val newChat = Chat(
-            id = ++chatId,
-            email = email,
-            message = message,
+    private fun addChat(email: String, message: String, isUser: Boolean, chatId: Int) {
+        val chat = chatRepository.getChatById(email, chatId) ?: return // Use the size of existing chats
+
+        val messageId = chat.messages.size + 1 // Simple way to generate a unique ID based on the current size
+        val newMessage = Message(
+            id = messageId, // Pass the generated ID here
+            content = message,
             time = getCurrentTime(),
             isUser = isUser
         )
-        chatRepository.saveChat(newChat) // 채팅 기록을 저장소에 저장
-        _chatList.value = chatRepository.getChatsByUser(email) // LiveData 업데이트
+
+        chat.messages.add(newMessage) // Add the new message to the chat
+        chatRepository.saveChat(email, chatId, chat) // Save the updated chat
+        _chatList.value = chatRepository.getChatsByUser(email)
     }
 
     private fun getCurrentTime(): String {
