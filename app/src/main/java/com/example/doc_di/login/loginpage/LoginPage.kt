@@ -31,11 +31,12 @@ import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.login.LoginImpl
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.login.GradientButton
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.ui.theme.LightBlue
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginPage(navController: NavController, userViewModel: UserViewModel) {
+fun LoginPage(navController: NavController, userViewModel: UserViewModel, reminderViewModel: ReminderViewModel) {
     val loginImpl = LoginImpl(RetrofitInstance.loginApi)
 
     val email = rememberSaveable { mutableStateOf("moderation2015@naver.com") }
@@ -86,7 +87,7 @@ fun LoginPage(navController: NavController, userViewModel: UserViewModel) {
                 onClick = {
                     scope.launch {
                         try {
-                            loginImpl.login(email.value, password.value, context, navController, loginCheck, userViewModel)
+                            loginImpl.login(email.value, password.value, context, navController, loginCheck, userViewModel, reminderViewModel)
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }

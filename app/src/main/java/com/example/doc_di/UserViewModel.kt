@@ -30,7 +30,7 @@ class UserViewModel: ViewModel(){
     private val _userImage = MutableLiveData<Bitmap?>()
     val userImage: LiveData<Bitmap?> get() = _userImage
 
-    fun fetchUser(context: Context, navController: NavController) {
+    suspend fun fetchUser(context: Context, navController: NavController, onComplete: () -> Unit) {
         viewModelScope.launch {
             val reLogin = {
                 navController.navigate(Routes.login.route) {
@@ -61,6 +61,7 @@ class UserViewModel: ViewModel(){
                     else{
                         reLogin()
                     }
+                    onComplete()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

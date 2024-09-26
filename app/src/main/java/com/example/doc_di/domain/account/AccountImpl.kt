@@ -56,7 +56,8 @@ class AccountImpl(private val accountApi: AccountApi) {
 
                 val modifyResponse = accountApi.modifyProfile(accountPart, filePart, accessToken!!)
                 if (modifyResponse.isSuccessful) {
-                    userViewModel.fetchUser(context, navController)
+                    userViewModel.fetchUser(context, navController){
+                    }
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "프로필 수정 성공", Toast.LENGTH_SHORT).show()
                         navController.navigate(Routes.home.route) {

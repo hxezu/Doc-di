@@ -28,6 +28,7 @@ import java.util.Locale
 class ReminderViewModel @Inject constructor(
     private val reminderApi: ReminderApi
 ) : ViewModel() {
+    val isLoading = MutableLiveData<Boolean>(false)
 
     private val _reminders = mutableStateOf<List<Reminder>>(emptyList())
     val reminders: State<List<Reminder>> = _reminders
@@ -88,6 +89,7 @@ class ReminderViewModel @Inject constructor(
 
 
     fun getBookedReminders(email: String) {
+        isLoading.value = true
         viewModelScope.launch {
             try {
                 val response = reminderApi.findBookedReminder(email)
@@ -97,6 +99,7 @@ class ReminderViewModel @Inject constructor(
             } catch (e: Exception) {
                 println("Failed to fetch Booked reminders: ${e.message}")
             }
+            isLoading.value = false
         }
     }
 

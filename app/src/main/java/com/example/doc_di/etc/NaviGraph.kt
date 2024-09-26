@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -13,8 +12,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.doc_di.UserViewModel
+import com.example.doc_di.chatbot.ChatBotViewModel
 import com.example.doc_di.chatbot.ChatListScreen
+import com.example.doc_di.chatbot.ChatScreen
 import com.example.doc_di.domain.RetrofitInstance
+import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.pill.PillsSearchRepositoryImpl
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.account_manage.ModifyLogoutAccountDelete
@@ -23,12 +25,12 @@ import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.login.resetpassword.ResetPassword
+import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
 import com.example.doc_di.reminder.booked_reminder.AddScheduleScreenUI
 import com.example.doc_di.reminder.booked_reminder.EditScheduleScreen
 import com.example.doc_di.reminder.home.ManagementScreen
-import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
-import com.example.doc_di.reminder.medication_reminder.EditMedicationScreen
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.medication_reminder.EditMedicationScreen
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
@@ -48,17 +50,22 @@ fun NaviGraph(navController: NavHostController) {
         }
     })
 
+    val chatBotViewModel: ChatBotViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            val chatBotImpl = ChatBotImpl(RetrofitInstance.chatBotApi) // Create instance of ChatBotImpl
+            return ChatBotViewModel(chatBotImpl) as T // Pass it to the ViewModel
+        }
+    })
+
     val btmBarViewModel: BtmBarViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
     val reviewViewModel: ReviewViewModel = viewModel()
     val reminderViewModel: ReminderViewModel = viewModel()
-    val pastAppointment by reminderViewModel.pastAppointments.observeAsState()
-    val upcomingAppointment by reminderViewModel.upcomingAppointments.observeAsState()
 
     NavHost(navController = navController, startDestination = Routes.login.route) {
 
         composable(Routes.login.route) {
-            LoginPage(navController, userViewModel)
+            LoginPage(navController, userViewModel, reminderViewModel)
         }
 
         composable(Routes.register.route) {
@@ -69,12 +76,12 @@ fun NaviGraph(navController: NavHostController) {
             ResetPassword(navController)
         }
 
-        composable(Routes.home.route) {
-            Home(upcomingAppointment, navController, btmBarViewModel, userViewModel)
+        composable(route = Routes.home.route) {
+            Home(navController, btmBarViewModel, userViewModel, reminderViewModel)
         }
 
         composable(Routes.appointmentSchedule.route) {
-            AppointmentSchedule(upcomingAppointment, pastAppointment, navController, btmBarViewModel)
+            AppointmentSchedule(navController, btmBarViewModel)
         }
 
         composable(
@@ -140,7 +147,20 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.chatListScreen.route) {
-            ChatListScreen(navController, btmBarViewModel)
+            ChatListScreen(
+                navController,
+                btmBarViewModel,
+                userViewModel,
+                chatBotViewModel
+            )
+        }
+
+        composable(route = Routes.chatScreen.route) {
+            ChatScreen(
+                navController,
+                btmBarViewModel,
+                userViewModel,
+                chatBotViewModel)
         }
 
         composable(route = Routes.managementScreen.route) {
