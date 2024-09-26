@@ -65,7 +65,7 @@ fun NaviGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Routes.login.route) {
 
         composable(Routes.login.route) {
-            LoginPage(navController, userViewModel)
+            LoginPage(navController, userViewModel, reminderViewModel)
         }
 
         composable(Routes.register.route) {

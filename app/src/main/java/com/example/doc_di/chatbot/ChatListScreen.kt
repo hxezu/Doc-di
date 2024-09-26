@@ -2,7 +2,6 @@ package com.example.doc_di.chatbot
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -17,25 +16,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.FloatingActionButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material.Scaffold
+import androidx.compose.material.FabPosition
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -73,57 +72,62 @@ fun ChatListScreen(
         }
     }
 
-    Scaffold(bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel) }) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(
-                    text = "DDoc-Di 와 대화하기",
-                    textAlign = TextAlign.Left,
-                    modifier = Modifier
-                        .padding(start = 20.dp, top = 60.dp, bottom = 30.dp)
-                        .fillMaxWidth(),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MainBlue,
-                )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White)
-                ) {
-                    LazyColumn(
-                        modifier = Modifier.padding(bottom = 90.dp)
-                    ) {
-//                        items(nonNullChatList, key = { it.id }) { chat ->
-//                            ChatEachRow(chat = chat){
-//                                navController.currentBackStackEntry?.savedStateHandle?.set("data",it)
-//                                navController.navigate(Routes.chatScreen.route)
-//                            }
-//                        }
-                    }
-                }
-            }
-            IconButton(
+    Scaffold(
+        backgroundColor = Color.Transparent,
+        bottomBar = { BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
+        },
+        floatingActionButton = {
+            FloatingActionButton(
                 onClick = { navController.navigate(Routes.chatScreen.route) },
-                modifier = Modifier
-                    .align(BottomCenter)
-                    .padding(16.dp, bottom = 150.dp)
-                    .border(2.dp, MainBlue, CircleShape)
-                ) {
+                backgroundColor = MainBlue,
+                modifier = Modifier.padding(bottom = 20.dp),
+                elevation = FloatingActionButtonDefaults.elevation(8.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = "Add Chat",
-                    tint = MainBlue
+                    tint = White
                 )
             }
+        },
+        floatingActionButtonPosition = FabPosition.Center,
+        ) { paddingValues ->
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(Color.Transparent)
+        ) {
+            Text(
+                text = "DDoc-Di 와 대화하기",
+                textAlign = TextAlign.Left,
+                modifier = Modifier
+                    .padding(start = 20.dp, top = 100.dp, bottom = 30.dp)
+                    .background(Color.Transparent)
+                    .fillMaxWidth(),
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.Black,
+                )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent)
+            ) {
+                LazyColumn(
+                    modifier = Modifier.padding(bottom = 90.dp)
+                ) {
+    //                        items(nonNullChatList, key = { it.id }) { chat ->
+    //                            ChatEachRow(chat = chat){
+    //                                navController.currentBackStackEntry?.savedStateHandle?.set("data",it)
+    //                                navController.navigate(Routes.chatScreen.route)
+    //                            }
+    //                        }
+                }
+            }
         }
+
     }
 }
 
@@ -137,7 +141,7 @@ fun ChatEachRow(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(Color.Transparent)
             .noRippleEffect { onClick() }
             .padding(horizontal = 20.dp, vertical = 10.dp),
     ) {

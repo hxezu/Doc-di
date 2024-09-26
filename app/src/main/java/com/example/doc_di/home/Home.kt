@@ -68,6 +68,9 @@ fun Home(
     val starColor = Color(0xFFFFC462)
     val cardTextColor = Color(0xFF72777A)
 
+    val userInfo = userViewModel.userInfo.value
+    val upcomingAppointments by reminderViewModel.upcomingAppointments.observeAsState()
+
     fun updateBtmBarItem(route: String) {
         btmBarViewModel.btmNavBarItems.forEach {
             it.selected = route == it.route
@@ -95,15 +98,10 @@ fun Home(
         bottomBar = { BottomNavigationBar(navController, btmBarViewModel) },
         containerColor = Color.Transparent,
     ) {
-        if (userViewModel.userInfo.value == null) {
+
+        if (userInfo == null ) {
             LoadingHomeScreen()
         } else {
-            println("Fetching reminders for user: ${userViewModel.userInfo.value!!.email}")
-            reminderViewModel.getBookedReminders(userViewModel.userInfo.value!!.email)
-            reminderViewModel.getReminders(userViewModel.userInfo.value!!.email)
-
-            val upcomingAppointments by reminderViewModel.upcomingAppointments.observeAsState()
-
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier

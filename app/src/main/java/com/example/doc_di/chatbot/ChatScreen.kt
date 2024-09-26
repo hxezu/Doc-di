@@ -201,7 +201,7 @@ fun CustomTextField(
                         text = stringResource(R.string.type_message),
                         style = TextStyle(
                             fontSize = 14.sp,
-                            color = Color.Black
+                            color = Color.Gray
                         ),
                         textAlign = TextAlign.Center
                     )
@@ -219,7 +219,7 @@ fun CustomTextField(
             IconButton(
                     onClick = onSendClick,
             modifier = Modifier
-                .size(48.dp)
+                .size(30.dp)
                 .clip(CircleShape)
                 .background(MainBlue)
             ) {

@@ -8,6 +8,7 @@ import com.example.doc_di.UserViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.login.loginpage.saveAccessToken
 import com.example.doc_di.login.loginpage.saveRefreshToken
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -18,7 +19,8 @@ class LoginImpl(private val loginApi: LoginApi) {
         context: Context,
         navController: NavController,
         loginCheck: MutableState<Boolean>,
-        userViewModel: UserViewModel
+        userViewModel: UserViewModel,
+        reminderViewModel: ReminderViewModel
     ) {
         val loginDTO = LoginDTO(
             username = username,
@@ -40,8 +42,13 @@ class LoginImpl(private val loginApi: LoginApi) {
                 saveRefreshToken(context, refreshToken)
             }
 
-            userViewModel.fetchUser(context, navController)
-
+            userViewModel.fetchUser(context, navController){
+                userViewModel.userInfo.value?.let { userInfo ->
+                    reminderViewModel.getBookedReminders(userInfo.email)
+                    println("Success to Fetch Reminders")
+                }
+            }
+            
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
             }
