@@ -1,6 +1,5 @@
 package com.example.doc_di.reminder.home.utils
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -17,9 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,7 +41,6 @@ import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
-import com.example.doc_di.ui.theme.LightBlue
 
 @Composable
 fun MedicationCard(
@@ -53,11 +49,10 @@ fun MedicationCard(
     deleteReminder: (Int) -> Unit,
     navController: NavController,
     searchViewModel: SearchViewModel,
-    reviewViewModel: ReviewViewModel
+    reviewViewModel: ReviewViewModel,
 ) {
     val pillList = searchViewModel.pills.collectAsState().value
     val isLoading = searchViewModel.isLoading.collectAsState().value
-    val selectedPillLoaded by searchViewModel.selectedPillLoaded.collectAsState()
 
     // State for popup message
     val context = LocalContext.current
@@ -75,7 +70,7 @@ fun MedicationCard(
             .fillMaxWidth()
             .padding(vertical = 10.dp, horizontal = 20.dp),
 
-    ) {
+        ) {
         // medicationTime null 체크 및 포맷팅
         val formattedMedicationTime = reminder.medicationTime?.let {
             it.split(" ")[1] // "yyyy-MM-dd" 부분만 추출
@@ -84,19 +79,24 @@ fun MedicationCard(
         Text(
             text = formattedMedicationTime,
             color = Color.Black, // 검정색 설정
-            fontWeight = FontWeight.Bold )
+            fontWeight = FontWeight.Bold
+        )
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
                 .padding(vertical = 10.dp, horizontal = 20.dp)
                 .border(
-                    border = BorderStroke(width = 0.5.dp, color = Color(0xFFECEDEF)), // Black border with 2.dp width
+                    border = BorderStroke(
+                        width = 0.5.dp,
+                        color = Color(0xFFECEDEF)
+                    ), // Black border with 2.dp width
                     shape = RoundedCornerShape(30.dp) // Same shape as the card
                 ),
             onClick = {
                 searchViewModel.setSelectedPillByPillName(reminder.medicineName)
-                      },
+                navController.navigate(Routes.searchResult.route)
+            },
             shape = RoundedCornerShape(30.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White,
@@ -104,96 +104,83 @@ fun MedicationCard(
         ) {
 //            if(isLoading){
 //            }else{
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment
-                        .CenterVertically
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment
+                    .CenterVertically
+            ) {
+                Image(
+                    modifier = Modifier
+                        .padding(start = 15.dp)
+                        .align(Alignment.CenterVertically)
+                        .weight(1f),
+                    painter = painterResource(id = R.drawable.pillemoji),
+                    contentDescription = "용법 이미지"
+                )
+
+                Spacer(modifier = Modifier.width(20.dp))
+
+                Column(
+                    modifier = Modifier
+                        .weight(3f),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Image(
-                        modifier = Modifier
-                            .padding(start = 15.dp)
-                            .align(Alignment.CenterVertically)
-                            .weight(1f),
-                        painter = painterResource(id = R.drawable.pillemoji),
-                        contentDescription = "용법 이미지"
-                    )
-
-                    Spacer(modifier = Modifier.width(20.dp))
-
-                    Column(
-                        modifier = Modifier
-                            .weight(3f),
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(
-                            text = reminder.medicineName,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = reminder.dosage.toString() + " 정",
-                            fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-
-                    }
-
                     Text(
-                        text = reminder.recurrence,
+                        text = reminder.medicineName,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = reminder.dosage.toString() + " 정",
                         fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .weight(1.5f)
+                        style = MaterialTheme.typography.bodyMedium
                     )
 
-                    // 점 세 개 아이콘 버튼
-                    IconButton(
-                        onClick = { expanded = true },
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More Options"
-                        )
-                    }
+                }
 
-                    // 드롭다운 메뉴
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                Text(
+                    text = reminder.recurrence,
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .weight(1.5f)
+                )
+
+                // 점 세 개 아이콘 버튼
+                IconButton(
+                    onClick = { expanded = true },
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "More Options"
+                    )
+                }
+
+                // 드롭다운 메뉴
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            expanded = false
+                            navController.navigate("editMedicationScreen/${reminder.id}")
+                        }
                     ) {
-                        DropdownMenuItem(
-                            onClick = {
-                                expanded = false
-                                navController.navigate("editMedicationScreen/${reminder.id}")
-                            }
-                        ) {
-                            Text("수정")
+                        Text("수정")
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            expanded = false
+                            reminder.id?.let { deleteReminder(it.toInt()) }
                         }
-                        DropdownMenuItem(
-                            onClick = {
-                                expanded = false
-                                reminder.id?.let { deleteReminder(it.toInt()) }
-                            }
-                        ) {
-                            Text("삭제")
-                        }
+                    ) {
+                        Text("삭제")
                     }
                 }
-//            }
-        }
-
-    }
-    LaunchedEffect(selectedPillLoaded) {
-        if (selectedPillLoaded) {
-            navController.navigate(Routes.pillInformation.route) {
-                // Clear the back stack if needed
-                popUpTo(Routes.pillInformation.route) { inclusive = true }
             }
-            searchViewModel.setSelectedPillLoaded(false) // Reset after navigation
         }
     }
-
 }
-

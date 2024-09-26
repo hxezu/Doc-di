@@ -3,7 +3,6 @@ package com.example.doc_di.search
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -45,14 +44,6 @@ class SearchViewModel(
 
     private val _showErrorToastChannel = Channel<Boolean>()
     val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
-
-    private val _selectedPillLoaded = MutableStateFlow(false)
-    val selectedPillLoaded: StateFlow<Boolean> get() = _selectedPillLoaded
-
-    // Call this method to set the state
-    fun setSelectedPillLoaded(isLoaded: Boolean) {
-        _selectedPillLoaded.value = isLoaded
-    }
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -103,19 +94,6 @@ class SearchViewModel(
         option["name"] = pillName
         setOptions(option)
         searchPillsByOptions()
-
-        viewModelScope.launch {
-            val pillList = pills.value
-            val selectedPill = pillList.find { it.itemName == pillName }
-            if (selectedPill != null) {
-                this@SearchViewModel.selectedPill.value = selectedPill
-                _selectedPillLoaded.value = true
-                Log.d("SearchViewModel", "Selected Pill Loaded: ${selectedPill.itemName}")
-            } else {
-                _selectedPillLoaded.value = false
-                Log.d("SearchViewModel", "Pill not found: $pillName")
-            }
-        }
     }
 
     fun setPillInfo(itemSeq: String) {
