@@ -32,9 +32,10 @@ class ChatBotViewModel(
         _chatList.value = chats
     }
 
-    fun createNewChat(email: String) {
+    fun createNewChat(email: String) : String?{
         val newChat = chatRepository.createNewChat(email)
         _chatList.value = chatRepository.getChatsByUser(email)
+        return newChat.id.toString()
     }
 
     fun sendMessage(email: String, message: String) {
