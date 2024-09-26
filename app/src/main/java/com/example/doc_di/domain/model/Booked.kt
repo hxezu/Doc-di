@@ -7,7 +7,7 @@ import java.util.Locale
 
 @Parcelize
 data class Booked(
-    val id: Int?,
+    val id: Int,
     val hospitalName: String,
     val doctorName: String,
     val subject: String,

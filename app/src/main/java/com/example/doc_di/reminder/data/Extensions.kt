@@ -18,6 +18,7 @@ fun Booked.toAppointmentData(): AppointmentData {
     }
 
     return AppointmentData(
+        appointmentId = this.id,
         hospitalName = this.hospitalName,
         doctorName = this.doctorName,
         subject = this.subject,
