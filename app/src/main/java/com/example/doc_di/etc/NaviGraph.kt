@@ -10,14 +10,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.doc_di.UserViewModel
 import com.example.doc_di.chatbot.ChatBotViewModel
 import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.chatbot.ChatScreen
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.chatbot.ChatBotImpl
+import com.example.doc_di.domain.chatbot.ChatRepository
 import com.example.doc_di.domain.pill.PillsSearchRepositoryImpl
 import com.example.doc_di.home.Home
 import com.example.doc_di.home.account_manage.ModifyLogoutAccountDelete
@@ -54,9 +57,9 @@ fun NaviGraph(navController: NavHostController) {
     val chatBotViewModel: ChatBotViewModel =
         viewModel(factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val chatBotImpl =
-                    ChatBotImpl(RetrofitInstance.chatBotApi) // Create instance of ChatBotImpl
-                return ChatBotViewModel(chatBotImpl) as T // Pass it to the ViewModel
+                val chatRepository = ChatRepository()
+                val chatBotImpl = ChatBotImpl(RetrofitInstance.chatBotApi) // Create instance of ChatBotImpl
+                return ChatBotViewModel(chatRepository, chatBotImpl) as T // Pass it to the ViewModel
             }
         })
 
@@ -83,7 +86,7 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.home.route) {
-            Home(upcomingAppointment, navController, btmBarViewModel, userViewModel)
+            Home(upcomingAppointment, navController, btmBarViewModel, userViewModel, reminderViewModel)
         }
 
         composable(Routes.appointmentSchedule.route) {
@@ -167,14 +170,32 @@ fun NaviGraph(navController: NavHostController) {
             )
         }
 
-        composable(route = Routes.chatScreen.route) {
+        // 채팅 상세 화면: 특정 채팅 ID를 인자로 받음
+        composable(
+            route = "chat_screen/{chatId}",
+            arguments = listOf(navArgument("chatId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val chatId = backStackEntry.arguments?.getInt("chatId") ?: 0
             ChatScreen(
-                navController,
-                btmBarViewModel,
-                userViewModel,
-                chatBotViewModel
+                navController = navController,
+                btmBarViewModel = btmBarViewModel,
+                userViewModel = userViewModel,
+                chatBotViewModel = chatBotViewModel,
+                chatId = chatId
             )
         }
+
+        // 채팅 상세 화면: 새로운 대화 (chatId 없음)
+        composable(route = "chat_screen") {
+            ChatScreen(
+                navController = navController,
+                btmBarViewModel = btmBarViewModel,
+                userViewModel = userViewModel,
+                chatBotViewModel = chatBotViewModel,
+                chatId = null
+            )
+        }
+
 
         composable(route = Routes.managementScreen.route) {
             ManagementScreen(

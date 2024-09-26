@@ -61,21 +61,22 @@ fun ChatScreen(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
     userViewModel: UserViewModel,
-    chatBotViewModel: ChatBotViewModel
+    chatBotViewModel: ChatBotViewModel,
+    chatId: Int? = null
 ) {
-    val chatList by chatBotViewModel.chatList.observeAsState()
-    val nonNullChatList = chatList ?: emptyList()
     val userInfo by userViewModel.userInfo.observeAsState()
-
+    val chatList by chatBotViewModel.chatList.observeAsState()
 
     var message by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        if(userInfo != null){
-            println("Create Chat for user: ${userViewModel.userInfo.value!!.email}")
-        }else{
-            println("User email is missing, cannot create Chat")
+    LaunchedEffect(chatId, userInfo) {
+        userInfo?.email?.let { email ->
+            chatBotViewModel.loadChats(email)
         }
+    }
+
+    val selectedChat = chatId?.let { id ->
+        chatList?.firstOrNull { it.id == id }
     }
 
 
@@ -100,17 +101,31 @@ fun ChatScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .clip(
-                            RoundedCornerShape(
-                                topStart = 30.dp, topEnd = 30.dp
-                            )
-                        )
+                        .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
                         .background(Color.White)
                 ) {
-                    LazyColumn(modifier = Modifier.padding(start = 20.dp, top = 15.dp, end = 20.dp)
-                    ){
-                        items(nonNullChatList, key={it.id}) { chat ->
-                            ChatRow(chat = chat)
+                    if (selectedChat != null) {
+                        // 선택된 채팅에 해당하는 메시지들 필터링
+                        val messages = chatList!!.filter { it.email == selectedChat.email }
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 20.dp, top = 15.dp, end = 20.dp)
+                        ) {
+                            items(messages, key = { it.id }) { chat ->
+                                ChatRow(chat = chat)
+                            }
+                        }
+                    } else {
+                        // 새로운 대화일 경우 전체 메시지 표시
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 20.dp, top = 15.dp, end = 20.dp)
+                        ) {
+                            items(chatList!!, key = { it.id }) { chat ->
+                                ChatRow(chat = chat)
+                            }
                         }
                     }
 
@@ -120,9 +135,11 @@ fun ChatScreen(
                 text = message,
                 onValueChange = { message = it },
                 onSendClick ={
-                    if(message.isNotBlank()){
-                        chatBotViewModel.sendMessage(message, userInfo!!.email)
-                        message = ""
+                    userInfo?.email?.let { email ->
+                        if (message.isNotBlank()) {
+                            chatBotViewModel.sendMessage(email, message)
+                            message = ""
+                        }
                     }
                 },
                 modifier = Modifier

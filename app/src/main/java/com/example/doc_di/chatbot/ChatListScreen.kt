@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.FloatingActionButtonDefaults
@@ -43,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.UserViewModel
-import com.example.doc_di.data.personList
 import com.example.doc_di.domain.model.Chat
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.Routes
@@ -61,12 +61,13 @@ fun ChatListScreen(
     chatBotViewModel: ChatBotViewModel
 ) {
     val chatList by chatBotViewModel.chatList.observeAsState()
-    val nonNullChatList = chatList ?: emptyList()
     val userInfo by userViewModel.userInfo.observeAsState()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(userInfo) {
         if(userInfo != null){
-            println("Fetching Chat for user: ${userViewModel.userInfo.value!!.email}")
+            userInfo?.email?.let { email ->
+                chatBotViewModel.loadChats(email)
+            }
         }else{
             println("User email is missing, cannot fetch Chat")
         }
@@ -78,7 +79,12 @@ fun ChatListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(Routes.chatScreen.route) },
+                onClick = {
+                    userInfo?.email?.let { email ->
+                        val newChatId = chatBotViewModel.createNewChat(email)
+                        navController.navigate("chat_screen/$newChatId") // 새로운 채팅 상세 화면으로 이동
+                    }
+                          },
                 backgroundColor = MainBlue,
                 modifier = Modifier.padding(bottom = 20.dp),
                 elevation = FloatingActionButtonDefaults.elevation(8.dp)
@@ -108,7 +114,7 @@ fun ChatListScreen(
                     .fillMaxWidth(),
                 style = MaterialTheme.typography.titleLarge,
                 color = Color.Black,
-                )
+            )
 
             Box(
                 modifier = Modifier
@@ -118,16 +124,29 @@ fun ChatListScreen(
                 LazyColumn(
                     modifier = Modifier.padding(bottom = 90.dp)
                 ) {
-    //                        items(nonNullChatList, key = { it.id }) { chat ->
-    //                            ChatEachRow(chat = chat){
-    //                                navController.currentBackStackEntry?.savedStateHandle?.set("data",it)
-    //                                navController.navigate(Routes.chatScreen.route)
-    //                            }
-    //                        }
+                    chatList?.let { chats ->
+                        items(chats, key = { it.id }) { chat ->
+                            ChatEachRow(chat = chat) {
+                                navController.navigate("chat_screen/${chat.id}") // 특정 채팅 상세 화면으로 이동
+                            }
+                        }
+                    } ?: run {
+                        // chatList가 null일 때 보여줄 메시지
+                        item {
+                            Text(
+                                text = "채팅이 없습니다.",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center,
+                                color = Color.Gray
+                            )
+                        }
+                    }
                 }
             }
         }
-
     }
 }
 

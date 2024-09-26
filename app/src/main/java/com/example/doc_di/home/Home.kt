@@ -37,6 +37,7 @@ import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.LoadingHomeScreen
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.reminder.data.AppointmentData
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import kotlin.system.exitProcess
 
 
@@ -47,6 +48,7 @@ fun Home(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
     userViewModel: UserViewModel,
+    reminderViewModel: ReminderViewModel
 ) {
     val titleColor = Color(0xFF404446)
     val cardPillColor = Color(0xFF202325)
@@ -71,6 +73,7 @@ fun Home(
                 Routes.managementScreen.route -> { updateBtmBarItem(Routes.managementScreen.route) }
             }
         }
+
     }
 
     BackHandler {
@@ -86,6 +89,7 @@ fun Home(
         if (userInfo == null) {
             LoadingHomeScreen()
         } else {
+            reminderViewModel.getBookedReminders(userInfo.email)
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
