@@ -36,11 +36,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.doc_di.R
+import com.example.doc_di.etc.Routes
 import com.example.doc_di.reminder.data.AppointmentData
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 
 @Composable
-fun UpcomingAppointmentList(upcomingAppointment: List<AppointmentData>) {
+fun UpcomingAppointmentList(
+    upcomingAppointment: List<AppointmentData>,
+    navController: NavController,
+    reminderViewModel: ReminderViewModel
+) {
     var dropdownStates by remember { mutableStateOf(List(upcomingAppointment.size) { false }) }
     val options = listOf("수정", "삭제")
 
@@ -56,7 +63,7 @@ fun UpcomingAppointmentList(upcomingAppointment: List<AppointmentData>) {
     ) {
         itemsIndexed(upcomingAppointment) { index, appointmentData ->
             Card(
-                onClick = { /*TODO 진료 일정 수정 화면 연결*/ },
+                onClick = { navController.navigate(Routes.editScheduleScreen.route + "/${appointmentData.appointmentId}") },
                 shape = MaterialTheme.shapes.small,
                 colors = CardDefaults.cardColors(Color.White),
                 elevation = CardDefaults.cardElevation(2.dp),
@@ -103,9 +110,9 @@ fun UpcomingAppointmentList(upcomingAppointment: List<AppointmentData>) {
                                     DropdownMenuItem(
                                         onClick = {
                                             if (option == "수정") {
-
+                                                navController.navigate(Routes.editScheduleScreen.route + "/${appointmentData.appointmentId}")
                                             } else if (option == "삭제") {
-
+                                                reminderViewModel.deleteBookedReminder(appointmentData.appointmentId)
                                             }
                                             dropdownStates = dropdownStates.map { false }
                                         }

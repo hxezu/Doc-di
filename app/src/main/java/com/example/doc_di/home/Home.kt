@@ -54,6 +54,7 @@ fun Home(
     val pinColor = Color(0xFF979C9E)
     val starColor = Color(0xFFFFC462)
     val cardTextColor = Color(0xFF72777A)
+    val userInfo = userViewModel.userInfo.value
 
     fun updateBtmBarItem(route: String) {
         btmBarViewModel.btmNavBarItems.forEach {
@@ -82,7 +83,7 @@ fun Home(
         bottomBar = { BottomNavigationBar(navController, btmBarViewModel) },
         containerColor = Color.Transparent,
     ) {
-        if (upcomingAppointment.isNullOrEmpty()) {
+        if (userInfo == null) {
             LoadingHomeScreen()
         } else {
             Column(

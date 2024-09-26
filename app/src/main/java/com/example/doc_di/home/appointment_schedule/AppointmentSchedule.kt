@@ -23,6 +23,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.GoBack
 import com.example.doc_di.reminder.data.AppointmentData
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -31,6 +32,7 @@ fun AppointmentSchedule(
     pastAppointment: List<AppointmentData>?,
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
+    reminderViewModel: ReminderViewModel
 ) {
     val reservedTreatment = remember { mutableStateOf(true) }
 
@@ -70,7 +72,7 @@ fun AppointmentSchedule(
                     }
                 }
                 else{
-                    UpcomingAppointmentList(upcomingAppointment)
+                    UpcomingAppointmentList(upcomingAppointment, navController, reminderViewModel)
                 }
             }
             else {

@@ -5,7 +5,6 @@ sealed class Routes(val route: String) {
     object register : Routes("RegisterPage")
     object resetPassword : Routes("ResetPassword")
     object home: Routes("Home")
-    object appointmentTest: Routes("AppointmentTest")
     object appointmentSchedule: Routes("AppointmentSchedule")
     object search: Routes("Search")
     object searchMethod: Routes("SearchMethod")

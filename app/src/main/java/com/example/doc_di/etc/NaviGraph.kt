@@ -51,12 +51,14 @@ fun NaviGraph(navController: NavHostController) {
         }
     })
 
-    val chatBotViewModel: ChatBotViewModel = viewModel(factory = object : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val chatBotImpl = ChatBotImpl(RetrofitInstance.chatBotApi) // Create instance of ChatBotImpl
-            return ChatBotViewModel(chatBotImpl) as T // Pass it to the ViewModel
-        }
-    })
+    val chatBotViewModel: ChatBotViewModel =
+        viewModel(factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val chatBotImpl =
+                    ChatBotImpl(RetrofitInstance.chatBotApi) // Create instance of ChatBotImpl
+                return ChatBotViewModel(chatBotImpl) as T // Pass it to the ViewModel
+            }
+        })
 
     val btmBarViewModel: BtmBarViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
@@ -85,7 +87,13 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(Routes.appointmentSchedule.route) {
-            AppointmentSchedule(upcomingAppointment, pastAppointment, navController, btmBarViewModel)
+            AppointmentSchedule(
+                upcomingAppointment,
+                pastAppointment,
+                navController,
+                btmBarViewModel,
+                reminderViewModel
+            )
         }
 
         composable(
@@ -164,7 +172,8 @@ fun NaviGraph(navController: NavHostController) {
                 navController,
                 btmBarViewModel,
                 userViewModel,
-                chatBotViewModel)
+                chatBotViewModel
+            )
         }
 
         composable(route = Routes.managementScreen.route) {
@@ -174,10 +183,11 @@ fun NaviGraph(navController: NavHostController) {
                 reminderViewModel,
                 userViewModel,
                 searchViewModel,
-                reviewViewModel)
+                reviewViewModel
+            )
         }
 
-        composable(route ="addMedicationScreen?selectedDate={selectedDate}") {backStackEntry ->
+        composable(route = "addMedicationScreen?selectedDate={selectedDate}") { backStackEntry ->
             val selectedDate = backStackEntry.arguments?.getString("selectedDate")
             AddMedicationScreenUI(
                 navController = navController,
@@ -197,7 +207,7 @@ fun NaviGraph(navController: NavHostController) {
             EditScheduleScreen(navController, btmBarViewModel, reminderViewModel, reminderId)
         }
 
-        composable(route ="addScheduleScreen?selectedDate={selectedDate}") {backStackEntry ->
+        composable(route = "addScheduleScreen?selectedDate={selectedDate}") { backStackEntry ->
             val selectedDate = backStackEntry.arguments?.getString("selectedDate")
             AddScheduleScreenUI(
                 navController = navController,
