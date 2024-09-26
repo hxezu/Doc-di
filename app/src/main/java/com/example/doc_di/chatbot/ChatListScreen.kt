@@ -157,6 +157,9 @@ fun ChatEachRow(
     chat: Chat,
     onClick:()->Unit
 ) {
+    val lastMessage = chat.messages.lastOrNull()
+    val lastMessageContent = lastMessage?.content?: "No messages yet"
+    val lastMessageTime = lastMessage?.time?: "No messages yet"
 
     Box(
         modifier = Modifier
@@ -181,13 +184,14 @@ fun ChatEachRow(
                     Column(
                     ) {
                         Text(
-                            text = chat.id.toString(), style = TextStyle(
+                            text = chat.id.toString() + "번째 대화", style = TextStyle(
                                 color = Color.Black, fontSize = 15.sp
                             )
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = "Okay", style = TextStyle(
+                            text = lastMessageContent,
+                            style = TextStyle(
                                 color = Gray, fontSize = 14.sp
                             )
                         )
@@ -195,7 +199,8 @@ fun ChatEachRow(
 
                 }
                 Text(
-                    text = "12:23 PM", style = TextStyle(
+                    text = lastMessageTime,
+                    style = TextStyle(
                         color = Gray, fontSize = 12.sp
                     )
                 )
