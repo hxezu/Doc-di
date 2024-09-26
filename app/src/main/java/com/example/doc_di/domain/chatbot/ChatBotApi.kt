@@ -6,8 +6,8 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface ChatBotApi {
-    @POST("/chatbot")
+    @POST("chatbot")
     suspend fun chatWithRasa(
         @Body chatBotClientDto: ChatBotClientDto,
-    ): Response<SuccessResponse<String>>
+    ):  Response<Unit>
 }

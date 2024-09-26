@@ -77,7 +77,7 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.home.route) {
-            Home(navController, btmBarViewModel, userViewModel)
+            Home(navController, btmBarViewModel, userViewModel, reminderViewModel)
         }
 
         composable(route = Routes.appointmentSchedule.route) {

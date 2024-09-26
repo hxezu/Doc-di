@@ -1,5 +1,6 @@
 package com.example.doc_di.chatbot
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,8 @@ import com.example.doc_di.domain.model.Chat
 import com.example.doc_di.domain.chatbot.ChatBotApi
 import com.example.doc_di.domain.chatbot.ChatBotClientDto
 import com.example.doc_di.domain.chatbot.ChatBotImpl
+import com.example.doc_di.domain.chatbot.RasaDto
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -25,22 +28,34 @@ class ChatBotViewModel(private val chatBotImpl: ChatBotImpl) : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val chatBotClientDto = ChatBotClientDto(
-                    email = userEmail,
-                    message = message
-                )
+                val chatBotClientDto = ChatBotClientDto(email = userEmail, message = message)
+                println("chatBotClientDto: $chatBotClientDto")
                 val response = chatBotImpl.chatWithRasa(chatBotClientDto)
+
                 if (response.isSuccessful) {
                     val responseBody = response.body()
-                    val botMessage = responseBody?.data ?: "챗봇으로부터 응답이 없습니다."
-                    addChat(botMessage, isUser = false)
+                    if (responseBody != null) {
+                        val rasaDto = Gson().fromJson(responseBody.data, RasaDto::class.java)
+
+                        // Now you can access the properties of rasaDto
+                        when (rasaDto.action) {
+                            "DB_SEARCH" -> {
+                                // Handle DB_SEARCH action
+                            }
+                            "PLAIN" -> {
+                                // Handle PLAIN action
+                            }
+                            // Add more cases as needed
+                        }
+                    }else{
+                        addChat("No response from the chatbot.", isUser = false)
+                    }
                 } else {
-                    val errorMessage = "오류: ${response.code()} - ${response.message()}"
-                    addChat(errorMessage, isUser = false)
+                    addChat("Error: ${response.code()} - ${response.message()}", isUser = false)
+                    Log.e("ChatBotApi", "Error: ${response.code()} - ${response.message()}")
                 }
             } catch (e: Exception) {
-                val exceptionMessage = "예외 발생: ${e.message}"
-                addChat(exceptionMessage, isUser = false)
+                addChat("Exception occurred: ${e.message}", isUser = false)
             }
         }
     }
