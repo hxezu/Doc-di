@@ -109,6 +109,7 @@ class ReminderViewModel @Inject constructor(
                 val response: Response<Unit> = reminderApi.deleteBookedReminder(bookedReminderId)
                 if (response.isSuccessful) {
                     _bookedReminders.value = _bookedReminders.value.filterNot { it.id?.toInt() == bookedReminderId }
+                    updateAppointments(_bookedReminders.value)
                 } else {
                     Log.e("ReminderViewModel", "진료 알림 삭제 실패: ${response.errorBody()?.string()}")
                 }
