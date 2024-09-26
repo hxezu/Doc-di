@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,6 +52,8 @@ fun NaviGraph(navController: NavHostController) {
     val userViewModel: UserViewModel = viewModel()
     val reviewViewModel: ReviewViewModel = viewModel()
     val reminderViewModel: ReminderViewModel = viewModel()
+    val pastAppointment by reminderViewModel.pastAppointments.observeAsState()
+    val upcomingAppointment by reminderViewModel.upcomingAppointments.observeAsState()
 
     NavHost(navController = navController, startDestination = Routes.login.route) {
 
@@ -67,11 +70,11 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(Routes.home.route) {
-            Home(navController, btmBarViewModel, userViewModel, reminderViewModel)
+            Home(upcomingAppointment, navController, btmBarViewModel, userViewModel)
         }
 
         composable(Routes.appointmentSchedule.route) {
-            AppointmentSchedule(navController, btmBarViewModel)
+            AppointmentSchedule(upcomingAppointment, pastAppointment, navController, btmBarViewModel)
         }
 
         composable(

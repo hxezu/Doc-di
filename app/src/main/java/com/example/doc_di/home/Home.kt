@@ -22,7 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,18 +36,17 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.LoadingHomeScreen
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.etc.observeAsState
-import com.example.doc_di.reminder.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.data.AppointmentData
 import kotlin.system.exitProcess
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Home(
+    upcomingAppointment: List<AppointmentData>?,
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
     userViewModel: UserViewModel,
-    reminderViewModel: ReminderViewModel
 ) {
     val titleColor = Color(0xFF404446)
     val cardPillColor = Color(0xFF202325)
@@ -56,8 +54,6 @@ fun Home(
     val pinColor = Color(0xFF979C9E)
     val starColor = Color(0xFFFFC462)
     val cardTextColor = Color(0xFF72777A)
-
-    val upcomingAppointment by reminderViewModel.upcomingAppointments.observeAsState()
 
     fun updateBtmBarItem(route: String) {
         btmBarViewModel.btmNavBarItems.forEach {
