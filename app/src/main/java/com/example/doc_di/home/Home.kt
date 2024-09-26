@@ -102,6 +102,8 @@ fun Home(
             reminderViewModel.getBookedReminders(userViewModel.userInfo.value!!.email)
             reminderViewModel.getReminders(userViewModel.userInfo.value!!.email)
 
+            val upcomingAppointments by reminderViewModel.upcomingAppointments.observeAsState()
+
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
@@ -109,7 +111,7 @@ fun Home(
                     .padding(start = 40.dp, bottom = 106.dp, top = 40.dp)
             ) {
                 HomeGreeting(navController, userViewModel)
-                //UpcomingAppointment(upcomingAppointment, navController)
+                UpcomingAppointment(upcomingAppointments, navController)
 
                 Column {
                     Text(
