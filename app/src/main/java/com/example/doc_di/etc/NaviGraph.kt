@@ -22,12 +22,12 @@ import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.login.resetpassword.ResetPassword
+import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
 import com.example.doc_di.reminder.booked_reminder.AddScheduleScreenUI
 import com.example.doc_di.reminder.booked_reminder.EditScheduleScreen
 import com.example.doc_di.reminder.home.ManagementScreen
-import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
-import com.example.doc_di.reminder.medication_reminder.EditMedicationScreen
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
+import com.example.doc_di.reminder.medication_reminder.EditMedicationScreen
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
@@ -44,6 +44,13 @@ fun NaviGraph(navController: NavHostController) {
     val searchViewModel: SearchViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SearchViewModel(PillsSearchRepositoryImpl(RetrofitInstance.pillApi)) as T
+        }
+    })
+
+    val chatBotViewModel: ChatBotViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            val chatBotImpl = ChatBotImpl(RetrofitInstance.chatBotApi) // Create instance of ChatBotImpl
+            return ChatBotViewModel(chatBotImpl) as T // Pass it to the ViewModel
         }
     })
 
@@ -66,7 +73,7 @@ fun NaviGraph(navController: NavHostController) {
             ResetPassword(navController)
         }
 
-        composable(Routes.home.route) {
+        composable(route = Routes.home.route) {
             Home(navController, btmBarViewModel, userViewModel, reminderViewModel)
         }
 
@@ -137,7 +144,20 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.chatListScreen.route) {
-            ChatListScreen(navController, btmBarViewModel)
+            ChatListScreen(
+                navController,
+                btmBarViewModel,
+                userViewModel,
+                chatBotViewModel
+            )
+        }
+
+        composable(route = Routes.chatScreen.route) {
+            ChatScreen(
+                navController,
+                btmBarViewModel,
+                userViewModel,
+                chatBotViewModel)
         }
 
         composable(route = Routes.managementScreen.route) {

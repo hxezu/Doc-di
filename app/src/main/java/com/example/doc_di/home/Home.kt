@@ -2,18 +2,24 @@ package com.example.doc_di.home
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,9 +28,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,8 +43,6 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.LoadingHomeScreen
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.etc.observeAsState
-import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import kotlin.system.exitProcess
 
 
@@ -48,16 +52,19 @@ fun Home(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
     userViewModel: UserViewModel,
-    reminderViewModel: ReminderViewModel
 ) {
     val titleColor = Color(0xFF404446)
     val cardPillColor = Color(0xFF202325)
+    val cardProfessorColor = Color(0xFF202325)
+    val treatmentTimeColor = Color(0xFF404446)
+    val locateColor = Color(0xFF6C7072)
+    val departmentColor = Color(0xFF5555CB)
     val alarmColor = Color(0xFF979C9E)
     val pinColor = Color(0xFF979C9E)
     val starColor = Color(0xFFFFC462)
     val cardTextColor = Color(0xFF72777A)
 
-    val upcomingAppointment by reminderViewModel.upcomingAppointments.observeAsState()
+    val userInfo by userViewModel.userInfo.observeAsState()
 
     fun updateBtmBarItem(route: String) {
         btmBarViewModel.btmNavBarItems.forEach {
@@ -89,6 +96,10 @@ fun Home(
         if (userViewModel.userInfo.value == null) {
             LoadingHomeScreen()
         } else {
+            println("Fetching reminders for user: ${userViewModel.userInfo.value!!.email}")
+            reminderViewModel.getBookedReminders(userViewModel.userInfo.value!!.email)
+            reminderViewModel.getReminders(userViewModel.userInfo.value!!.email)
+
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
