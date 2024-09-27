@@ -1,5 +1,6 @@
 package com.example.doc_di.reminder.booked_reminder.utils
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,10 +36,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.doc_di.R
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
@@ -215,42 +219,56 @@ fun EndDateTextField(
         shouldDisplay = true
     }
 
+    val context = LocalContext.current
+
     val startCalendar = Calendar.getInstance().apply {
         timeInMillis = bookDate
-        add(Calendar.DAY_OF_MONTH, 0)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
     }
-    startCalendar.set(Calendar.HOUR_OF_DAY, 0)
-    startCalendar.set(Calendar.MINUTE, 0)
-    startCalendar.set(Calendar.SECOND, 0)
-    startCalendar.set(Calendar.MILLISECOND, 0)
     val startDayMillis = startCalendar.timeInMillis
 
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = startDayMillis,
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis >= startDayMillis
-            }
-        }
-    )
-
     var selectedDate by rememberSaveable {
-        mutableStateOf(
-            datePickerState.selectedDateMillis?.toFormattedDateString() ?: ""
-        )
+        mutableStateOf("날짜를 선택해주세요")
     }
 
-    EndDatePickerDialog(
-        state = datePickerState,
-        shouldDisplay = shouldDisplay,
-        onConfirmClicked = { selectedDateInMillis ->
-            selectedDate = selectedDateInMillis.toFormattedDateString()
-            onDateSelected(selectedDateInMillis)
-        },
-        dismissRequest = {
-            shouldDisplay = false
+    if (shouldDisplay) {
+        val datePickerDialog = remember {
+            DatePickerDialog(
+                context,
+                R.style.CustomDatePickerTheme, // Apply your custom style here
+                { _, year, month, dayOfMonth ->
+                    val selectedCalendar = Calendar.getInstance()
+                    selectedCalendar.set(year, month, dayOfMonth)
+                    val selectedDateInMillis = selectedCalendar.timeInMillis
+                    selectedDate = selectedDateInMillis.toFormattedDateString()
+                    onDateSelected(selectedDateInMillis)
+                },
+                startCalendar.get(Calendar.YEAR),
+                startCalendar.get(Calendar.MONTH),
+                startCalendar.get(Calendar.DAY_OF_MONTH)
+            ).apply {
+                // Set the minimum selectable date
+                datePicker.minDate = startDayMillis
+
+                // Optional: Set maximum date if needed
+                // datePicker.maxDate = someEndDateInMillis
+
+                setOnDismissListener {
+                    shouldDisplay = false
+                }
+            }
         }
-    )
+
+        DisposableEffect(Unit) {
+            datePickerDialog.show()
+            onDispose {
+                datePickerDialog.dismiss()
+            }
+        }
+    }
 
     var isFocused by rememberSaveable { mutableStateOf(false) }
 

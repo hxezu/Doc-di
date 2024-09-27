@@ -18,4 +18,10 @@
         <item name="android:textColorPrimary">#FF4b7be5</item> <!-- Text color -->
         <item name="android:textColorSecondary">#FF95CCFF</item> <!-- Secondary text color -->
     </style>
+    <style name="CustomDatePickerTheme" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="colorAccent">#FF007AEB</item> <!-- Accent color -->
+        <item name="android:textColorPrimary">#FF000000</item> <!-- Text color 4b7be5 -->
+        <item name="android:textColorSecondary">#FF000000</item> <!-- Secondary text color FF95CCFF -->
+        <item name="android:textColorTertiary">#FFFFFFFF</item> <!-- Teritory text color -->
+    </style>
 </resources>
