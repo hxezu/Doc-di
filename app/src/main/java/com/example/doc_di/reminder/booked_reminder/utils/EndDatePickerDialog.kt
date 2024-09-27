@@ -34,12 +34,12 @@ fun EndDatePickerDialog(
                         dismissRequest()
                     }
                 ) {
-                    Text(text = "OK")
+                    Text(text = "확인")
                 }
             },
             dismissButton = {
                 TextButton(onClick = dismissRequest) {
-                    Text(text = "Cancel")
+                    Text(text = "취소")
                 }
             },
             content = {
@@ -53,7 +53,7 @@ fun EndDatePickerDialog(
                                 text = it
                             )
                         }
-                    }
+                    },
                 )
             }
         )

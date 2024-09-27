@@ -148,6 +148,7 @@ fun EditScheduleScreen(
                         )
                     }
                 },
+                modifier = Modifier.padding(top = 20.dp)
             )
         },
         bottomBar = {
