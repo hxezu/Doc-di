@@ -141,16 +141,16 @@ fun MedicationCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
 
-                    }
+                }
 
-                    Text(
-                        text = "주기: " + reminder.recurrence,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier
-                            .weight(2.5f)
-                            .align(Alignment.CenterVertically)
-                    )
+                Text(
+                    text = "주기: " + reminder.recurrence,
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .weight(2.5f)
+                        .align(Alignment.CenterVertically)
+                )
 
                 // 점 세 개 아이콘 버튼
                 IconButton(
