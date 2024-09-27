@@ -148,6 +148,7 @@ fun EditScheduleScreen(
                         )
                     }
                 },
+                modifier = Modifier.padding(top = 20.dp)
             )
         },
         bottomBar = {
@@ -326,11 +327,12 @@ fun EditScheduleScreen(
             Spacer(modifier = Modifier.padding(4.dp))
 
             if (isRecurring) {
-                EditEndDate (
+                EditEndDate(
+                    endDate = Date(endDate), // Pass endDate as Date
                     onDateSelected = { selectedEndDate ->
-                    endDate = selectedEndDate
-                    isEndDateSelected = true
-                },
+                        endDate = selectedEndDate
+                        isEndDateSelected = true
+                    },
                     isEndDateSelected = isEndDateSelected
             )
                 Spacer(modifier = Modifier.padding(4.dp))

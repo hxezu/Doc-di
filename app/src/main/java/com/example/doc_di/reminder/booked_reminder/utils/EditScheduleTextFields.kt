@@ -1,5 +1,6 @@
 package com.example.doc_di.reminder.booked_reminder.utils
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,10 +37,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.doc_di.R
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
@@ -93,6 +97,7 @@ fun EditDepartment(
                 value = selectedDepartment,
                 onValueChange = {},
                 readOnly = true,
+                singleLine = true,
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
@@ -167,7 +172,7 @@ fun EditTimerTextField(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             readOnly = true,
-            value =  selectedTime.getDateFormatted("a HH:mm"),
+            value =  selectedTime.getDateFormatted("a hh:mm"),
             onValueChange = {},
             trailingIcon = {
                 if (isLastItem && !isOnlyItem) {
@@ -184,6 +189,7 @@ fun EditTimerTextField(
                     }
                 }
             },
+            singleLine = true,
             shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MainBlue,
@@ -199,8 +205,10 @@ fun EditTimerTextField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditEndDate(onDateSelected: (Long) -> Unit,
-                     isEndDateSelected: Boolean) {
+fun EditEndDate(
+    endDate: Date,
+    onDateSelected: (Long) -> Unit,
+    isEndDateSelected: Boolean) {
     Text(
         color = Color.Black,
         text = "정기 진료 종료일",
@@ -214,38 +222,52 @@ fun EditEndDate(onDateSelected: (Long) -> Unit,
         shouldDisplay = true
     }
 
-    val today = Calendar.getInstance()
-    today.set(Calendar.HOUR_OF_DAY, 0)
-    today.set(Calendar.MINUTE, 0)
-    today.set(Calendar.SECOND, 0)
-    today.set(Calendar.MILLISECOND, 0)
-    val currentDayMillis = today.timeInMillis
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = System.currentTimeMillis(),
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis >= currentDayMillis
-            }
-        }
-    )
+    val context = LocalContext.current
+
+    val currentDayMillis = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
 
     var selectedDate by rememberSaveable {
-        mutableStateOf(
-            datePickerState.selectedDateMillis?.toFormattedDateString() ?: ""
-        )
+        mutableStateOf(endDate.toFormattedDateString())
     }
 
-    EndDatePickerDialog(
-        state = datePickerState,
-        shouldDisplay = shouldDisplay,
-        onConfirmClicked = { selectedDateInMillis ->
-            selectedDate = selectedDateInMillis.toFormattedDateString()
-            onDateSelected(selectedDateInMillis)
-        },
-        dismissRequest = {
-            shouldDisplay = false
+    if (shouldDisplay) {
+        val datePickerDialog = remember {
+            DatePickerDialog(
+                context,
+                R.style.CustomDatePickerTheme, // Apply your custom style here
+                { _, year, month, dayOfMonth ->
+                    val selectedCalendar = Calendar.getInstance()
+                    selectedCalendar.set(year, month, dayOfMonth)
+                    val selectedDateInMillis = selectedCalendar.timeInMillis
+                    selectedDate = selectedDateInMillis.toFormattedDateString()
+                    onDateSelected(selectedDateInMillis)
+                    shouldDisplay = false
+                },
+                endDate.year + 1900, // Adjusting for deprecated method
+                endDate.month,
+                endDate.date
+            ).apply {
+                // Set the minimum selectable date
+                datePicker.minDate = currentDayMillis
+
+                setOnDismissListener {
+                    shouldDisplay = false
+                }
+            }
         }
-    )
+
+        DisposableEffect(Unit) {
+            datePickerDialog.show()
+            onDispose {
+                datePickerDialog.dismiss()
+            }
+        }
+    }
 
     var isFocused by rememberSaveable { mutableStateOf(false) }
 
@@ -257,6 +279,7 @@ fun EditEndDate(onDateSelected: (Long) -> Unit,
                 isFocused = focusState.isFocused
             },
         readOnly = true,
+        singleLine = true,
         value = selectedDate,
         onValueChange = {},
         trailingIcon = {
@@ -312,7 +335,8 @@ fun EditDoctorName(
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-            unfocusedBorderColor = if (isDoctorEntered) MainBlue else Color.Gray
+            unfocusedBorderColor = if (isDoctorEntered) MainBlue else Color.Gray,
+            cursorColor = MainBlue
         ),
         singleLine = true,
         modifier = Modifier
@@ -363,7 +387,8 @@ fun EditHospitalName(
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-            unfocusedBorderColor = if (isHospitalEntered) MainBlue else Color.Gray
+            unfocusedBorderColor = if (isHospitalEntered) MainBlue else Color.Gray,
+            cursorColor = MainBlue
         ),
         singleLine = true,
         modifier = Modifier

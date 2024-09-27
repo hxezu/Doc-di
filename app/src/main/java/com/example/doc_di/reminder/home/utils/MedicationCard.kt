@@ -1,5 +1,6 @@
 package com.example.doc_di.reminder.home.utils
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -16,7 +17,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +44,7 @@ import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
+import com.example.doc_di.ui.theme.LightBlue
 
 @Composable
 fun MedicationCard(
@@ -70,7 +74,7 @@ fun MedicationCard(
             .fillMaxWidth()
             .padding(vertical = 10.dp, horizontal = 20.dp),
 
-        ) {
+    ) {
         // medicationTime null 체크 및 포맷팅
         val formattedMedicationTime = reminder.medicationTime?.let {
             it.split(" ")[1] // "yyyy-MM-dd" 부분만 추출
@@ -137,15 +141,16 @@ fun MedicationCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
 
-                }
+                    }
 
-                Text(
-                    text = reminder.recurrence,
-                    fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .weight(1.5f)
-                )
+                    Text(
+                        text = "주기: " + reminder.recurrence,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier
+                            .weight(2.5f)
+                            .align(Alignment.CenterVertically)
+                    )
 
                 // 점 세 개 아이콘 버튼
                 IconButton(
@@ -182,5 +187,8 @@ fun MedicationCard(
                 }
             }
         }
+
     }
+
 }
+

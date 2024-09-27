@@ -1,5 +1,6 @@
 package com.example.doc_di.reminder.medication_reminder.utils
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,7 @@ import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,10 +39,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.doc_di.R
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
@@ -85,6 +89,7 @@ fun EditRecurrence(
                 value = selectedRecurrence,
                 onValueChange = {},
                 readOnly = true,
+                singleLine = true,
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
@@ -159,7 +164,8 @@ fun EditTimerText(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             readOnly = true,
-            value = selectedTime.getDateFormatted("a HH:mm"),
+            singleLine = true,
+            value = selectedTime.getDateFormatted("a hh:mm"),
             onValueChange = {},
             trailingIcon = {
                 if (isLastItem && !isOnlyItem) {
@@ -209,6 +215,8 @@ fun EditEndDate(
     val isPressed: Boolean by interactionSource.collectIsPressedAsState()
     if (isPressed) { shouldDisplay = true }
 
+    val context = LocalContext.current
+
     val currentDayMillis = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
@@ -216,28 +224,43 @@ fun EditEndDate(
         set(Calendar.MILLISECOND, 0)
     }.timeInMillis
 
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = endDate.time, // Use endDate here
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis >= currentDayMillis
-            }
-        }
-    )
-
     var selectedDate by rememberSaveable {
         mutableStateOf(endDate.toFormattedDateString())
     }
 
-    EndDatePickerDialog(
-        state = datePickerState,
-        shouldDisplay = shouldDisplay,
-        onConfirmClicked = { selectedDateInMillis ->
-            selectedDate = selectedDateInMillis.toFormattedDateString()
-            onDateSelected(selectedDateInMillis)
-        },
-        dismissRequest = { shouldDisplay = false }
-    )
+    if (shouldDisplay) {
+        val datePickerDialog = remember {
+            DatePickerDialog(
+                context,
+                R.style.CustomDatePickerTheme, // Apply your custom style here
+                { _, year, month, dayOfMonth ->
+                    val selectedCalendar = Calendar.getInstance()
+                    selectedCalendar.set(year, month, dayOfMonth)
+                    val selectedDateInMillis = selectedCalendar.timeInMillis
+                    selectedDate = selectedDateInMillis.toFormattedDateString()
+                    onDateSelected(selectedDateInMillis)
+                    shouldDisplay = false
+                },
+                endDate.year + 1900, // Adjusting for deprecated method
+                endDate.month,
+                endDate.date
+            ).apply {
+                // Set the minimum selectable date
+                datePicker.minDate = currentDayMillis
+
+                setOnDismissListener {
+                    shouldDisplay = false
+                }
+            }
+        }
+
+        DisposableEffect(Unit) {
+            datePickerDialog.show()
+            onDispose {
+                datePickerDialog.dismiss()
+            }
+        }
+    }
 
     var isFocused by rememberSaveable { mutableStateOf(false) }
 
@@ -248,6 +271,7 @@ fun EditEndDate(
                 isFocused = focusState.isFocused
             },
         readOnly = true,
+        singleLine = true,
         value = endDate.toFormattedDateString(),
         onValueChange = {},
         trailingIcon = {
@@ -344,7 +368,8 @@ fun EditDoseInput(
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-                unfocusedBorderColor = if (isDoseEntered) MainBlue else Color.Gray
+                unfocusedBorderColor = if (isDoseEntered) MainBlue else Color.Gray,
+                cursorColor = MainBlue
             ),
             singleLine = true,
             modifier = Modifier
@@ -418,7 +443,8 @@ fun EditMedicationName(
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-            unfocusedBorderColor = if (isNameEntered) MainBlue else Color.Gray
+            unfocusedBorderColor = if (isNameEntered) MainBlue else Color.Gray,
+            cursorColor = MainBlue
         ),
         singleLine = true,
         modifier = Modifier

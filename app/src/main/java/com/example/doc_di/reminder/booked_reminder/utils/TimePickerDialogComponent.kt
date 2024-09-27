@@ -3,6 +3,7 @@ package com.example.doc_di.reminder.booked_reminder.utils
 import android.app.TimePickerDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.example.doc_di.R
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import java.util.Calendar
 
@@ -40,6 +41,7 @@ private fun getTimePickerDialog(
     val (hour, minute) = selectedDate.dateInformation
     return TimePickerDialog(
         context,
+        R.style.CustomTimePickerTheme,
         listener,
         hour,
         minute,

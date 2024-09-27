@@ -1,61 +1,63 @@
 package com.example.doc_di.reminder.medication_reminder.utils
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import android.app.DatePickerDialog
+import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.doc_di.extension.toFormattedDateString
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.example.doc_di.R
+import java.util.Calendar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EndDatePickerDialog(
-    state: DatePickerState,
     shouldDisplay: Boolean,
+    initialDateInMillis: Long,
     onConfirmClicked: (selectedDateInMillis: Long) -> Unit,
     dismissRequest: () -> Unit
 ) {
+    val context = LocalContext.current
+
     if (shouldDisplay) {
-        DatePickerDialog(
-            onDismissRequest = dismissRequest,
-            confirmButton = {
-                Button(
-                    modifier = Modifier.padding(0.dp, 0.dp, 8.dp, 0.dp),
-                    onClick = {
-                        state.selectedDateMillis?.let {
-                            onConfirmClicked(it)
-                        }
-                        dismissRequest()
-                    }
-                ) {
-                    Text(text = "OK")
-                }
+        ShowCustomDatePickerDialog(
+            context = context,
+            initialDateInMillis = initialDateInMillis,
+            onDateSelected = { selectedDateInMillis ->
+                onConfirmClicked(selectedDateInMillis)
+                dismissRequest()
             },
-            dismissButton = {
-                TextButton(onClick = dismissRequest) {
-                    Text(text = "Cancel")
-                }
-            },
-            content = {
-                DatePicker(
-                    state = state,
-                    showModeToggle = false,
-                    headline = {
-                        state.selectedDateMillis?.toFormattedDateString()?.let {
-                            Text(
-                                modifier = Modifier.padding(start = 16.dp),
-                                text = it
-                            )
-                        }
-                    }
-                )
-            }
+            onDismissRequest = dismissRequest
         )
+    }
+}
+
+@Composable
+fun ShowCustomDatePickerDialog(
+    context: Context,
+    initialDateInMillis: Long,
+    onDateSelected: (Long) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    val calendar = remember { Calendar.getInstance().apply { timeInMillis = initialDateInMillis } }
+
+    LaunchedEffect(Unit) {
+        val datePickerDialog = DatePickerDialog(
+            context,
+            R.style.CustomDatePickerTheme, // Your custom style
+            { _, year, month, dayOfMonth ->
+                val selectedCalendar = Calendar.getInstance()
+                selectedCalendar.set(year, month, dayOfMonth)
+                onDateSelected(selectedCalendar.timeInMillis)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+
+        datePickerDialog.setOnDismissListener {
+            onDismissRequest()
+        }
+
+        datePickerDialog.show()
     }
 }
