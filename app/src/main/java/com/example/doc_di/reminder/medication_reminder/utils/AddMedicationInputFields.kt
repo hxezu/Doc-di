@@ -80,6 +80,7 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit,
         ) {
             OutlinedTextField(
                 value = selectedOptionText,
+                singleLine = true,
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = {
@@ -158,7 +159,8 @@ fun TimerTextField(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             readOnly = true,
-            value = selectedTime.getDateFormatted("a HH:mm"),
+            singleLine = true,
+            value = selectedTime.getDateFormatted("a hh:mm"),
             onValueChange = {},
             trailingIcon = {
                 if (isLastItem && !isOnlyItem) {
@@ -256,6 +258,7 @@ fun EndDateTextField(
                 isFocused = focusState.isFocused
             },
         readOnly = true,
+        singleLine = true,
         value = selectedDate,
         onValueChange = {},
         trailingIcon = {
@@ -351,7 +354,8 @@ fun DoseInputField(
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-                unfocusedBorderColor = if (isDoseEntered) MainBlue else Color.Gray
+                unfocusedBorderColor = if (isDoseEntered) MainBlue else Color.Gray,
+                cursorColor = MainBlue
             ),
             singleLine = true,
             modifier = Modifier
@@ -424,7 +428,8 @@ fun AddMedicationName(isNameEntered: Boolean,
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-            unfocusedBorderColor = if (isNameEntered) MainBlue else Color.Gray
+            unfocusedBorderColor = if (isNameEntered) MainBlue else Color.Gray,
+            cursorColor = MainBlue
         ),
         singleLine = true,
         modifier = Modifier

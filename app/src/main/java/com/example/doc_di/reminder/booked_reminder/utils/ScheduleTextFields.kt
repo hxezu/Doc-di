@@ -85,6 +85,7 @@ fun DepartmentDropdownMenu(department: (String) -> Unit,
             onExpandedChange = { expanded = !expanded },
         ) {
             OutlinedTextField(
+                singleLine = true,
                 value = selectedOptionText,
                 onValueChange = {},
                 readOnly = true,
@@ -162,9 +163,10 @@ fun TimerTextField(
     ) {
 
         OutlinedTextField(
+            singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             readOnly = true,
-            value = selectedTime.getDateFormatted("a HH:mm"),
+            value = selectedTime.getDateFormatted("a hh:mm"),
             onValueChange = {},
             trailingIcon = {
                 if (isLastItem && !isOnlyItem) {
@@ -259,6 +261,7 @@ fun EndDateTextField(
             .onFocusChanged { focusState ->
                 isFocused = focusState.isFocused
             },
+        singleLine = true,
         readOnly = true,
         value = selectedDate,
         onValueChange = {},
@@ -314,7 +317,8 @@ fun AddDoctorName(isDoctorEntered: Boolean,
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-            unfocusedBorderColor = if (isDoctorEntered) MainBlue else Color.Gray
+            unfocusedBorderColor = if (isDoctorEntered) MainBlue else Color.Gray,
+            cursorColor = MainBlue
         ),
         singleLine = true,
         modifier = Modifier
@@ -364,7 +368,8 @@ fun AddHospitalName(isHospitalEntered: Boolean,
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-            unfocusedBorderColor = if (isHospitalEntered) MainBlue else Color.Gray
+            unfocusedBorderColor = if (isHospitalEntered) MainBlue else Color.Gray,
+            cursorColor = MainBlue
         ),
         singleLine = true,
         modifier = Modifier
@@ -426,6 +431,7 @@ fun AppointmentRecurrenceDropdownMenu(recurrence: (String) -> Unit,
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                     },
+                singleLine = true,
                 shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     textColor = if (isRecurrenceSelected) Color.Black else Color.Gray,

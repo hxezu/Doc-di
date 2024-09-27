@@ -115,9 +115,10 @@ fun BookedCard(
                 Text(
                     text = booked.subject,
                     fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
-                        .weight(1.5f)
+                        .align(Alignment.CenterVertically)
+                        .weight(2.5f)
                 )
 
                 // 점 세 개 아이콘 버튼

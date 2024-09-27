@@ -1,5 +1,6 @@
 package com.example.doc_di
 
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -22,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.etc.NaviGraph
 import com.example.doc_di.ui.theme.Doc_diTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -30,6 +32,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setLocale("ko")
         splashScreen = installSplashScreen()
 
         var isReady = false
@@ -76,5 +79,13 @@ class MainActivity : ComponentActivity() {
             // 상태바 색상을 투명하게 설정
             window.statusBarColor = android.graphics.Color.TRANSPARENT
         }
+    }
+
+    private fun setLocale(languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
     }
 }

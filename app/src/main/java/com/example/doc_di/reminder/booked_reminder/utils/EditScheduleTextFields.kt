@@ -93,6 +93,7 @@ fun EditDepartment(
                 value = selectedDepartment,
                 onValueChange = {},
                 readOnly = true,
+                singleLine = true,
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
@@ -167,7 +168,7 @@ fun EditTimerTextField(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             readOnly = true,
-            value =  selectedTime.getDateFormatted("a HH:mm"),
+            value =  selectedTime.getDateFormatted("a hh:mm"),
             onValueChange = {},
             trailingIcon = {
                 if (isLastItem && !isOnlyItem) {
@@ -184,6 +185,7 @@ fun EditTimerTextField(
                     }
                 }
             },
+            singleLine = true,
             shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MainBlue,
@@ -257,6 +259,7 @@ fun EditEndDate(onDateSelected: (Long) -> Unit,
                 isFocused = focusState.isFocused
             },
         readOnly = true,
+        singleLine = true,
         value = selectedDate,
         onValueChange = {},
         trailingIcon = {
@@ -312,7 +315,8 @@ fun EditDoctorName(
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-            unfocusedBorderColor = if (isDoctorEntered) MainBlue else Color.Gray
+            unfocusedBorderColor = if (isDoctorEntered) MainBlue else Color.Gray,
+            cursorColor = MainBlue
         ),
         singleLine = true,
         modifier = Modifier
@@ -363,7 +367,8 @@ fun EditHospitalName(
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-            unfocusedBorderColor = if (isHospitalEntered) MainBlue else Color.Gray
+            unfocusedBorderColor = if (isHospitalEntered) MainBlue else Color.Gray,
+            cursorColor = MainBlue
         ),
         singleLine = true,
         modifier = Modifier

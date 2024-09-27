@@ -12,4 +12,10 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:statusBarColor">@color/white</item>
     </style>
+
+    <style name="CustomTimePickerTheme" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="colorAccent">#FF007AEB</item> <!-- Accent color -->
+        <item name="android:textColorPrimary">#FF4b7be5</item> <!-- Text color -->
+        <item name="android:textColorSecondary">#FF95CCFF</item> <!-- Secondary text color -->
+    </style>
 </resources>

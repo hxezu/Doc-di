@@ -85,6 +85,7 @@ fun EditRecurrence(
                 value = selectedRecurrence,
                 onValueChange = {},
                 readOnly = true,
+                singleLine = true,
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
@@ -159,7 +160,8 @@ fun EditTimerText(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             readOnly = true,
-            value = selectedTime.getDateFormatted("a HH:mm"),
+            singleLine = true,
+            value = selectedTime.getDateFormatted("a hh:mm"),
             onValueChange = {},
             trailingIcon = {
                 if (isLastItem && !isOnlyItem) {
@@ -248,6 +250,7 @@ fun EditEndDate(
                 isFocused = focusState.isFocused
             },
         readOnly = true,
+        singleLine = true,
         value = endDate.toFormattedDateString(),
         onValueChange = {},
         trailingIcon = {
@@ -344,7 +347,8 @@ fun EditDoseInput(
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-                unfocusedBorderColor = if (isDoseEntered) MainBlue else Color.Gray
+                unfocusedBorderColor = if (isDoseEntered) MainBlue else Color.Gray,
+                cursorColor = MainBlue
             ),
             singleLine = true,
             modifier = Modifier
@@ -418,7 +422,8 @@ fun EditMedicationName(
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-            unfocusedBorderColor = if (isNameEntered) MainBlue else Color.Gray
+            unfocusedBorderColor = if (isNameEntered) MainBlue else Color.Gray,
+            cursorColor = MainBlue
         ),
         singleLine = true,
         modifier = Modifier
