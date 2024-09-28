@@ -9,5 +9,5 @@ interface ChatBotApi {
     @POST("chatbot")
     suspend fun chatWithRasa(
         @Body chatBotClientDto: ChatBotClientDto,
-    ):  Response<Unit>
+    ): Response<SuccessResponse<List<RasaDto>>>
 }

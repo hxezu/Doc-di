@@ -80,14 +80,18 @@ fun ChatScreen(
 
     var message by remember { mutableStateOf("") }
 
+    val selectedChat = chatList?.firstOrNull { it.id == chatId }
+
     LaunchedEffect(chatId, userInfo) {
         userInfo?.email?.let { email ->
             chatBotViewModel.loadChats(email)
         }
     }
 
-    val selectedChat = chatId?.let { id ->
-        chatList?.firstOrNull { it.id == id }
+    LaunchedEffect(chatList) {
+        userInfo?.email?.let { email ->
+            chatBotViewModel.loadChats(email)
+        }
     }
 
 
@@ -131,9 +135,7 @@ fun ChatScreen(
                     .fillMaxSize()
                     .background(Color.Transparent)
             ) {
-                ChatTitleRow(
-                    modifier = Modifier.padding( start = 20.dp, end = 20.dp)
-                )
+                ChatTitleRow(modifier = Modifier.padding( start = 20.dp, end = 20.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -197,13 +199,12 @@ fun ChatRow(
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(100.dp))
-                .background(
-                    if (chat.isUser) MainBlue else LightGray
-                ),
+                .background(if (chat.isUser) MainBlue else LightGray),
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
-                text = chat.content, style = TextStyle(
+                text = chat.content,
+                style = TextStyle(
                     color = if(chat.isUser) Color.White else Color.Black,
                     fontSize = 15.sp
                 ),
@@ -212,7 +213,8 @@ fun ChatRow(
             )
         }
         Text(
-            text = chat.time, style = TextStyle(
+            text = chat.time,
+            style = TextStyle(
                 color = Gray,
                 fontSize = 12.sp
             ),

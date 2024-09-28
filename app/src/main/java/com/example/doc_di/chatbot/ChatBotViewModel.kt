@@ -6,13 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.doc_di.domain.model.Chat
-import com.example.doc_di.domain.chatbot.ChatBotApi
 import com.example.doc_di.domain.chatbot.ChatBotClientDto
 import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.chatbot.ChatRepository
-import com.example.doc_di.domain.chatbot.RasaDto
 import com.example.doc_di.domain.model.Message
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -26,7 +23,6 @@ class ChatBotViewModel(
     private val _chatList = MutableLiveData<List<Chat>>(emptyList())
     val chatList: LiveData<List<Chat>> get() = _chatList
 
-    private var chatId = 0
 
     fun getChatById(email: String, chatId: Int): LiveData<Chat?> {
         val chat = MutableLiveData<Chat?>()
@@ -50,30 +46,29 @@ class ChatBotViewModel(
 
         viewModelScope.launch {
             try {
-                val chatBotClientDto = ChatBotClientDto(email = email, message = message)
+                val chatBotClientDto = ChatBotClientDto(sender = email, message = message)
                 Log.d("ChatBotViewModel", "Sending message: $chatBotClientDto")
                 val response = chatBotImpl.chatWithRasa(chatBotClientDto)
 
                 if (response.isSuccessful) {
                     val responseBody = response.body()
-                    if (responseBody != null) {
-                        val rasaDto = Gson().fromJson(responseBody.data, RasaDto::class.java)
+                    println("response: $responseBody")
+                    if (responseBody != null && responseBody.data != null) {
+                        val rasaDtoList = responseBody.data
 
-                        // Rasa 서버의 응답에 따라 처리
-                        when (rasaDto.action) {
-                            "DB_SEARCH" -> {
-                                // DB 검색 관련 작업 처리
-                                addChat(email, "DB 검색 결과: ${rasaDto.data}", isUser = false, chatId)
+                        for (rasaDto in rasaDtoList) {
+                            // 응답 메시지 추가
+                            rasaDto.text?.let { text ->
+                                addChat(email, text, isUser = false, chatId)
                             }
-                            "PLAIN" -> {
-                                // 단순 메시지 응답 처리
-                                addChat(email, rasaDto.message, isUser = false, chatId)
-                            }
-                            else -> {
-                                // 기타 액션 처리
-                                addChat(email, "알 수 없는 액션: ${rasaDto.action}", isUser = false, chatId)
+                            // 버튼 처리 예시 (필요에 따라 처리)
+                            rasaDto.buttons?.let { buttons ->
+                                buttons.forEach { button ->
+                                    addChat(email, "버튼: ${button.title}", isUser = false, chatId)
+                                }
                             }
                         }
+                        Log.d("ChatBotViewModel", "Chat list after response: ${_chatList.value}")
                     } else {
                         addChat(email, "챗봇으로부터 응답이 없습니다.", isUser = false, chatId)
                     }
@@ -102,6 +97,7 @@ class ChatBotViewModel(
         chat.messages.add(newMessage) // Add the new message to the chat
         chatRepository.saveChat(email, chatId, chat) // Save the updated chat
         _chatList.value = chatRepository.getChatsByUser(email)
+        Log.d("ChatBotViewModel", "Updated chat list: ${_chatList.value}")
     }
 
     private fun getCurrentTime(): String {
