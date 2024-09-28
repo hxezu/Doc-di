@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -136,59 +137,55 @@ fun ChatScreen(
                     .fillMaxSize()
                     .background(Color.Transparent)
             ) {
-                ChatTitleRow(modifier = Modifier.padding( start = 20.dp, end = 20.dp))
+                ChatTitleRow(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-                        .padding(top = 20.dp)
-                        .background(Color.Transparent)
+                        .weight(1f) // 가용 공간을 채우기 위한 weight 사용
+                        .consumeWindowInsets(paddingValues)
+                        .imePadding() // 키보드 나올 때 맞춰서 올라가도록
                 ) {
-                    val messages = if (selectedChat != null) {
-                    selectedChat.messages
-                } else {
-                    emptyList() // Show no messages when no chat is selected
-                }
-
-                    LazyColumn(
+                    Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(start = 20.dp, top = 15.dp, end = 20.dp)
+                            .background(Color.Transparent)
                     ) {
-                        items(messages, key = { it.id }) { message ->
-                            ChatRow(chat = message)
-                        }
-                        item {
-                            Spacer(modifier = Modifier.height(90.dp))
-                        }
+                        val messages = selectedChat?.messages ?: emptyList()
 
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 20.dp, top = 15.dp, end = 20.dp)
+                        ) {
+                            items(messages, key = { it.id }) { message ->
+                                ChatRow(chat = message)
+                            }
+                            item {
+                                Spacer(modifier = Modifier.height(90.dp))
+                            }
+                        }
                     }
 
+                    // 3. CustomTextField도 imePadding으로 키보드 따라 움직임
+                    CustomTextField(
+                        text = message,
+                        onValueChange = { message = it },
+                        onSendClick = {
+                            userInfo?.email?.let { email ->
+                                if (message.isNotBlank()) {
+                                    chatBotViewModel.sendMessage(email, message, selectedChat!!.id)
+                                    message = ""
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp, vertical = 20.dp)
+                            .align(Alignment.BottomCenter) // 화면 하단에 위치
+                            .consumeWindowInsets(paddingValues)
+                            .imePadding() // 키보드가 나오면 위로 밀리게
+                    )
                 }
-
             }
-            CustomTextField(
-                text = message,
-                onValueChange = { message = it },
-                onSendClick ={
-                    userInfo?.email?.let { email ->
-                        if (message.isNotBlank()) {
-                            chatBotViewModel.sendMessage(email, message, selectedChat!!.id)
-                            message = ""
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .padding(horizontal = 20.dp, vertical = 20.dp)
-                    .background(Color.Transparent)
-                    .align(BottomCenter)
-                    .imePadding()
-            )
-
-
         }
-
-
     }
 }
 
