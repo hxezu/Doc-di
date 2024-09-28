@@ -5,6 +5,7 @@ import com.example.doc_di.domain.model.Message
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 class ChatRepository {
 
@@ -13,7 +14,7 @@ class ChatRepository {
 
     // 특정 사용자의 채팅 기록 가져오기
     fun getChatsByUser(email: String): List<Chat> {
-        return chatDataStore[email] ?: emptyList() // Directly return the list
+        return chatDataStore[email] ?: emptyList()
     }
 
     fun getChatById(email: String, chatId: Int): Chat? {
@@ -22,16 +23,23 @@ class ChatRepository {
 
     // 채팅 기록 저장
     fun saveChat(email: String, chatId: Int, chat: Chat) {
-        val chats = chatDataStore.getOrPut(email) { mutableListOf() } // Initialize to mutable list
-        // Assuming chatId is just an index and not an actual ID reference; adding chat to the list
-        chats.add(chat) // Add the chat to the list
-    }
+        val chats = chatDataStore.getOrPut(email) { mutableListOf() }
 
-    private var chatIdCounter = 1
+        // Find the index of the existing chat with the same chatId
+        val existingChatIndex = chats.indexOfFirst { it.id == chatId }
+
+        if (existingChatIndex != -1) {
+            // Update the existing chat
+            chats[existingChatIndex] = chat
+        } else {
+            // Add as a new chat if it doesn't exist
+            chats.add(chat)
+        }
+    }
 
     // 새로운 채팅 세션 생성 (새로운 대화)
     fun createNewChat(email: String): Chat {
-        val newId = chatIdCounter++
+        val newId = System.currentTimeMillis()
         val initialMessages = mutableListOf<Message>()
 
         val initialMessageId = chatDataStore[email]?.flatMap { it.messages }?.size?.plus(1) ?: 1 // Unique ID for the message
@@ -46,11 +54,11 @@ class ChatRepository {
         )
 
         val newChat = Chat(
-            id = newId,
+            id = newId.toInt(),
             email = email,
             messages = initialMessages
         )
-        saveChat(email, newId, newChat)
+        saveChat(email,newChat.id, newChat)
         return newChat
     }
 

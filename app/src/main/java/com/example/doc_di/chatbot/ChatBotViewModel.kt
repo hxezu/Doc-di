@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.doc_di.domain.model.Chat
-import com.example.doc_di.domain.chatbot.ChatBotClientDto
+import com.example.doc_di.domain.chatbot.dto.ChatBotClientDto
 import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.chatbot.ChatRepository
 import com.example.doc_di.domain.model.Message
@@ -95,8 +95,17 @@ class ChatBotViewModel(
         )
 
         chat.messages.add(newMessage) // Add the new message to the chat
-        chatRepository.saveChat(email, chatId, chat) // Save the updated chat
-        _chatList.value = chatRepository.getChatsByUser(email)
+
+        val updatedChatList = _chatList.value?.toMutableList()?.apply {
+            // 같은 chatId를 가진 Chat 객체를 찾아서 업데이트
+            val index = indexOfFirst { it.id == chatId }
+            if (index != -1) {
+                set(index, chat)  // 리스트에서 해당 chat 객체를 업데이트
+            }
+        }
+
+        _chatList.value = updatedChatList ?: listOf(chat) // Ensure it's not null
+        chatRepository.saveChat(email, chatId, chat) // Save the updated chat, not add a new one
         Log.d("ChatBotViewModel", "Updated chat list: ${_chatList.value}")
     }
 

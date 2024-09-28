@@ -103,6 +103,7 @@ fun ChatScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                 ),
+                modifier = Modifier.padding(top = 20.dp),
                 navigationIcon = {
                     androidx.compose.material3.IconButton(
                         onClick = {
@@ -157,9 +158,14 @@ fun ChatScreen(
                         items(messages, key = { it.id }) { message ->
                             ChatRow(chat = message)
                         }
+                        item {
+                            Spacer(modifier = Modifier.height(90.dp))
+                        }
+
                     }
 
                 }
+
             }
             CustomTextField(
                 text = message,
@@ -178,6 +184,7 @@ fun ChatScreen(
                     .align(BottomCenter)
                     .imePadding()
             )
+
 
         }
 

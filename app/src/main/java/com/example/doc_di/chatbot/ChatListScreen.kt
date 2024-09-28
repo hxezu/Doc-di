@@ -184,7 +184,7 @@ fun ChatEachRow(
                     Column(
                     ) {
                         Text(
-                            text = chat.id.toString() + "번째 대화", style = TextStyle(
+                            text =  "대화 ID : " + chat.id.toString() , style = TextStyle(
                                 color = Color.Black, fontSize = 15.sp
                             )
                         )

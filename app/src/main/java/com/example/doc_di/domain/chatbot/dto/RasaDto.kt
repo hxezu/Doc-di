@@ -1,4 +1,4 @@
-package com.example.doc_di.domain.chatbot
+package com.example.doc_di.domain.chatbot.dto
 
 import com.example.doc_di.domain.model.Pill
 

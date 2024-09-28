@@ -1,4 +1,4 @@
-package com.example.doc_di.domain.chatbot
+package com.example.doc_di.domain.chatbot.dto
 
 data class FindByMedicineChartDto(
     val name: String,

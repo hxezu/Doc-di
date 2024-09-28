@@ -1,6 +1,7 @@
 package com.example.doc_di.domain.chatbot
 
-import okhttp3.ResponseBody.Companion.toResponseBody
+import com.example.doc_di.domain.chatbot.dto.ChatBotClientDto
+import com.example.doc_di.domain.chatbot.dto.RasaDto
 import retrofit2.Response
 
 class ChatBotImpl(private val chatBotApi: ChatBotApi) {
