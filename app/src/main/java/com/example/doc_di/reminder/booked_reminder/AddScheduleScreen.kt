@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,9 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.icons.filled.Check
@@ -51,7 +48,6 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.R
 import com.example.doc_di.UserViewModel
 import com.example.doc_di.domain.RetrofitInstance
@@ -66,7 +62,6 @@ import com.example.doc_di.reminder.booked_reminder.utils.DepartmentDropdownMenu
 import com.example.doc_di.reminder.booked_reminder.utils.EndDateTextField
 import com.example.doc_di.reminder.booked_reminder.utils.TimerTextField
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
-import com.example.doc_di.reminder.medication_reminder.utils.RecurrenceDropdownMenu
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.util.Department
 import com.example.doc_di.util.Recurrence
@@ -79,7 +74,7 @@ import java.util.Date
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddScheduleScreenUI(
+fun AddScheduleScreen(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
     userViewModel: UserViewModel,
@@ -158,8 +153,7 @@ fun AddScheduleScreenUI(
                             tint = Color.Black
                         )
                     }
-                },
-                modifier = Modifier.padding(top = 20.dp)
+                }
             )
         },
         bottomBar = {

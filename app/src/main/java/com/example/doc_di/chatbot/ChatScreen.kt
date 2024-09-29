@@ -104,7 +104,6 @@ fun ChatScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                 ),
-                modifier = Modifier.padding(top = 20.dp),
                 navigationIcon = {
                     androidx.compose.material3.IconButton(
                         onClick = {

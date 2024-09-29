@@ -29,9 +29,9 @@ import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.login.resetpassword.ResetPassword
-import com.example.doc_di.reminder.booked_reminder.AddScheduleScreenUI
+import com.example.doc_di.reminder.booked_reminder.AddScheduleScreen
 import com.example.doc_di.reminder.booked_reminder.EditScheduleScreen
-import com.example.doc_di.reminder.home.ManagementScreen
+import com.example.doc_di.reminder.home.ReminderScreen
 import com.example.doc_di.reminder.medication_reminder.AddMedicationScreenUI
 import com.example.doc_di.reminder.medication_reminder.EditMedicationScreen
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
@@ -198,7 +198,7 @@ fun NaviGraph(navController: NavHostController) {
 
 
         composable(route = Routes.managementScreen.route) {
-            ManagementScreen(
+            ReminderScreen(
                 navController,
                 btmBarViewModel,
                 reminderViewModel,
@@ -230,7 +230,7 @@ fun NaviGraph(navController: NavHostController) {
 
         composable(route = "addScheduleScreen?selectedDate={selectedDate}") { backStackEntry ->
             val selectedDate = backStackEntry.arguments?.getString("selectedDate")
-            AddScheduleScreenUI(
+            AddScheduleScreen(
                 navController = navController,
                 btmBarViewModel = btmBarViewModel,
                 userViewModel = userViewModel,

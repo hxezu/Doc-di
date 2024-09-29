@@ -146,7 +146,6 @@ fun AddMedicationScreenUI(
                         )
                     }
                 },
-                modifier = Modifier.padding(top = 20.dp)
             )
         },
         bottomBar = {

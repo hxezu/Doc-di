@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.FloatingActionButtonDefaults
@@ -52,6 +53,9 @@ import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.ui.theme.Line
 import com.example.doc_di.ui.theme.MainBlue
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -135,13 +139,26 @@ fun ChatListScreen(
                         color = Color.Gray
                     )
                 } else {
-                    // chatList가 비어 있지 않을 때 LazyColumn을 사용하여 리스트를 표시
+                    val sortedChatList = chatList!!.sortedByDescending { chat ->
+                        chat.messages.lastOrNull()?.let { message ->
+                            // Parse the time string to LocalDateTime
+                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                            try {
+                                LocalDateTime.parse(message.time, formatter)
+                            } catch (e: Exception) {
+                                LocalDateTime.MIN
+                            }
+                        } ?: LocalDateTime.MIN
+                    }
+
+                    // Assign sequential numbers based on sorted list
                     LazyColumn(
                         modifier = Modifier.padding(bottom = 90.dp)
                     ) {
-                        items(chatList!!, key = { it.id }) { chat ->
-                            ChatEachRow(chat = chat) {
-                                navController.navigate("chat_screen/${chat.id}") // 특정 채팅 상세 화면으로 이동
+                        itemsIndexed(sortedChatList, key = { _, chat -> chat.id }) { index, chat ->
+                            val chatName = "DDoc-Di 와의 대화 ${index + 1}"
+                            ChatEachRow(chat = chat, chatName = chatName) {
+                                navController.navigate("chat_screen/${chat.id}") // Navigate to specific chat screen
                             }
                         }
                     }
@@ -155,6 +172,7 @@ fun ChatListScreen(
 @Composable
 fun ChatEachRow(
     chat: Chat,
+    chatName: String,
     onClick:()->Unit
 ) {
     val lastMessage = chat.messages.lastOrNull()
@@ -184,7 +202,7 @@ fun ChatEachRow(
                     Column(
                     ) {
                         Text(
-                            text =  "대화 ID : " + chat.id.toString() , style = TextStyle(
+                            text =  chatName , style = TextStyle(
                                 color = Color.Black, fontSize = 15.sp
                             )
                         )
