@@ -74,7 +74,7 @@ import java.util.Date
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddScheduleScreenUI(
+fun AddScheduleScreen(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
     userViewModel: UserViewModel,
@@ -153,8 +153,7 @@ fun AddScheduleScreenUI(
                             tint = Color.Black
                         )
                     }
-                },
-                modifier = Modifier.padding(top = 20.dp)
+                }
             )
         },
         bottomBar = {

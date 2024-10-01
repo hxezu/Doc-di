@@ -53,7 +53,7 @@ import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ManagementScreen(
+fun ReminderScreen(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
     reminderViewModel: ReminderViewModel = hiltViewModel(),

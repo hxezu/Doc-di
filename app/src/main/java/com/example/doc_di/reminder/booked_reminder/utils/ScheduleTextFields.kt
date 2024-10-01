@@ -424,7 +424,7 @@ fun AppointmentRecurrenceDropdownMenu(recurrence: (String) -> Unit,
     ) {
         Text(
             color = Color.Black,
-            text = "복용 주기",
+            text = "진료 주기",
             style = MaterialTheme.typography.bodyLarge
         )
 
