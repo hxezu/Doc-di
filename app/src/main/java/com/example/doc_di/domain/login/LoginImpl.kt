@@ -4,10 +4,10 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
-import com.example.doc_di.UserViewModel
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.login.loginpage.saveAccessToken
-import com.example.doc_di.login.loginpage.saveRefreshToken
+import com.example.doc_di.login.UserViewModel
+import com.example.doc_di.login.saveAccessToken
+import com.example.doc_di.login.saveRefreshToken
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

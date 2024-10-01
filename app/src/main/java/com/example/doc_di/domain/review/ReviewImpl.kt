@@ -3,10 +3,10 @@ package com.example.doc_di.domain.review
 import android.content.Context
 import android.widget.Toast
 import androidx.navigation.NavController
-import com.example.doc_di.UserViewModel
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.account.AccountDTO
 import com.example.doc_di.domain.model.Pill
+import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

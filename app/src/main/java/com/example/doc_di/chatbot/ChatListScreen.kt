@@ -44,10 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
-import com.example.doc_di.UserViewModel
+import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.domain.model.Chat
 import com.example.doc_di.etc.BottomNavigationBar
-import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.ui.theme.Line

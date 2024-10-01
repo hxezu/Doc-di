@@ -66,7 +66,7 @@ fun PillSearch(navController: NavController, searchViewModel: SearchViewModel) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(280.dp, 310.dp)
+                    .size(280.dp, 340.dp)
                     .clickable {
                         scope.launch {
                             listState.animateScrollToItem(index)

@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
-import com.example.doc_di.UserViewModel
+import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.domain.review.ReviewImpl
 import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.search.SearchViewModel

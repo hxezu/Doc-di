@@ -15,11 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.doc_di.UserViewModel
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.model.Pill
 import com.example.doc_di.domain.pill.RateInfo
 import com.example.doc_di.etc.observeAsState
+import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import kotlinx.coroutines.launch

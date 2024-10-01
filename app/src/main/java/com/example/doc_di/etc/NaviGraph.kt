@@ -14,7 +14,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.doc_di.UserViewModel
 import com.example.doc_di.chatbot.ChatBotViewModel
 import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.chatbot.ChatScreen
@@ -26,6 +25,7 @@ import com.example.doc_di.home.Home
 import com.example.doc_di.home.account_manage.ModifyLogoutAccountDelete
 import com.example.doc_di.home.account_manage.modify_profile.Profile
 import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
+import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.login.loginpage.LoginPage
 import com.example.doc_di.login.register.RegisterPage
 import com.example.doc_di.login.resetpassword.ResetPassword
@@ -41,9 +41,6 @@ import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
 import com.example.doc_di.search.pillsearch.searchresult.SearchResult
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.PillInformation
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
-import com.example.doc_di.search.trash_maybe.MedicalAppointmentRecord
-import com.example.doc_di.search.trash_maybe.PrescribedMedicineList
-import com.example.doc_di.search.trash_maybe.PrescriptionRecord
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
@@ -147,18 +144,6 @@ fun NaviGraph(navController: NavHostController) {
                 userViewModel,
                 reviewViewModel
             )
-        }
-
-        composable(route = Routes.medicalAppointmentRecord.route) {
-            MedicalAppointmentRecord(navController, btmBarViewModel)
-        }
-
-        composable(route = Routes.prescriptionRecord.route) {
-            PrescriptionRecord(navController, btmBarViewModel)
-        }
-
-        composable(route = Routes.prescribedMedicineList.route) {
-            PrescribedMedicineList(navController, btmBarViewModel)
         }
 
         composable(route = Routes.chatListScreen.route) {

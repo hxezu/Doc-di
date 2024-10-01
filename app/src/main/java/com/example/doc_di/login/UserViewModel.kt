@@ -1,4 +1,4 @@
-package com.example.doc_di
+package com.example.doc_di.login
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -11,9 +11,6 @@ import androidx.navigation.NavController
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.account.AccountDTO
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.login.loginpage.getEncryptedSharedPreferences
-import com.example.doc_di.login.loginpage.saveAccessToken
-import com.example.doc_di.login.loginpage.saveRefreshToken
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import kotlinx.coroutines.launch

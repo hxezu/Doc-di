@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.doc_di.UserViewModel
+import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.domain.model.Pill
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.search.SearchViewModel

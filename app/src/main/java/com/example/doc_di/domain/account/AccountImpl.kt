@@ -5,10 +5,10 @@ import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
-import com.example.doc_di.UserViewModel
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.login.loginpage.removeAccessToken
-import com.example.doc_di.login.loginpage.removeRefreshToken
+import com.example.doc_di.login.UserViewModel
+import com.example.doc_di.login.removeAccessToken
+import com.example.doc_di.login.removeRefreshToken
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

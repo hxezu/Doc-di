@@ -7,10 +7,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.example.doc_di.UserViewModel
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.review.ReviewData
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.login.UserViewModel
 import kotlinx.coroutines.launch
 
 class ReviewViewModel : ViewModel() {

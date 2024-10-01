@@ -1,4 +1,4 @@
-package com.example.doc_di.login.loginpage
+package com.example.doc_di.login
 
 import android.content.Context
 import android.content.SharedPreferences
