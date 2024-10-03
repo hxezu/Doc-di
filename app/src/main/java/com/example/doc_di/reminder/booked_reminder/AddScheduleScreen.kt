@@ -63,8 +63,8 @@ import com.example.doc_di.reminder.booked_reminder.utils.EndDateTextField
 import com.example.doc_di.reminder.booked_reminder.utils.TimerTextField
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
-import com.example.doc_di.util.Department
-import com.example.doc_di.util.Recurrence
+import com.example.doc_di.reminder.util.Department
+import com.example.doc_di.reminder.util.Recurrence
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId

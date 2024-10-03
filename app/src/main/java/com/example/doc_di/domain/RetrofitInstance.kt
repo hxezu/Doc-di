@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
 
-    const val BASE_URL = "http://192.168.99.189:8080/"
-    //const val BASE_URL = "http://192.168.0.7:8080/"
+    //const val BASE_URL = "http://192.168.99.189:8080/"
+    const val BASE_URL = "http://192.168.92.238:8080/"
 
     private val interceptor: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -29,6 +29,12 @@ object RetrofitInstance {
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    private val retrofit: Retrofit = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl(BASE_URL)
+        .client(client)
         .build()
 
     val pillApi: PillApi = Retrofit.Builder()

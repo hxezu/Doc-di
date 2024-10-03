@@ -65,7 +65,7 @@ import com.example.doc_di.reminder.booked_reminder.utils.EditTimerTextField
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.ui.theme.MainBlue
-import com.example.doc_di.util.Department
+import com.example.doc_di.reminder.util.Department
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar

@@ -48,8 +48,8 @@ import com.example.doc_di.R
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
-import com.example.doc_di.util.Recurrence
-import com.example.doc_di.util.getRecurrenceList
+import com.example.doc_di.reminder.util.Recurrence
+import com.example.doc_di.reminder.util.getRecurrenceList
 import kotlinx.coroutines.delay
 import java.util.Calendar
 

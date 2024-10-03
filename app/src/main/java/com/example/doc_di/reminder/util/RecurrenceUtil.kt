@@ -1,4 +1,4 @@
-package com.example.doc_di.util
+package com.example.doc_di.reminder.util
 
 enum class Recurrence {
     Daily,

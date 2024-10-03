@@ -45,10 +45,10 @@ import com.example.doc_di.R
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
-import com.example.doc_di.util.Department
-import com.example.doc_di.util.Recurrence
-import com.example.doc_di.util.getDepartmentList
-import com.example.doc_di.util.getRecurrenceList
+import com.example.doc_di.reminder.util.Department
+import com.example.doc_di.reminder.util.Recurrence
+import com.example.doc_di.reminder.util.getDepartmentList
+import com.example.doc_di.reminder.util.getRecurrenceList
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)

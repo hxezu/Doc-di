@@ -64,7 +64,7 @@ import com.example.doc_di.reminder.medication_reminder.utils.EndDateTextField
 import com.example.doc_di.reminder.medication_reminder.utils.RecurrenceDropdownMenu
 import com.example.doc_di.reminder.medication_reminder.utils.TimerTextField
 import com.example.doc_di.ui.theme.MainBlue
-import com.example.doc_di.util.Recurrence
+import com.example.doc_di.reminder.util.Recurrence
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId

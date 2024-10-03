@@ -25,7 +25,7 @@ class BtmBarViewModel : ViewModel(){
             selected = false,
         ),
         BtmBarItem(
-            title = "복용 관리 화면",
+            title = "리마인더 관리 화면",
             iconResourceId = R.drawable.management,
             route = Routes.managementScreen.route,
             selected = false,
