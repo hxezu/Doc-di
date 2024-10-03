@@ -4,4 +4,5 @@ data class MedicationData(
     val name: String,
     val time: String,
     val endDate: String,
+    val dosage: Int,
 )

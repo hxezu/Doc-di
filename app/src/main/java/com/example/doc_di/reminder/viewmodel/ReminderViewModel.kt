@@ -188,6 +188,7 @@ class ReminderViewModel @Inject constructor(
                 endDate = parsedEndDate?.let { date ->
                     endDateFormat.format(date)
                 } ?: "날짜 정보 없음",
+                dosage = it.dosage
             )
         }
 
