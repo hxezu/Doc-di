@@ -126,4 +126,6 @@ dependencies {
     
     //페이로드 정보 가져오기 위해
     implementation("io.jsonwebtoken:jjwt:0.9.1")
+
+    implementation ("androidx.compose.runtime:runtime-livedata:1.4.3")
 }
