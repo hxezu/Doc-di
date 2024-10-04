@@ -196,4 +196,3 @@ class ReminderViewModel @Inject constructor(
         _medicationsForToday.value = todayMedications
     }
 }
-

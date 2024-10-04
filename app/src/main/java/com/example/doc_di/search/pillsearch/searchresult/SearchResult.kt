@@ -23,6 +23,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.GoBack
 import com.example.doc_di.login.UserViewModel
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import com.example.doc_di.ui.theme.LightBlue
@@ -34,12 +35,19 @@ fun SearchResult(
     btmBarViewModel: BtmBarViewModel,
     userViewModel: UserViewModel,
     searchViewModel: SearchViewModel,
-    reviewViewModel: ReviewViewModel
+    reviewViewModel: ReviewViewModel,
+    reminderViewModel: ReminderViewModel
 ) {
     val titleColor = Color(0xFF303437)
 
     val pillList = searchViewModel.pills.collectAsState().value
     val isLoading = searchViewModel.isLoading.collectAsState().value
+
+    LaunchedEffect(Unit) {
+        userViewModel.userInfo.value?.email?.let { email ->
+            reminderViewModel.getReminders(email)
+        }
+    }
 
     LaunchedEffect(navController.currentBackStackEntry) {
         searchViewModel.resetPillInfo()

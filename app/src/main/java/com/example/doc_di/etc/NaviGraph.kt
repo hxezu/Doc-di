@@ -132,7 +132,8 @@ fun NaviGraph(navController: NavHostController) {
                 btmBarViewModel,
                 userViewModel,
                 searchViewModel,
-                reviewViewModel
+                reviewViewModel,
+                reminderViewModel
             )
         }
 
@@ -142,7 +143,8 @@ fun NaviGraph(navController: NavHostController) {
                 btmBarViewModel,
                 searchViewModel,
                 userViewModel,
-                reviewViewModel
+                reviewViewModel,
+                reminderViewModel
             )
         }
 
