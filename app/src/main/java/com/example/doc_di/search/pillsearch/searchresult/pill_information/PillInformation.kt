@@ -19,8 +19,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,6 +42,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.GoBack
 import com.example.doc_di.login.UserViewModel
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.contents.PillInfo
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.contents.PillUsage
@@ -56,6 +59,7 @@ fun PillInformation(
     searchViewModel: SearchViewModel,
     userViewModel: UserViewModel,
     reviewViewModel: ReviewViewModel,
+    reminderViewModel: ReminderViewModel
 ) {
     val titleColor = Color(0xFF303437)
     val buttonColor = Color(0xFF007AEB)
@@ -82,12 +86,21 @@ fun PillInformation(
         )
     }
 
+    // 선택된 약이 사용자의 활성 복용 목록에 있는지 확인
+    val isUserTakingPill by remember(selectedPill) {
+        derivedStateOf {
+            reminderViewModel.reminders.value.any { reminder ->
+                selectedPill.itemName.contains(reminder.medicineName, ignoreCase = true)
+            }
+        }
+    }
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController, btmBarViewModel) },
         containerColor = Color.Transparent,
         /* TODO 사용자가 복용중인 약 리스트안에 search result의 약이 있다면 효능통계 갔을 시 + Floating Button */
         floatingActionButton = {
-            if (reviewViewModel.showSearch[3]) {
+            if (isUserTakingPill && reviewViewModel.showSearch[3]) {
                 FloatingActionButton(
                     onClick = { showPillReviewDialog = true },
                     containerColor = Color.White,
