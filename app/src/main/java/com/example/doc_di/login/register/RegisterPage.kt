@@ -6,25 +6,20 @@ import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,10 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.register.RegisterImpl
@@ -47,8 +40,8 @@ import com.example.doc_di.login.GradientButton
 import com.example.doc_di.login.register.registerinfo.RegisterEmail
 import com.example.doc_di.login.register.registerinfo.RegisterName
 import com.example.doc_di.login.register.registerinfo.RegisterPassword
-import com.example.doc_di.ui.theme.LightBlue
-import com.example.doc_di.ui.theme.MainBlue
+import com.example.doc_di.login.register.registerinfo.VerificationCode
+import com.example.doc_di.login.rememberImeState
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -87,7 +80,15 @@ fun RegisterPage(navController: NavController) {
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val imeState = rememberImeState()
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(key1 = imeState.value){
+        if (imeState.value){
+            scrollState.animateScrollTo(0)
+        }
+    }
 
     Scaffold(
         topBar = { RegisterTopBar(navController) },
@@ -98,62 +99,20 @@ fun RegisterPage(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState),
+                .verticalScroll(scrollState)
+                .imePadding()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = { focusManager.clearFocus() }
+                )
         ) {
             Spacer(modifier = Modifier.weight(2f))
             ProfileImage(imageUri, imageBitmap, bitmap, context)
             Spacer(modifier = Modifier.weight(1f))
             RegisterName(name, isNameAvailable)
             RegisterEmail(email)
-            Row (
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp)
-            ) {
-                OutlinedTextField(
-                    value = verifyCode.value,
-                    onValueChange = { verifyCode.value = it },
-                    shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
-                    label = {
-                        Text(
-                            text = "인증코드 입력",
-                            color = Color.Black,
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    },
-                    placeholder = { Text(text = "이메일 코드 입력", color = Color.Black) },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Email
-                    ),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = MainBlue,
-                        unfocusedBorderColor = LightBlue,
-                        cursorColor = MainBlue
-                    ),
-                    singleLine = true,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "인증코드 받기",
-                    fontSize = 15.sp,
-                    color = Color.Black,
-                    letterSpacing = 1.sp,
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier
-                        .padding(top = 9.dp)
-                        .width(100.dp)
-                        .clickable{
-                            scope.launch {
-                                registerImpl.makeCode(email.value, context)
-                            }
-                        }
-                )
-            }
+            VerificationCode(email, verifyCode, context)
             RegisterPassword(password, passwordCheck, isPasswordAvailable)
             Spacer(modifier = Modifier.weight(2f))
             GradientButton(

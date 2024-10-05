@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
@@ -19,6 +20,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -35,6 +37,8 @@ fun RegisterPassword(
 ) {
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     var passwordCheckHidden by rememberSaveable { mutableStateOf(true) }
+
+    val focusManager = LocalFocusManager.current
 
     OutlinedTextField(
         value = password.value,
@@ -93,6 +97,9 @@ fun RegisterPassword(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password
         ),
+        keyboardActions = KeyboardActions(
+            onDone = { focusManager.clearFocus() }
+        ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,
             unfocusedBorderColor = LightBlue,
@@ -112,7 +119,6 @@ fun RegisterPassword(
             .fillMaxWidth()
             .padding(horizontal = 40.dp)
             .height(64.dp)
-
     )
     if (password.value.isNotEmpty() && passwordCheck.value.isNotEmpty()) {
         if (password.value == passwordCheck.value) {

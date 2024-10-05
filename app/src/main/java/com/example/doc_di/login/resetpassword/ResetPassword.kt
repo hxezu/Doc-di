@@ -1,28 +1,38 @@
 package com.example.doc_di.login.resetpassword
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.domain.resetpw.ResetImpl
 import com.example.doc_di.login.GradientButton
+import com.example.doc_di.login.rememberImeState
 import com.example.doc_di.ui.theme.LightBlue
 import kotlinx.coroutines.launch
 
@@ -35,12 +45,31 @@ fun ResetPassword(navController: NavController) {
     val resetImpl = ResetImpl()
     val cornerRadius = 16.dp
 
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val imeState = rememberImeState()
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(key1 = imeState.value){
+        if (imeState.value){
+            scrollState.animateScrollTo(0)
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(scrollState)
+            .imePadding()
+            .clickable (
+                interactionSource = remember { MutableInteractionSource()},
+                indication = null,
+                onClick = { focusManager.clearFocus() }
+            )
     ) {
         Spacer(modifier = Modifier.weight(2f))
         Text(
@@ -69,15 +98,18 @@ fun ResetPassword(navController: NavController) {
                     popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
                 }
-            }
+                keyboardController?.hide()
+            },
         ) {
             Text(
-                text = "회원가입하러 가기",
+                text = "회원가입 하러가기",
                 letterSpacing = 1.sp,
                 style = MaterialTheme.typography.labelLarge,
                 color = LightBlue
             )
         }
-        Spacer(modifier = Modifier.weight(1f))
+        if (!imeState.value){
+            Spacer(modifier = Modifier.weight(1f))
+        }
     }
 }

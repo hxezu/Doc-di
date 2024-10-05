@@ -10,12 +10,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterTopBar(navController: NavController) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     CenterAlignedTopAppBar(
         title = { Text("회원가입", color = Color.Black) },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -23,6 +25,7 @@ fun RegisterTopBar(navController: NavController) {
         ),
         navigationIcon = {
             IconButton(onClick = {
+                keyboardController?.hide()
                 navController.navigate(Routes.login.route) {
                     navController.popBackStack()
                 }

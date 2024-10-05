@@ -56,7 +56,7 @@ android {
 dependencies {
     // Hilt 종속성
     implementation("com.google.dagger:hilt-android:2.48")
-     // Hilt 라이브러리 버전
+    // Hilt 라이브러리 버전
     kapt("com.google.dagger:hilt-android-compiler:2.48") // Hilt 컴파일러 버전
 
     // Hilt Navigation Compose 종속성
@@ -107,6 +107,7 @@ dependencies {
 
     // Accompanist
     implementation("com.google.accompanist:accompanist-permissions:0.30.1")
+    implementation("com.google.accompanist:accompanist-insets:0.31.5-beta")
 
     // Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")

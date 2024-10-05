@@ -2,6 +2,7 @@ package com.example.doc_di.login.loginpage
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
@@ -17,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -30,6 +32,8 @@ import com.example.doc_di.ui.theme.MainBlue
 @Composable
 fun PasswordTextField(password: MutableState<String>) {
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
+    val focusManager = LocalFocusManager.current
+
     OutlinedTextField(
         value = password.value,
         onValueChange = { password.value = it },
@@ -47,6 +51,9 @@ fun PasswordTextField(password: MutableState<String>) {
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { focusManager.clearFocus() }
         ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MainBlue,

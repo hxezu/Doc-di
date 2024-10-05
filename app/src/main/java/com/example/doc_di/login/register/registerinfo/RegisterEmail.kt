@@ -27,7 +27,7 @@ fun RegisterEmail(email: MutableState<String>) {
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         label = {
             Text(
-                text = "이메일 입력",
+                text = "이메일",
                 color = Color.Black,
                 style = MaterialTheme.typography.labelMedium,
             )
@@ -47,6 +47,5 @@ fun RegisterEmail(email: MutableState<String>) {
             .fillMaxWidth()
             .padding(horizontal = 40.dp)
             .height(64.dp)
-
     )
 }

@@ -16,17 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,35 +35,32 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
-import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.domain.review.ReviewImpl
 import com.example.doc_di.etc.observeAsState
+import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PillReviewDialog(
     onDismiss: () -> Unit,
     navController: NavController,
     searchViewModel: SearchViewModel,
     userViewModel: UserViewModel,
-    reviewViewModel: ReviewViewModel
+    reviewViewModel: ReviewViewModel,
 ) {
     val starYellow = Color(0xFFFFC107)
     val starGray = Color(0xFFE9EBED)
     val buttonColor = Color(0xFF4B7BE5)
 
-    var reviewText by rememberSaveable { mutableStateOf("") }
+    var reviewText = rememberSaveable { mutableStateOf("") }
     var curStarRating by rememberSaveable { mutableStateOf<Short>(0) }
 
     val selectedPill = searchViewModel.getSelectedPill()
@@ -87,7 +80,6 @@ fun PillReviewDialog(
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.75f)
@@ -95,6 +87,7 @@ fun PillReviewDialog(
                     .background(Color.White)
                     .padding(horizontal = 40.dp)
             ) {
+                Spacer(modifier = Modifier.weight(1f))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -116,7 +109,7 @@ fun PillReviewDialog(
                         )
                     )
                 }
-
+                Spacer(modifier = Modifier.weight(1f))
                 Row(horizontalArrangement = Arrangement.Center) {
                     for (i in 1..5) {
                         Icon(
@@ -132,43 +125,16 @@ fun PillReviewDialog(
                         }
                     }
                 }
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "상세 리뷰",
-                        color = Color(0xFF9CA4AB),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = reviewText,
-                        onValueChange = { reviewText = it },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = buttonColor,
-                            cursorColor = buttonColor,
-                            unfocusedBorderColor = buttonColor
-                        ),
-                        shape = RoundedCornerShape(24.dp),
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Done,
-                            keyboardType = KeyboardType.Text
-                        ),
-                        maxLines = 4,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(136.dp)
-                            .padding(horizontal = 20.dp)
-                    )
-                }
-
+                Spacer(modifier = Modifier.weight(1f))
+                DialogDetailReview(reviewText)
+                Spacer(modifier = Modifier.weight(1f))
                 Button(
                     onClick = {
                         scope.launch {
                             reviewImpl.createReview(
                                 userInfo,
                                 selectedPill,
-                                reviewText,
+                                reviewText.value,
                                 curStarRating,
                                 context,
                                 navController,
@@ -186,6 +152,7 @@ fun PillReviewDialog(
                 ) {
                     Text(text = "작성 완료", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }

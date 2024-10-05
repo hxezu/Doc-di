@@ -5,18 +5,23 @@ import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +34,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +45,7 @@ import com.example.doc_di.domain.account.AccountImpl
 import com.example.doc_di.etc.GoBack
 import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.login.UserViewModel
+import com.example.doc_di.login.rememberImeState
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -71,6 +79,16 @@ fun Profile(navController: NavController, userViewModel: UserViewModel) {
     }
 
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
+    val imeState = rememberImeState()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(key1 = imeState) {
+        if (imeState.value) {
+            scrollState.animateScrollTo(0)
+        }
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -78,12 +96,22 @@ fun Profile(navController: NavController, userViewModel: UserViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 40.dp, vertical = 68.dp)
+            .verticalScroll(scrollState)
+            .imePadding()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = { focusManager.clearFocus() }
+            )
     ) {
         GoBack(
             modifier = Modifier
                 .size(30.dp)
                 .align(Alignment.Start)
-                .clickable { navController.popBackStack() }
+                .clickable {
+                    keyboardController?.hide()
+                    navController.popBackStack()
+                }
         )
         Spacer(modifier = Modifier.weight(1.5f))
         ModifyProfileImage(imageUri, imageBitmap, bitmap, context)

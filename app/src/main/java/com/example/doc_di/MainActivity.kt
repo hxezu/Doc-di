@@ -12,7 +12,10 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -22,6 +25,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.example.doc_di.etc.NaviGraph
 import com.example.doc_di.ui.theme.Doc_diTheme
+import com.example.doc_di.ui.theme.MainBlue
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
 
@@ -54,19 +58,28 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize()
                     )
                     val navController = rememberNavController()
-                    NaviGraph(navController)
+                    val customTextSelectionColors = TextSelectionColors(
+                        handleColor = MainBlue,
+                        backgroundColor = MainBlue.copy(0.4f)
+                    )
+
+                    CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+                        NaviGraph(navController)
+                    }
                 }
             }
         }
         setupTransparentStatusBar()
     }
+
     private fun setupTransparentStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
             val controller = window.insetsController
             if (controller != null) {
-                controller.hide( WindowInsets.Type.navigationBars())
-                controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                controller.hide(WindowInsets.Type.navigationBars())
+                controller.systemBarsBehavior =
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
         } else {
             window.decorView.systemUiVisibility = (
