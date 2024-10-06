@@ -98,7 +98,6 @@ fun PillInformation(
     Scaffold(
         bottomBar = { BottomNavigationBar(navController, btmBarViewModel) },
         containerColor = Color.Transparent,
-        /* TODO 사용자가 복용중인 약 리스트안에 search result의 약이 있다면 효능통계 갔을 시 + Floating Button */
         floatingActionButton = {
             if (isUserTakingPill && reviewViewModel.showSearch[3]) {
                 FloatingActionButton(

@@ -1,4 +1,4 @@
-package com.example.doc_di.home
+package com.example.doc_di.home.dosage
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -28,28 +26,26 @@ import com.example.doc_di.R
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.reminder.data.MedicationData
+import com.example.doc_di.search.SearchViewModel
 
 @Composable
 fun MedicationCardForToday(
     medication: MedicationData,
     navController: NavController,
-    btmBarViewModel: BtmBarViewModel
+    btmBarViewModel: BtmBarViewModel,
+    searchViewModel: SearchViewModel
 ) {
     val cardPillColor = Color(0xFF202325)
     val alarmColor = Color(0xFF979C9E)
     val pinColor = Color(0xFF979C9E)
-    val starColor = Color(0xFFFFC462)
     val cardTextColor = Color(0xFF72777A)
 
     Card(
         onClick = {
-            // BottomNavigationBar의 선택 상태 업데이트
-            btmBarViewModel.btmNavBarItems.forEach {
-                it.selected = false
-            }
+            searchViewModel.setSelectedPillByPillName(medication.name)
+            btmBarViewModel.btmNavBarItems[0].selected = false
             btmBarViewModel.btmNavBarItems[1].selected = true
-            // 복용 알림 상세 화면으로 이동 (Routes.pillInformation.route를 사용)
-            navController.navigate(Routes.pillInformation.route)
+            navController.navigate(Routes.searchResult.route)
         },
         colors = CardDefaults.cardColors(Color.White),
         elevation = CardDefaults.cardElevation(1.dp),
@@ -77,7 +73,7 @@ fun MedicationCardForToday(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = " ${medication.time}",
+                    text = medication.time,
                     color = cardTextColor
                 )
             }
@@ -93,7 +89,7 @@ fun MedicationCardForToday(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "${medication.endDate}까지",
+                    text = "2024.10.12",
                     color = cardTextColor
                 )
             }

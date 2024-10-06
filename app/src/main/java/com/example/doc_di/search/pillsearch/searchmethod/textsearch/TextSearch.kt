@@ -46,12 +46,9 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
     val mainSearchColor = Color(0xFF1892FA)
 
     var nameSearch by rememberSaveable { mutableStateOf("") }
-    val option = mutableMapOf<String, String>()
 
     fun doSearch() {
-        option["name"] = nameSearch
-        searchViewModel.setOptions(option)
-        searchViewModel.searchPillsByOptions()
+        searchViewModel.setSelectedPillByPillName(nameSearch)
         navController.navigate(Routes.searchResult.route)
     }
 

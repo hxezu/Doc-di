@@ -55,8 +55,12 @@ fun NaviGraph(navController: NavHostController) {
         viewModel(factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val chatRepository = ChatRepository()
-                val chatBotImpl = ChatBotImpl(RetrofitInstance.chatBotApi) // Create instance of ChatBotImpl
-                return ChatBotViewModel(chatRepository, chatBotImpl) as T // Pass it to the ViewModel
+                val chatBotImpl =
+                    ChatBotImpl(RetrofitInstance.chatBotApi) // Create instance of ChatBotImpl
+                return ChatBotViewModel(
+                    chatRepository,
+                    chatBotImpl
+                ) as T // Pass it to the ViewModel
             }
         })
 
@@ -83,7 +87,14 @@ fun NaviGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.home.route) {
-            Home(upcomingAppointment, navController, btmBarViewModel, userViewModel, reminderViewModel)
+            Home(
+                upcomingAppointment,
+                navController,
+                btmBarViewModel,
+                userViewModel,
+                reminderViewModel,
+                searchViewModel
+            )
         }
 
         composable(Routes.appointmentSchedule.route) {
