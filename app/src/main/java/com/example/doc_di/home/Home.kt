@@ -74,6 +74,7 @@ fun Home(
         } else {
             LaunchedEffect(userInfo.email) {
                 reminderViewModel.getBookedReminders(userInfo.email)
+                reminderViewModel.getReminders(userInfo.email)
             }
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
