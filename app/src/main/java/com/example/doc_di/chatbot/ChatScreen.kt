@@ -37,6 +37,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -57,7 +58,6 @@ import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.domain.model.Message
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
-import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,24 +70,13 @@ fun ChatScreen(
     chatBotViewModel: ChatBotViewModel,
     chatId: Int? = null
 ) {
-
     val userInfo by userViewModel.userInfo.observeAsState()
-    val chat by chatBotViewModel.getChatById(userInfo?.email!!, chatId!!).observeAsState()
-    val chatList by chatBotViewModel.chatList.observeAsState()
-
+    val messages by chatBotViewModel.messages.observeAsState(emptyList()) // messages를 observe
     var message by remember { mutableStateOf("") }
 
-    val selectedChat = chatList?.firstOrNull { it.id == chatId }
-
-    LaunchedEffect(chatId, userInfo) {
-        userInfo?.email?.let { email ->
-            chatBotViewModel.loadChats(email)
-        }
-    }
-
-    LaunchedEffect(chatList) {
-        userInfo?.email?.let { email ->
-            chatBotViewModel.loadChats(email)
+    LaunchedEffect(chatId) {
+        chatId?.let {
+            chatBotViewModel.loadMessages(it) // 메시지 하위 컬렉션을 로드
         }
     }
 
@@ -144,15 +133,13 @@ fun ChatScreen(
                             .fillMaxSize()
                             .background(Color.Transparent)
                     ) {
-                        val messages = selectedChat?.messages ?: emptyList()
-
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(start = 20.dp, top = 15.dp, end = 20.dp)
                         ) {
                             items(messages, key = { it.id }) { message ->
-                                ChatRow(chat = message)
+                                ChatRow(chat = message) // Firestore에서 불러온 messages 리스트 사용
                             }
                             item {
                                 Spacer(modifier = Modifier.height(90.dp))
@@ -166,8 +153,8 @@ fun ChatScreen(
                         onValueChange = { message = it },
                         onSendClick = {
                             userInfo?.email?.let { email ->
-                                if (message.isNotBlank()) {
-                                    chatBotViewModel.sendMessage(email, message, selectedChat!!.id)
+                                if (message.isNotBlank() && chatId != null) {
+                                    chatBotViewModel.sendMessage(email, message, chatId)
                                     message = ""
                                 }
                             }

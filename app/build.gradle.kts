@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
     id("kotlin-kapt")
+    id("com.google.gms.google-services")
     id("com.google.dagger.hilt.android") version "2.48"
 }
 
@@ -102,8 +103,10 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
 
     // Firebase dependencies
-    implementation("com.google.firebase:firebase-analytics:21.3.0")
-    implementation("com.google.firebase:firebase-crashlytics:18.3.3")
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation ("com.google.firebase:firebase-firestore:24.1.0")
+    implementation ("com.google.firebase:firebase-auth")
 
     // Accompanist
     implementation("com.google.accompanist:accompanist-permissions:0.30.1")
