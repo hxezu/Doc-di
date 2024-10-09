@@ -45,6 +45,7 @@ class LoginImpl(private val loginApi: LoginApi) {
             userViewModel.fetchUser(context, navController){
                 userViewModel.userInfo.value?.let { userInfo ->
                     reminderViewModel.getBookedReminders(userInfo.email)
+                    reminderViewModel.getReminders(userInfo.email)
                     println("Success to Fetch Reminders")
                 }
             }

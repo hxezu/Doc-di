@@ -38,7 +38,7 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 28.dp, vertical = 56.dp)
+            .padding(horizontal = 40.dp, vertical = 68.dp)
     ) {
         GoBack(
             modifier = Modifier
