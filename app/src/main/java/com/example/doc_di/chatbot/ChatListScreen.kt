@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -47,9 +48,9 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.domain.model.Chat
+import com.example.doc_di.domain.model.Message
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
-import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.ui.theme.Line
 import com.example.doc_di.ui.theme.MainBlue
 import java.time.LocalDateTime
@@ -86,8 +87,9 @@ fun ChatListScreen(
             FloatingActionButton(
                 onClick = {
                     userInfo?.email?.let { email ->
-                        val newChatId = chatBotViewModel.createNewChat(email)
-                        navController.navigate("chat_screen/$newChatId") // 새로운 채팅 상세 화면으로 이동
+                        chatBotViewModel.createNewChat(email) { newChatId ->
+                            navController.navigate("chat_screen/$newChatId") // 생성된 채팅 ID를 사용해 채팅 화면으로 이동
+                        }
                     }
                           },
                 backgroundColor = MainBlue,
@@ -138,26 +140,23 @@ fun ChatListScreen(
                         color = Color.Gray
                     )
                 } else {
-                    val sortedChatList = chatList!!.sortedByDescending { chat ->
-                        chat.messages.lastOrNull()?.let { message ->
-                            // Parse the time string to LocalDateTime
-                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                            try {
-                                LocalDateTime.parse(message.time, formatter)
-                            } catch (e: Exception) {
-                                LocalDateTime.MIN
-                            }
-                        } ?: LocalDateTime.MIN
-                    }
-
-                    // Assign sequential numbers based on sorted list
-                    LazyColumn(
-                        modifier = Modifier.padding(bottom = 90.dp)
+                    LazyColumn(modifier = Modifier.padding(bottom = 90.dp)
                     ) {
-                        itemsIndexed(sortedChatList, key = { _, chat -> chat.id }) { index, chat ->
-                            val chatName = "DDoc-Di 와의 대화 ${index + 1}"
-                            ChatEachRow(chat = chat, chatName = chatName) {
-                                navController.navigate("chat_screen/${chat.id}") // Navigate to specific chat screen
+                        items(chatList!!) { chat ->
+                            LaunchedEffect(chat.id) {
+                                chatBotViewModel.loadMessages(chat.id) // 각 채팅에 대한 메시지 로드
+                            }
+
+                            val messages by chatBotViewModel.messages.observeAsState(emptyList())
+                            val lastMessage = messages.lastOrNull()
+
+                            val chatName = "DDoc-Di 와의 대화" // index 제거
+                            ChatEachRow(
+                                chat = chat,
+                                lastMessage = lastMessage,
+                                chatName = chatName
+                            ) {
+                                navController.navigate("chat_screen/${chat.id}")
                             }
                         }
                     }
@@ -171,12 +170,12 @@ fun ChatListScreen(
 @Composable
 fun ChatEachRow(
     chat: Chat,
+    lastMessage: Message?,
     chatName: String,
     onClick:()->Unit
 ) {
-    val lastMessage = chat.messages.lastOrNull()
-    val lastMessageContent = lastMessage?.content?: "No messages yet"
-    val lastMessageTime = lastMessage?.time?: "No messages yet"
+    val lastMessageContent = lastMessage?.content ?: "No messages yet"
+    val lastMessageTime = lastMessage?.time ?: "No messages yet"
 
     Box(
         modifier = Modifier

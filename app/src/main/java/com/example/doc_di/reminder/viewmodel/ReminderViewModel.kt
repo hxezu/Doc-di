@@ -34,6 +34,8 @@ class ReminderViewModel @Inject constructor(
     val reminders: State<List<Reminder>> = _reminders
     private val _bookedReminders = mutableStateOf<List<Booked>>(emptyList())
     val bookedReminders: State<List<Booked>> = _bookedReminders
+    private val _pills = mutableStateOf<List<Pill>>(emptyList())
+    val pills: State<List<Pill>> = _pills
 
 
     //LiveData
@@ -78,6 +80,7 @@ class ReminderViewModel @Inject constructor(
                 val response: Response<Unit> = reminderApi.deleteReminder(reminderId)
                 if (response.isSuccessful) {
                     _reminders.value = _reminders.value.filterNot { it.id?.toInt() == reminderId }
+                    updateMedicationsForToday(_reminders.value, _pills.value)
                 } else {
                     Log.e("ReminderViewModel", "복용 알림 삭제 실패: ${response.errorBody()?.string()}")
                 }

@@ -2,67 +2,111 @@ package com.example.doc_di.domain.chatbot
 
 import com.example.doc_di.domain.model.Chat
 import com.example.doc_di.domain.model.Message
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.UUID
 
 class ChatRepository {
 
-    // 사용자 이메일을 키로 사용하는 채팅 기록 저장소
-    private val chatDataStore: MutableMap<String, MutableList<Chat>> = mutableMapOf()
+    private val firestore = FirebaseFirestore.getInstance()
 
-    // 특정 사용자의 채팅 기록 가져오기
-    fun getChatsByUser(email: String): List<Chat> {
-        return chatDataStore[email] ?: emptyList()
-    }
+    // Firestore에서 특정 사용자의 채팅 목록을 가져옴
+    suspend fun getChatsByUser(email: String): List<Chat> {
+        return try {
+            val chatDocuments = firestore.collection("chats")
+                .whereEqualTo("email", email)
+                .get().await()
 
-    fun getChatById(email: String, chatId: Int): Chat? {
-        return chatDataStore[email]?.firstOrNull { it.id == chatId }
-    }
-
-    // 채팅 기록 저장
-    fun saveChat(email: String, chatId: Int, chat: Chat) {
-        val chats = chatDataStore.getOrPut(email) { mutableListOf() }
-
-        // Find the index of the existing chat with the same chatId
-        val existingChatIndex = chats.indexOfFirst { it.id == chatId }
-
-        if (existingChatIndex != -1) {
-            // Update the existing chat
-            chats[existingChatIndex] = chat
-        } else {
-            // Add as a new chat if it doesn't exist
-            chats.add(chat)
+            chatDocuments.toObjects(Chat::class.java)
+        } catch (e: Exception) {
+            emptyList() // 오류 발생 시 빈 리스트 반환
         }
     }
 
-    // 새로운 채팅 세션 생성 (새로운 대화)
-    fun createNewChat(email: String): Chat {
-        val newId = System.currentTimeMillis()
-        val initialMessages = mutableListOf<Message>()
+    // Firestore에서 특정 채팅을 ID로 가져옴
+    suspend fun getChatById(email: String, chatId: Int): Chat? {
+        return try {
+            val chatDocument = firestore.collection("chats")
+                .document(chatId.toString())
+                .get().await()
 
-        val initialMessageId = chatDataStore[email]?.flatMap { it.messages }?.size?.plus(1) ?: 1 // Unique ID for the message
-
-        initialMessages.add(
-            Message(
-                id = initialMessageId,  // Provide a unique ID for the new message
-                content = "새로운 대화를 시작합니다.",
-                time = getCurrentTime(),
-                isUser = false
-            )
-        )
-
-        val newChat = Chat(
-            id = newId.toInt(),
-            email = email,
-            messages = initialMessages
-        )
-        saveChat(email,newChat.id, newChat)
-        return newChat
+            chatDocument.toObject(Chat::class.java)
+        } catch (e: Exception) {
+            null // 오류 발생 시 null 반환
+        }
     }
 
-    // 현재 시간 문자열 반환
+    // Firestore에서 특정 채팅의 메시지들을 가져옴
+    suspend fun getMessagesByChatId(chatId: Int): List<Message> {
+        return try {
+            val messagesDocuments = firestore.collection("chats")
+                .document(chatId.toString())
+                .collection("messages")
+                .get().await()
+
+            messagesDocuments.toObjects(Message::class.java)
+        } catch (e: Exception) {
+            emptyList() // 오류 발생 시 빈 리스트 반환
+        }
+    }
+
+    // Firestore에 새로운 채팅을 생성 (빈 messages 컬렉션도 포함)
+    suspend fun createNewChat(email: String): String {
+        val newId = System.currentTimeMillis().toInt()
+        val newChat = Chat(
+            id = newId,
+            email = email,
+        )
+
+        return try {
+            firestore.collection("chats")
+                .document(newId.toString())
+                .set(newChat)
+                .await()
+
+            // 챗봇의 첫 번째 메시지 추가
+            val firstMessage = Message(
+                id = System.currentTimeMillis().toInt(),
+                content = "대화를 시작합니다",
+                time = getCurrentTime(),
+                isUser = false // 챗봇 메시지로 설정
+            )
+
+            // Firestore 하위 컬렉션에 첫 번째 메시지 저장
+            firestore.collection("chats")
+                .document(newId.toString())
+                .collection("messages")
+                .add(firstMessage)
+                .await()
+
+            newId.toString() // 새로 생성된 채팅 ID 반환
+        } catch (e: FirebaseFirestoreException) {
+            // Firestore 관련 에러 처리
+            println("Firestore error: ${e.message}")
+            throw e
+        } catch (e: Exception) {
+            // 기타 오류 처리
+            println("Error: ${e.message}")
+            throw e
+        }
+    }
+
+    // 메시지를 Firestore 하위 컬렉션에 저장
+    suspend fun saveMessage(chatId: Int, message: Message) {
+        try {
+            firestore.collection("chats")
+                .document(chatId.toString())
+                .collection("messages") // 하위 컬렉션 사용
+                .add(message) // 각 메시지를 messages 하위 컬렉션에 추가
+                .await()
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
     private fun getCurrentTime(): String {
         val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         return dateFormat.format(Date())

@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -152,39 +153,50 @@ fun MedicationCard(
                         .align(Alignment.CenterVertically)
                 )
 
-                // 점 세 개 아이콘 버튼
-                IconButton(
-                    onClick = { expanded = true },
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                Box(
+                    modifier = Modifier
+                        .weight(2.5f)
+                        .align(Alignment.CenterVertically)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More Options"
-                    )
+
+                    IconButton(
+                        onClick = { expanded = true },
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More Options"
+                        )
+                    }
+                    // 드롭다운 메뉴
+                    DropdownMenu(
+                        expanded = expanded,
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded = false
+                                navController.navigate("editMedicationScreen/${reminder.id}")
+                            }
+                        ) {
+                            Text("수정")
+                        }
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded = false
+                                reminder.id?.let { deleteReminder(it.toInt()) }
+                            }
+                        ) {
+                            Text("삭제")
+                        }
+                    }
+
                 }
 
-                // 드롭다운 메뉴
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        onClick = {
-                            expanded = false
-                            navController.navigate("editMedicationScreen/${reminder.id}")
-                        }
-                    ) {
-                        Text("수정")
-                    }
-                    DropdownMenuItem(
-                        onClick = {
-                            expanded = false
-                            reminder.id?.let { deleteReminder(it.toInt()) }
-                        }
-                    ) {
-                        Text("삭제")
-                    }
-                }
+
+
+
             }
         }
 

@@ -31,7 +31,10 @@ import com.example.doc_di.etc.Routes
 import com.example.doc_di.reminder.data.AppointmentData
 
 @Composable
-fun UpcomingAppointment(upcomingAppointment: List<AppointmentData>?, navController: NavController) {
+fun UpcomingAppointment(
+    upcomingAppointment: List<AppointmentData>?,
+    navController: NavController
+) {
     val titleColor = Color(0xFF404446)
 
     Column {
