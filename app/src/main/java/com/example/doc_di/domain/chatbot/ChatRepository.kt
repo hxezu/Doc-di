@@ -1,5 +1,6 @@
 package com.example.doc_di.domain.chatbot
 
+import android.util.Log
 import com.example.doc_di.domain.model.Chat
 import com.example.doc_di.domain.model.Message
 import com.google.firebase.firestore.FirebaseFirestore
@@ -20,8 +21,16 @@ class ChatRepository {
                 .whereEqualTo("email", email)
                 .get().await()
 
+            // 로드된 채팅이 비어 있는 경우 처리
+            if (chatDocuments.isEmpty) {
+                Log.d("ChatRepository", "No chats found for user: $email")
+            } else {
+                Log.d("ChatRepository", "Found chats for user: $email")
+            }
+
             chatDocuments.toObjects(Chat::class.java)
         } catch (e: Exception) {
+            Log.e("ChatRepository", "Error fetching chats: ${e.message}")
             emptyList() // 오류 발생 시 빈 리스트 반환
         }
     }
@@ -45,6 +54,7 @@ class ChatRepository {
             val messagesDocuments = firestore.collection("chats")
                 .document(chatId.toString())
                 .collection("messages")
+                .orderBy("time")
                 .get().await()
 
             messagesDocuments.toObjects(Message::class.java)
@@ -72,7 +82,7 @@ class ChatRepository {
                 id = System.currentTimeMillis().toInt(),
                 content = "대화를 시작합니다",
                 time = getCurrentTime(),
-                isUser = false // 챗봇 메시지로 설정
+                user = false // 챗봇 메시지로 설정
             )
 
             // Firestore 하위 컬렉션에 첫 번째 메시지 저장
@@ -107,8 +117,21 @@ class ChatRepository {
         }
     }
 
+    suspend fun deleteChat(chatId: Int) {
+        try {
+            firestore.collection("chats")
+                .document(chatId.toString())
+                .delete()
+                .await() // Firestore 비동기 처리
+        } catch (e: Exception) {
+            Log.e("ChatRepository", "Error deleting chat: ${e.message}")
+            throw e
+        }
+    }
+
+
     private fun getCurrentTime(): String {
-        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         return dateFormat.format(Date())
     }
 }
