@@ -69,13 +69,13 @@ fun ChatListScreen(
     val userInfo by userViewModel.userInfo.observeAsState()
 
     LaunchedEffect(Unit) {
-        if(userInfo != null){
+        if (userInfo != null) {
             userInfo?.email?.let { email ->
+                Log.d("ChatListScreen", "Fetching chats for user: $email")
                 chatBotViewModel.loadChats(email)
             }
-            Log.d("ChatListScreen", "Fetching Chat for user: ${userViewModel.userInfo.value!!.email}")
-        }else{
-            println("User email is missing, cannot fetch Chat")
+        } else {
+            Log.d("ChatListScreen", "User email is missing, cannot fetch chats")
         }
     }
 
@@ -140,17 +140,19 @@ fun ChatListScreen(
                         color = Color.Gray
                     )
                 } else {
+                    val sortedChatList = chatList!!.map { chat ->
+                        val messages by chatBotViewModel.getMessagesForChat(chat.id).observeAsState(emptyList())
+                        val lastMessage = messages.lastOrNull()
+                        Pair(chat, lastMessage)
+                    }
+                        .filter { it.second != null } // 마지막 메시지가 있는 채팅만 필터링
+                        .sortedByDescending { it.second!!.time } // 마지막 메시지 시간 기준으로 내림차순 정렬
+
                     LazyColumn(modifier = Modifier.padding(bottom = 90.dp)
                     ) {
-                        items(chatList!!) { chat ->
-                            LaunchedEffect(chat.id) {
-                                chatBotViewModel.loadMessages(chat.id) // 각 채팅에 대한 메시지 로드
-                            }
+                        items(sortedChatList) { (chat, lastMessage) ->
+                            val chatName = "DDoc-Di 와의 대화"
 
-                            val messages by chatBotViewModel.messages.observeAsState(emptyList())
-                            val lastMessage = messages.lastOrNull()
-
-                            val chatName = "DDoc-Di 와의 대화" // index 제거
                             ChatEachRow(
                                 chat = chat,
                                 lastMessage = lastMessage,
@@ -175,7 +177,10 @@ fun ChatEachRow(
     onClick:()->Unit
 ) {
     val lastMessageContent = lastMessage?.content ?: "No messages yet"
-    val lastMessageTime = lastMessage?.time ?: "No messages yet"
+    val lastMessageTime = lastMessage?.time?.let { time ->
+        // 'HH:mm:ss' 형식에서 시와 분만 추출
+        time.substring(11, 16) // "HH:mm" 형식으로 변환
+    } ?: "No messages yet"
 
     Box(
         modifier = Modifier
