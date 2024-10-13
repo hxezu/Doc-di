@@ -35,11 +35,27 @@ class ChatBotViewModel(
         return chat
     }
 
+    fun deleteChat(email: String, chatId: Int) {
+        viewModelScope.launch {
+            try {
+                chatRepository.deleteChat(chatId) // Firestore에서 대화 삭제
+                loadChats(email) // 필요한 경우 사용자 채팅 목록 갱신
+            } catch (e: Exception) {
+                Log.e("ChatBotViewModel", "Error deleting chat: ${e.message}")
+            }
+        }
+    }
+
     // 모든 채팅 목록 로드
     fun loadChats(email: String) {
         viewModelScope.launch {
-            val chats = chatRepository.getChatsByUser(email)
-            _chatList.value = chats
+            try {
+                val chats = chatRepository.getChatsByUser(email)
+                _chatList.value = chats
+                Log.d("ChatBotViewModel", "Loaded chats: $chats")
+            } catch (e: Exception) {
+                Log.e("ChatBotViewModel", "Error loading chats: ${e.message}")
+            }
         }
     }
 
@@ -49,6 +65,16 @@ class ChatBotViewModel(
             _messages.value = messages
         }
     }
+
+    fun getMessagesForChat(chatId: Int): LiveData<List<Message>> {
+        val messages = MutableLiveData<List<Message>>()
+        viewModelScope.launch {
+            val loadedMessages = chatRepository.getMessagesByChatId(chatId)
+            messages.value = loadedMessages
+        }
+        return messages
+    }
+
 
     // 새로운 채팅 생성
     fun createNewChat(email: String, onChatCreated: (String) -> Unit) {
@@ -66,6 +92,7 @@ class ChatBotViewModel(
     fun sendMessage(email: String, message: String, chatId: Int) {
         // 사용자가 보낸 메시지 저장
         addMessageToChat(email, message, isUser = true, chatId)
+        loadMessages(chatId)
 
         viewModelScope.launch {
             try {
@@ -80,16 +107,20 @@ class ChatBotViewModel(
                         responseBody.data.forEach { rasaDto ->
                             rasaDto.text?.let { text ->
                                 addMessageToChat(email, text, isUser = false, chatId) // 챗봇 메시지 저장
+                                loadMessages(chatId)
                             }
                         }
                     } else {
                         addMessageToChat(email, "챗봇으로부터 응답이 없습니다.", isUser = false, chatId)
+                        loadMessages(chatId)
                     }
                 } else {
                     addMessageToChat(email, "오류 발생: ${response.code()} - ${response.message()}", isUser = false, chatId)
+                    loadMessages(chatId)
                 }
             } catch (e: Exception) {
                 addMessageToChat(email, "예외 발생: ${e.message}", isUser = false, chatId)
+                loadMessages(chatId)
             }
         }
     }
@@ -102,7 +133,7 @@ class ChatBotViewModel(
                     id = System.currentTimeMillis().toInt(),
                     content = message,
                     time = getCurrentTime(),
-                    isUser = isUser
+                    user = isUser
                 )
 
                 // Firestore 하위 컬렉션에 메시지 저장
@@ -115,7 +146,7 @@ class ChatBotViewModel(
 
     // 현재 시간을 포맷팅하는 함수
     private fun getCurrentTime(): String {
-        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         return dateFormat.format(Date())
     }
 }

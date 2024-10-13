@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TextField
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -121,7 +123,12 @@ fun ChatScreen(
                     .fillMaxSize()
                     .background(Color.Transparent)
             ) {
-                ChatTitleRow(modifier = Modifier.padding(start = 20.dp, end = 20.dp))
+                ChatTitleRow(modifier = Modifier.padding(start = 20.dp, end = 20.dp)){
+                    chatId?.let {
+                        chatBotViewModel.deleteChat(userInfo?.email ?: "", it) // Firebase에서 대화 삭제
+                        navController.popBackStack() // 이전 화면으로 돌아감
+                    }
+                }
                 Box(
                     modifier = Modifier
                         .weight(1f) // 가용 공간을 채우기 위한 weight 사용
@@ -133,6 +140,7 @@ fun ChatScreen(
                             .fillMaxSize()
                             .background(Color.Transparent)
                     ) {
+                        Spacer(modifier = Modifier.height(10.dp))
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -180,26 +188,30 @@ fun ChatRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.Transparent),
-        horizontalAlignment = if (chat.isUser) Alignment.End else Alignment.Start
+        horizontalAlignment = if (chat.user) Alignment.End else Alignment.Start
     ) {
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(100.dp))
-                .background(if (chat.isUser) MainBlue else LightGray),
+                .background(if (chat.user) MainBlue else LightGray),
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
                 text = chat.content,
                 style = TextStyle(
-                    color = if(chat.isUser) Color.White else Color.Black,
+                    color = if(chat.user) Color.White else Color.Black,
                     fontSize = 15.sp
                 ),
                 modifier = Modifier.padding(vertical = 8.dp, horizontal = 15.dp),
                 textAlign = TextAlign.Start
             )
         }
+        val lastMessageTime = chat.time.let { time ->
+            time.substring(11, 16) // "HH:mm" 형식으로 변환
+        }
+
         Text(
-            text = chat.time,
+            text =  lastMessageTime,
             style = TextStyle(
                 color = Gray,
                 fontSize = 12.sp
@@ -280,7 +292,9 @@ fun CustomTextField(
 @Composable
 fun ChatTitleRow(
     modifier: Modifier = Modifier,
+    onDeleteClick: () -> Unit
 ) {
+    var expanded by remember { mutableStateOf(false) }
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -312,13 +326,30 @@ fun ChatTitleRow(
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-        IconButton(
-            onClick = {}, modifier = Modifier
-                .size(24.dp)
-                .align(CenterVertically)
-        ) {
-            Icon(Icons.Default.MoreVert, contentDescription = "", tint = MainBlue)
+        Box(modifier = Modifier.align(CenterVertically)){
+            IconButton(
+                onClick = { expanded = true },
+                modifier = Modifier
+                    .size(24.dp)
+            ) {
+                Icon(Icons.Default.MoreVert, contentDescription = "", tint = MainBlue)
+            }
+            DropdownMenu(
+                    expanded = expanded,
+            onDismissRequest = { expanded = false }
+            ) {
+            DropdownMenuItem(
+                onClick = {
+                    onDeleteClick() // 삭제 클릭 시 호출
+                    expanded = false // 드롭다운 메뉴 닫기
+                }
+            ) {
+                Text(text = "삭제")
+            }
         }
+        }
+
     }
+
 
 }
