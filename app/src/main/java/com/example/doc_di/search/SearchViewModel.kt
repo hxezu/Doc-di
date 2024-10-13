@@ -12,12 +12,11 @@ import com.example.doc_di.domain.model.Pill
 import com.example.doc_di.domain.model.PillInfo
 import com.example.doc_di.domain.pill.PillsSearchRepository
 import com.example.doc_di.domain.pill.Result
+import com.example.doc_di.domain.pill.SearchHistoryDto
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -43,7 +42,6 @@ class SearchViewModel(
     val pillInfo = _pillInfo.asStateFlow()
 
     private val _showErrorToastChannel = Channel<Boolean>()
-    val showErrorToastChannel = _showErrorToastChannel.receiveAsFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -96,10 +94,10 @@ class SearchViewModel(
         searchPillsByOptions()
     }
 
-    fun setPillInfo(itemSeq: String) {
+    fun setPillInfo(searchHistoryDto: SearchHistoryDto) {
         viewModelScope.launch {
             _isLoading.value = true
-            pillsSearchRepository.getPillInfo(itemSeq).collectLatest { result ->
+            pillsSearchRepository.getPillInfo(searchHistoryDto).collectLatest { result ->
                 _isLoading.value = false
                 when (result) {
                     is Result.Error -> {

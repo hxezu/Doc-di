@@ -27,11 +27,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.domain.model.Pill
+import com.example.doc_di.domain.pill.SearchHistoryDto
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ShowPillList(
@@ -61,7 +64,13 @@ fun ShowPillList(
                         reviewViewModel.showSearch[2] = false
                         reviewViewModel.showSearch[3] = false
                         searchViewModel.setSelectedPill(pill)
-                        searchViewModel.setPillInfo(pill.itemSeq.toString())
+                        val searchHistoryDto = SearchHistoryDto(
+                            userViewModel.userInfo.value!!.email,
+                            pill.itemName,
+                            pill.itemSeq.toString(),
+                            LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+                        )
+                        searchViewModel.setPillInfo(searchHistoryDto)
                         reviewViewModel.fetchReviewInfo(
                             context,
                             navController,

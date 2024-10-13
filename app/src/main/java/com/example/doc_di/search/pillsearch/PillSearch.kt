@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -46,8 +47,9 @@ fun PillSearch(navController: NavController, searchViewModel: SearchViewModel) {
             color = Color.Black,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 40.dp, bottom = 20.dp)
+                .padding(start = 40.dp)
         )
+        Spacer(modifier = Modifier.height(20.dp))
         SnappingLazyRow(
             items = items,
             itemWidth = 280.dp,

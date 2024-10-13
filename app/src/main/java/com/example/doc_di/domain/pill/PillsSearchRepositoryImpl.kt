@@ -37,10 +37,10 @@ class PillsSearchRepositoryImpl(
         }
     }
 
-    override suspend fun getPillInfo(name: String): Flow<Result<PillInfo>> {
+    override suspend fun getPillInfo(searchHistoryDto: SearchHistoryDto): Flow<Result<PillInfo>> {
         return flow{
             val pillsFromApi = try{
-                pillApi.getPillInfo(name)
+                pillApi.getPillInfo(searchHistoryDto)
             }
             catch (e: IOException){
                 e.printStackTrace()

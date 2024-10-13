@@ -66,7 +66,7 @@ fun PillInformation(
 
     val isLoading = searchViewModel.isLoading.collectAsState().value
     val selectedPill = searchViewModel.getSelectedPill()
-
+    val context = LocalContext.current
 
     val imageState = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
@@ -95,6 +95,7 @@ fun PillInformation(
         }
     }
 
+    userViewModel.getPillHistory(userViewModel.userInfo.value!!.email, context, navController)
     Scaffold(
         bottomBar = { BottomNavigationBar(navController, btmBarViewModel) },
         containerColor = Color.Transparent,

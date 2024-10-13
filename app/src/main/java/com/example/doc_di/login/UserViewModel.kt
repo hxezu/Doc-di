@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.account.AccountDTO
+import com.example.doc_di.domain.review.SearchHistory
 import com.example.doc_di.etc.Routes
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
@@ -27,6 +28,9 @@ class UserViewModel: ViewModel(){
     private val _userImage = MutableLiveData<Bitmap?>()
     val userImage: LiveData<Bitmap?> get() = _userImage
 
+    private val _pastHistory = MutableLiveData<List<SearchHistory>?>()
+    val pastHistory: LiveData<List<SearchHistory>?> get() = _pastHistory
+
     suspend fun fetchUser(context: Context, navController: NavController, onComplete: () -> Unit) {
         viewModelScope.launch {
             val reLogin = {
@@ -41,6 +45,14 @@ class UserViewModel: ViewModel(){
                 val accessToken = checkAccessAndReissue(context, navController)
                 if (accessToken != null) {
                     val email = getEmailFromToken(accessToken) ?: return@launch
+
+                    val pillHistoryResponse = RetrofitInstance.pillApi.getPillHistory(accessToken, email)
+                    if (pillHistoryResponse.isSuccessful){
+                        _pastHistory.postValue(pillHistoryResponse.body()?.data)
+                    }
+                    else{
+                        reLogin()
+                    }
 
                     val userInfoResponse = RetrofitInstance.accountApi.getUserInfo(email, accessToken)
                     if (userInfoResponse.isSuccessful) {
@@ -150,6 +162,26 @@ class UserViewModel: ViewModel(){
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        }
+    }
+
+    fun getPillHistory(email: String, context: Context, navController: NavController){
+        viewModelScope.launch {
+            val accessToken = checkAccessAndReissue(context, navController)
+            val pillHistoryResponse = RetrofitInstance.pillApi.getPillHistory(accessToken!!, email)
+            if (pillHistoryResponse.isSuccessful){
+                _pastHistory.postValue(pillHistoryResponse.body()?.data)
+            }
+        }
+    }
+
+    fun deletePillHistory(id: Int, context: Context, navController: NavController){
+        viewModelScope.launch {
+            val accessToken = checkAccessAndReissue(context, navController)
+            val deleteHistoryResponse = RetrofitInstance.pillApi.deleteHistory(accessToken!!, id)
+            if (deleteHistoryResponse.isSuccessful){
+                getPillHistory(getEmailFromToken(accessToken)!!, context, navController)
+            }
         }
     }
 

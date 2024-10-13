@@ -72,6 +72,7 @@ fun NaviGraph(navController: NavHostController) {
     val pastAppointment by reminderViewModel.pastAppointments.observeAsState()
     val upcomingAppointment by reminderViewModel.upcomingAppointments.observeAsState()
 
+
     NavHost(navController = navController, startDestination = Routes.login.route) {
 
         composable(Routes.login.route) {

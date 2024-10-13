@@ -10,6 +10,6 @@ interface PillsSearchRepository {
     ): Flow<Result<List<Pill>>>
 
     suspend fun getPillInfo(
-        itemSeq: String
+        searchHistoryDto: SearchHistoryDto
     ): Flow<Result<PillInfo>>
 }

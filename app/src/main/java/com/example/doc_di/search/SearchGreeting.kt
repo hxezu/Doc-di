@@ -20,8 +20,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.etc.observeAsState
+import com.example.doc_di.login.UserViewModel
 
 @Composable
 fun SearchGreeting(userViewModel: UserViewModel) {
@@ -35,6 +35,7 @@ fun SearchGreeting(userViewModel: UserViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp)
+                .padding(top = 40.dp)
         ) {
             Text(
                 text = "좋은 하루에요,\n${userViewModel.userInfo.value?.name}님",
