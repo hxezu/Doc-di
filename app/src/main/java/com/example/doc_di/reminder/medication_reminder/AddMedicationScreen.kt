@@ -60,6 +60,7 @@ import com.example.doc_di.etc.Routes
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.reminder.medication_reminder.utils.AddMedicationName
 import com.example.doc_di.reminder.medication_reminder.utils.DoseInputField
+import com.example.doc_di.reminder.medication_reminder.utils.DoseUnitDropdownMenu
 import com.example.doc_di.reminder.medication_reminder.utils.EndDateTextField
 import com.example.doc_di.reminder.medication_reminder.utils.RecurrenceDropdownMenu
 import com.example.doc_di.reminder.medication_reminder.utils.TimerTextField
@@ -87,12 +88,14 @@ fun AddMedicationScreenUI(
 
     var name by rememberSaveable { mutableStateOf("") }
     var dose by rememberSaveable { mutableStateOf("") }
+    var doseUnit by rememberSaveable { mutableStateOf("") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
     var endDate by rememberSaveable { mutableStateOf(Date()) }
 
 
     var isNameEntered by remember { mutableStateOf(false) }
     var isDoseEntered by remember { mutableStateOf(false) }
+    var isDoseUnitSelected by remember { mutableStateOf(false) }
     var isRecurrenceSelected by remember { mutableStateOf(false) }
     var isEndDateSelected by remember { mutableStateOf(false) }
 
@@ -120,7 +123,7 @@ fun AddMedicationScreenUI(
 
     // Check if the last TimerTextField is selected
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
-    val isSaveButtonEnabled = isNameEntered && isDoseEntered && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
+    val isSaveButtonEnabled = isDoseUnitSelected && isNameEntered && isDoseEntered && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
 
     Scaffold(
         backgroundColor = Color.Transparent,
@@ -156,10 +159,12 @@ fun AddMedicationScreenUI(
                 onClick = {
                     if (isSaveButtonEnabled) {
                         scope.launch {
+                            val dosageString = "$dose $doseUnit"
+
                             reminderImpl.createReminder(
                                 email = userEmail,
                                 medicineName = name,
-                                dosage = dose.toShort(),
+                                dosage = dosageString,
                                 recurrence = recurrence,
                                 startDate = startDate,
                                 endDate = endDate,
@@ -238,13 +243,24 @@ fun AddMedicationScreenUI(
                         dose = doseValue
                         isDoseEntered = doseValue.isNotEmpty()
                     })
-                RecurrenceDropdownMenu (
-                    recurrence = { selectedRecurrence ->
-                        recurrence = selectedRecurrence
-                        isRecurrenceSelected = true
-                    },
-                    isRecurrenceSelected = isRecurrenceSelected)
+                DoseUnitDropdownMenu(
+                    isDoseUnitSelected = isDoseUnitSelected,
+                    doseUnit = { selectedDoseUnit ->
+                        doseUnit = selectedDoseUnit
+                        isDoseUnitSelected = true
+                    })
+
             }
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
+            RecurrenceDropdownMenu (
+                recurrence = { selectedRecurrence ->
+                    recurrence = selectedRecurrence
+                    isRecurrenceSelected = true
+                },
+                isRecurrenceSelected = isRecurrenceSelected
+            )
 
             Spacer(modifier = Modifier.padding(4.dp))
             EndDateTextField(

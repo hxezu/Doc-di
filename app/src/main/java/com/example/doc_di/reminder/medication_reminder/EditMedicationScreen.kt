@@ -62,6 +62,7 @@ import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.reminder.medication_reminder.utils.EditDoseInput
+import com.example.doc_di.reminder.medication_reminder.utils.EditDoseUnit
 import com.example.doc_di.reminder.medication_reminder.utils.EditEndDate
 import com.example.doc_di.reminder.medication_reminder.utils.EditMedicationName
 import com.example.doc_di.reminder.medication_reminder.utils.EditRecurrence
@@ -90,6 +91,7 @@ fun EditMedicationScreen(
 
     var name by remember { mutableStateOf("") }
     var dose by remember { mutableStateOf(0) }
+    var doseUnit by rememberSaveable { mutableStateOf("") }
     var recurrence by remember { mutableStateOf("") }
     var endDate by remember { mutableStateOf(Date()) }
     var existingDate by remember { mutableStateOf(Date()) } // 기존 날짜 저장
@@ -99,7 +101,13 @@ fun EditMedicationScreen(
     LaunchedEffect(reminder) {
         reminder?.let {
             name = it.medicineName
-            dose = it.dosage
+
+            val dosageParts = it.dosage.toString().split(" ")
+            if (dosageParts.size >= 2) {
+                dose = dosageParts[0].toIntOrNull() ?: 0  // Extract the dose and convert it to Int
+                doseUnit = dosageParts.subList(1, dosageParts.size).joinToString(" ")  // Handle multi-word units
+            }
+
             recurrence = it.recurrence
             medicationTime = it.medicationTime
 
@@ -113,6 +121,7 @@ fun EditMedicationScreen(
 
     var isNameEntered by remember { mutableStateOf(true) }
     var isDoseEntered by remember { mutableStateOf(true) }
+    var isDoseUnitSelected by remember { mutableStateOf(false) }
     var isRecurrenceSelected by remember { mutableStateOf(true) }
     var isEndDateSelected by remember { mutableStateOf(true) }
 
@@ -129,7 +138,7 @@ fun EditMedicationScreen(
     fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
 
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
-    val isSaveButtonEnabled = isNameEntered && isDoseEntered && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
+    val isSaveButtonEnabled = isDoseUnitSelected && isNameEntered && isDoseEntered && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
 
 
     Scaffold(
@@ -193,7 +202,7 @@ fun EditMedicationScreen(
 
                         val updatedReminder = reminder?.copy(
                             medicineName = name,
-                            dosage = dose,
+                            dosage = "$dose $doseUnit",
                             recurrence = recurrence,
                             endDate = endDate.toFormattedDateString(),
                             medicationTime = updatedTimes.joinToString(", ") // 시간을 문자열로 결합
@@ -283,14 +292,27 @@ fun EditMedicationScreen(
                         dose = doseValue
                         isDoseEntered = doseValue > 0
                     })
-                EditRecurrence (
-                    selectedRecurrence = recurrence,
-                    recurrence = { selectedRecurrence ->
-                        recurrence = selectedRecurrence
-                        isRecurrenceSelected = true
-                    },
-                    isRecurrenceSelected = isRecurrenceSelected)
+                EditDoseUnit(
+                    selectedDoseUnit = doseUnit,
+                    isDoseUnitSelected = isDoseUnitSelected,
+                    doseUnit = { selectedDoseUnit ->
+                        doseUnit = selectedDoseUnit
+                        isDoseUnitSelected = true
+                    }
+                )
+
             }
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
+            EditRecurrence (
+                selectedRecurrence = recurrence,
+                recurrence = { selectedRecurrence ->
+                    recurrence = selectedRecurrence
+                    isRecurrenceSelected = true
+                },
+                isRecurrenceSelected = isRecurrenceSelected
+            )
 
             Spacer(modifier = Modifier.padding(4.dp))
             EditEndDate(

@@ -8,7 +8,7 @@ import java.util.Date
 data class Reminder(
     val id: Int?,
     val medicineName: String,
-    val dosage: Int,
+    val dosage: String,
     val recurrence: String,
     val endDate: String,
     val medicationTaken: Boolean,
