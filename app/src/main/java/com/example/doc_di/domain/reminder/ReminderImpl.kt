@@ -20,7 +20,7 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
     suspend fun createReminder(
         email: String,
         medicineName: String,
-        dosage: Short,
+        dosage: String,
         recurrence: String,
         startDate: Date,
         endDate: Date,

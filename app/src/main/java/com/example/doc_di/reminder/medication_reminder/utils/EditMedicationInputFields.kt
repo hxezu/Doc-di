@@ -130,6 +130,75 @@ fun EditRecurrence(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditDoseUnit(
+    selectedDoseUnit: String,
+    doseUnit: (String) -> Unit,
+    isDoseUnitSelected: Boolean
+) {
+    val doseUnitOptions = listOf("정", "캡슐", "ml", "mg", "g")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(selectedDoseUnit) }
+    var isFocused by rememberSaveable { mutableStateOf(false) }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            color = Color.Black,
+            text = "복용 단위",
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+        ) {
+            OutlinedTextField(
+                value = selectedDoseUnit,
+                onValueChange = {},
+                readOnly = true,
+                singleLine = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        tint = Color.Black // 아이콘 색상 설정
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+                    .onFocusChanged { focusState ->
+                        isFocused = focusState.isFocused
+                    },
+                shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = if (isDoseUnitSelected) Color.Black else Color.Gray,
+                    focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
+                    unfocusedBorderColor = if (isDoseUnitSelected) MainBlue else Color.Gray
+                )
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                doseUnitOptions.forEach { unitOption ->
+                    DropdownMenuItem(
+                        text = {  Text(unitOption) },
+                        onClick = {
+                            selectedOptionText = unitOption
+                            doseUnit(selectedOptionText)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
 
 
 @Composable

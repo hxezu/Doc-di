@@ -137,7 +137,7 @@ fun MedicationCard(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = reminder.dosage.toString() + " 정",
+                        text = reminder.dosage,
                         fontWeight = FontWeight.Medium,
                         style = MaterialTheme.typography.bodyMedium
                     )
