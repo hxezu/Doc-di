@@ -32,17 +32,20 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.reminder.data.AppointmentData
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun AppointmentCard(index: Int, appointmentData: AppointmentData, navController: NavController) {
+fun AppointmentCard(
+    appointmentData: AppointmentData,
+    navController: NavController,
+    reminderViewModel: ReminderViewModel
+) {
     val cardProfessorColor = Color(0xFF202325)
     val treatmentTimeColor = Color(0xFF404446)
     val locateColor = Color(0xFF6C7072)
     val departmentColor = Color(0xFF5555CB)
-    val appointmentCardColors = listOf(Color(0xFFF0F0FF), Color(0xFFFFF9F0))
-    val appointmentCardImageIds = listOf(R.drawable.doctor_image, R.drawable.warm_up_image)
 
     val date = appointmentData.formattedTime.split(" ")
     val todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
@@ -52,12 +55,32 @@ fun AppointmentCard(index: Int, appointmentData: AppointmentData, navController:
         tomorrowDate -> "내일 ${date[1]} ${date[2]}"
         else -> appointmentData.formattedTime
     }
-    val cardColor = if (index % 2 == 0) appointmentCardColors[0] else appointmentCardColors[1]
-    val cardImageId = if (index % 2 == 0) appointmentCardImageIds[0] else appointmentCardImageIds[1]
+
+    val cardColor = mapOf(
+        "내과" to Color(0xFFF4E6E6), "안과" to Color(0xFFFBF8DD),
+        "치과" to Color(0xFFFFF4FF), "정형외과" to Color(0xFFFFF9F0),
+        "외과" to Color(0xFFE2F1E7), "이비인후과" to Color(0xFFD1E9F6),
+        "성형외과" to Color(0xFFF5EDED), "피부과" to Color(0xFFF5EFFF),
+        "산부인과" to Color(0xFFF0F0FF), "소아과" to Color(0xFFFFECC8),
+        "정신과" to Color(0xFFFEFAE0), "한의원" to Color(0xFFE2F1E7),
+    )
+
+    val cardImageId = mapOf(
+        "내과" to R.drawable.internal_department, "안과" to R.drawable.ophthalmology_department,
+        "치과" to R.drawable.dentist_department, "정형외과" to R.drawable.orthopedics_department,
+        "외과" to R.drawable.surgery_department, "이비인후과" to R.drawable.otolaryngology_department,
+        "성형외과" to R.drawable.plastic_surgery_department, "피부과" to R.drawable.dermatology_department,
+        "산부인과" to R.drawable.obstetrics_department, "소아과" to R.drawable.pediatrics_department,
+        "정신과" to R.drawable.psychiatry_department, "한의원" to R.drawable.oriental_department,
+    )
+
     Box(modifier = Modifier.width(280.dp)) {
         Card(
-            onClick = { navController.navigate(Routes.appointmentSchedule.route) },
-            colors = CardDefaults.cardColors(cardColor),
+            onClick = {
+                reminderViewModel.reservedTreatment = true
+                navController.navigate(Routes.appointmentSchedule.route)
+            },
+            colors = CardDefaults.cardColors(cardColor[appointmentData.subject]!!),
             elevation = CardDefaults.cardElevation(1.dp),
             modifier = Modifier
                 .width(280.dp)
@@ -117,12 +140,12 @@ fun AppointmentCard(index: Int, appointmentData: AppointmentData, navController:
             }
         }
         Image(
-            painter = painterResource(id = cardImageId),
+            painter = painterResource(id = cardImageId[appointmentData.subject]!!),
             contentDescription = "의사 이미지",
             modifier = Modifier
                 .size(160.dp)
                 .align(Alignment.BottomEnd)
-                .offset(x = 4.dp, y = 36.dp)
+                .offset(x = 4.dp, y = 6.dp)
         )
     }
 }

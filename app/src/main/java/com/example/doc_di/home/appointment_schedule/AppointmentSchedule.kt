@@ -34,7 +34,7 @@ fun AppointmentSchedule(
     btmBarViewModel: BtmBarViewModel,
     reminderViewModel: ReminderViewModel
 ) {
-    val reservedTreatment = remember { mutableStateOf(true) }
+    val reservedTreatment = remember { mutableStateOf(reminderViewModel.reservedTreatment) }
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController, btmBarViewModel) },

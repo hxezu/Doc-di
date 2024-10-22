@@ -1,33 +1,32 @@
 package com.example.doc_di.reminder.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.doc_di.domain.model.Reminder
-import com.example.doc_di.domain.reminder.ReminderApi
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-import androidx.compose.runtime.*
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.doc_di.domain.model.Booked
 import com.example.doc_di.domain.model.Pill
+import com.example.doc_di.domain.model.Reminder
+import com.example.doc_di.domain.reminder.ReminderApi
 import com.example.doc_di.reminder.data.AppointmentData
 import com.example.doc_di.reminder.data.MedicationData
-import com.example.doc_di.reminder.data.getClassName
-import com.example.doc_di.reminder.data.getRating
 import com.example.doc_di.reminder.data.toAppointmentData
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import retrofit2.Response
-import java.util.Date
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 
 @HiltViewModel
 class ReminderViewModel @Inject constructor(
     private val reminderApi: ReminderApi
 ) : ViewModel() {
+    var reservedTreatment = false
     val isLoading = MutableLiveData<Boolean>(false)
 
     private val _reminders = mutableStateOf<List<Reminder>>(emptyList())

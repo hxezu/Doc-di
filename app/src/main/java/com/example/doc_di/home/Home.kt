@@ -83,7 +83,7 @@ fun Home(
                     .padding(start = 40.dp, bottom = 106.dp, top = 40.dp)
             ) {
                 HomeGreeting(navController, userViewModel)
-                UpcomingAppointment(upcomingAppointment, navController)
+                UpcomingAppointment(upcomingAppointment, navController, reminderViewModel)
                 DosageList(medicationsForToday,navController, btmBarViewModel, searchViewModel)
             }
         }

@@ -1,8 +1,11 @@
 package com.example.doc_di.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,11 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.sharp.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,21 +35,43 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.reminder.data.AppointmentData
+import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 
 @Composable
 fun UpcomingAppointment(
     upcomingAppointment: List<AppointmentData>?,
-    navController: NavController
+    navController: NavController,
+    reminderViewModel: ReminderViewModel,
 ) {
     val titleColor = Color(0xFF404446)
 
     Column {
-        Text(
-            text = "다가오는 진료 일정",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = titleColor,
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(end = 40.dp)
+        ) {
+            Text(
+                text = "다가오는 진료 일정",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = titleColor,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable {
+                    reminderViewModel.reservedTreatment = false
+                    navController.navigate(Routes.appointmentSchedule.route)
+                }
+            ) {
+                Text(text = "지난 진료 기록 보기", fontSize = 14.sp, color = Color(0xFF6C7072))
+                Icon(
+                    imageVector = Icons.Sharp.KeyboardArrowRight,
+                    contentDescription = "지난 진료 기록 버튼",
+                    tint = Color(0xFF6C7072)
+                )
+            }
+        }
         if (upcomingAppointment.isNullOrEmpty()) {
             Card(
                 colors = CardDefaults.cardColors(Color.Transparent),
@@ -90,8 +118,8 @@ fun UpcomingAppointment(
                     .fillMaxWidth()
                     .padding(top = 16.dp, end = 40.dp)
             ) {
-                itemsIndexed(upcomingAppointment) { index, appointmentData ->
-                    AppointmentCard(index, appointmentData, navController)
+                items(upcomingAppointment) { appointmentData ->
+                    AppointmentCard(appointmentData, navController, reminderViewModel)
                 }
             }
         }

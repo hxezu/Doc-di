@@ -4,7 +4,7 @@
         <domain includeSubdomains="true">dev.frndapp.in</domain>
     </domain-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">192.168.99.189</domain>
+        <domain includeSubdomains="true">192.168.53.189</domain>
     </domain-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">192.168.66.6</domain>

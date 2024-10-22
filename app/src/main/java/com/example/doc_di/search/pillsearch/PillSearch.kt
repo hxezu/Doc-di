@@ -35,8 +35,8 @@ fun PillSearch(navController: NavController, searchViewModel: SearchViewModel) {
     val scope = rememberCoroutineScope()
     val items = mutableListOf(
         R.drawable.search_text,
-        R.drawable.search_shape,
-        R.drawable.search_image
+        R.drawable.search_image,
+        R.drawable.search_shape
     )
 
     Column {
