@@ -461,6 +461,7 @@ fun AppointmentRecurrenceDropdownMenu(recurrence: (String) -> Unit,
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Color(0xFFdeeff5))
             ) {
                 getRecurrenceList().forEach { recurrenceOption ->
                     DropdownMenuItem(
