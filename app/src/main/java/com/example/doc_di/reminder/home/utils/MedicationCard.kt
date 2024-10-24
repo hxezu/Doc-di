@@ -1,8 +1,8 @@
 package com.example.doc_di.reminder.home.utils
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,9 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,7 +43,6 @@ import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
-import com.example.doc_di.ui.theme.LightBlue
 
 @Composable
 fun MedicationCard(
@@ -171,8 +168,10 @@ fun MedicationCard(
                     // 드롭다운 메뉴
                     DropdownMenu(
                         expanded = expanded,
-                        modifier = Modifier.align(Alignment.CenterEnd),
-                        onDismissRequest = { expanded = false }
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .background(Color(0xFFDEEFF5))
                     ) {
                         DropdownMenuItem(
                             onClick = {

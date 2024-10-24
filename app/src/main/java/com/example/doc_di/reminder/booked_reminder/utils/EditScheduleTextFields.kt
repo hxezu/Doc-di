@@ -1,6 +1,7 @@
 package com.example.doc_di.reminder.booked_reminder.utils
 
 import android.app.DatePickerDialog
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -122,6 +123,7 @@ fun EditDepartment(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Color(0xFFDEEFF5))
             ) {
                 getDepartmentList().forEach { departmentOption ->
                     DropdownMenuItem(

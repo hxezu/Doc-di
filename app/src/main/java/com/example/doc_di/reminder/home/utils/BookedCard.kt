@@ -2,6 +2,7 @@ package com.example.doc_di.reminder.home.utils
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -141,8 +142,10 @@ fun BookedCard(
                     // 드롭다운 메뉴
                     DropdownMenu(
                         expanded = expanded,
-                        modifier = Modifier.align(Alignment.CenterEnd),
-                        onDismissRequest = { expanded = false }
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .background(Color(0xFFDEEFF5))
                     ) {
                         DropdownMenuItem(
                             onClick = {

@@ -1,6 +1,7 @@
 package com.example.doc_di.reminder.medication_reminder.utils
 
 import android.app.DatePickerDialog
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -25,9 +26,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -47,9 +46,9 @@ import androidx.compose.ui.unit.dp
 import com.example.doc_di.R
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
-import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.reminder.util.Recurrence
 import com.example.doc_di.reminder.util.getRecurrenceList
+import com.example.doc_di.ui.theme.MainBlue
 import kotlinx.coroutines.delay
 import java.util.Calendar
 import java.util.Date
@@ -114,6 +113,7 @@ fun EditRecurrence(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Color(0xFFDEEFF5))
             ) {
                 getRecurrenceList().forEach { recurrenceOption ->
                     DropdownMenuItem(
@@ -184,6 +184,7 @@ fun EditDoseUnit(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Color(0xFFDEEFF5))
             ) {
                 doseUnitOptions.forEach { unitOption ->
                     DropdownMenuItem(
