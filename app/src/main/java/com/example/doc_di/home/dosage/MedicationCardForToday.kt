@@ -89,7 +89,8 @@ fun MedicationCardForToday(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "2024.10.12",
+                    fontSize = 15.sp,
+                    text = "${medication.endDate}까지",
                     color = cardTextColor
                 )
             }
@@ -104,7 +105,7 @@ fun MedicationCardForToday(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "${medication.dosage}정",
+                    text = "${medication.dosage}",
                     color = cardTextColor
                 )
             }

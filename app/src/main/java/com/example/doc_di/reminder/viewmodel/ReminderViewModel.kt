@@ -164,7 +164,7 @@ class ReminderViewModel @Inject constructor(
         val currentDateString = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
         val timeFormat = SimpleDateFormat("a hh:mm", Locale("ko", "KR"))
         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) // medicationTime 형식에 맞춰 조정
-        val endDateFormat = SimpleDateFormat("yyyy년 M월 d일", Locale("ko", "KR"))
+        val endDateFormat = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
 
         val todayMedications = reminders.filter { reminder ->
             val reminderDate = try {
