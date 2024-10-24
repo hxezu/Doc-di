@@ -50,7 +50,7 @@ fun MedicationCardForToday(
         colors = CardDefaults.cardColors(Color.White),
         elevation = CardDefaults.cardElevation(1.dp),
         modifier = Modifier
-            .width(180.dp)
+            .width(200.dp)
     ) {
         Column(
             modifier = Modifier.padding(24.dp)
@@ -90,7 +90,7 @@ fun MedicationCardForToday(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     fontSize = 15.sp,
-                    text = "${medication.endDate}까지",
+                    text = "${medication.endDate} 까지",
                     color = cardTextColor
                 )
             }
