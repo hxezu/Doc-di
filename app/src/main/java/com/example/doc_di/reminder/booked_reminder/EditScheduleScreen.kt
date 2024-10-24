@@ -84,6 +84,7 @@ fun EditScheduleScreen(
     val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
     val booked by remember(reminderId) { mutableStateOf(reminderId?.let { reminderViewModel.getBookedReminderById(it) }) }
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
 
     var clinicName by rememberSaveable { mutableStateOf("") }
@@ -225,7 +226,7 @@ fun EditScheduleScreen(
                 .fillMaxSize()
                 .padding(paddingValues)  // Apply paddingValues here to avoid overlapping with the TopAppBar
                 .padding(horizontal = 20.dp)  // Additional padding as needed
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
@@ -316,7 +317,15 @@ fun EditScheduleScreen(
                 Switch(
                     modifier = Modifier.padding(end = 20.dp),
                     checked = isRecurring,
-                    onCheckedChange = { checked -> isRecurring = checked },
+                    onCheckedChange = { checked ->
+                        isRecurring = checked
+                        if (checked) {
+                            scope.launch {
+                                val maxScroll = scrollState.maxValue + 600 // 버튼 크기만큼 더 스크롤
+                                scrollState.animateScrollTo(maxScroll)
+                            }
+                        }
+                                      },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MainBlue,
                         checkedTrackColor = MainBlue.copy(alpha = 0.5f)

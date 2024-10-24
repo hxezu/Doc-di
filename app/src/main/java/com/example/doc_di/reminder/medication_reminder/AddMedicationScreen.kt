@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.FabPosition
@@ -26,6 +28,8 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -34,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +51,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -84,12 +90,14 @@ fun AddMedicationScreenUI(
     val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
     val userEmail = userViewModel.userInfo.value?.email ?: ""
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
 
     var name by rememberSaveable { mutableStateOf("") }
     var dose by rememberSaveable { mutableStateOf("") }
     var doseUnit by rememberSaveable { mutableStateOf("") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
+    var isRecurring by rememberSaveable { mutableStateOf(false) }
     var endDate by rememberSaveable { mutableStateOf(Date()) }
 
 
@@ -123,7 +131,18 @@ fun AddMedicationScreenUI(
 
     // Check if the last TimerTextField is selected
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
-    val isSaveButtonEnabled = isDoseUnitSelected && isNameEntered && isDoseEntered && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
+    val isSaveButtonEnabled = when{
+        isRecurring -> isNameEntered && isDoseEntered && isDoseUnitSelected && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
+        else -> isNameEntered && isDoseEntered && isDoseUnitSelected && selectedTimes.isNotEmpty()
+    }
+
+    val defaultDate = selectedDate?.let {
+        Calendar.getInstance().apply {
+            set(it.year, it.monthValue - 1, it.dayOfMonth, 23, 59, 59)
+            set(Calendar.MILLISECOND, 999) // 밀리초를 999로 설정
+        }.time
+    } ?: Date()
+
 
     Scaffold(
         backgroundColor = Color.Transparent,
@@ -167,7 +186,7 @@ fun AddMedicationScreenUI(
                                 dosage = dosageString,
                                 recurrence = recurrence,
                                 startDate = startDate,
-                                endDate = endDate,
+                                endDate = if (isRecurring) endDate else defaultDate,
                                 medicationTimes = selectedTimes,
                                 context = context,
                                 isAllWritten  = isSaveButtonEnabled,
@@ -203,7 +222,7 @@ fun AddMedicationScreenUI(
                 .fillMaxSize()
                 .padding(paddingValues)  // Apply paddingValues here to avoid overlapping with the TopAppBar
                 .padding(horizontal = 20.dp)  // Additional padding as needed
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
@@ -211,7 +230,7 @@ fun AddMedicationScreenUI(
                     .fillMaxWidth()
                     .padding(bottom = 25.dp),
                 verticalAlignment = CenterVertically // Aligns the image and text vertically in the center
-            ){
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.pillemoji),
                     contentDescription = "Icon",
@@ -254,25 +273,59 @@ fun AddMedicationScreenUI(
 
             Spacer(modifier = Modifier.padding(4.dp))
 
-            RecurrenceDropdownMenu (
-                recurrence = { selectedRecurrence ->
-                    recurrence = selectedRecurrence
-                    isRecurrenceSelected = true
-                },
-                isRecurrenceSelected = isRecurrenceSelected
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    color = Color.Black,
+                    text = "정기 복용",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Switch(
+                    modifier = Modifier.padding(end = 20.dp),
+                    checked = isRecurring,
+                    onCheckedChange = { checked ->
+                        isRecurring = checked
+                        if (checked) {
+                            scope.launch {
+                                val maxScroll = scrollState.maxValue + 600 // 버튼 크기만큼 더 스크롤
+                                scrollState.animateScrollTo(maxScroll)
+                            }
+                        }
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MainBlue,
+                        checkedTrackColor = MainBlue.copy(alpha = 0.5f)
+                    )
+                )
+            }
 
             Spacer(modifier = Modifier.padding(4.dp))
-            EndDateTextField(
-                startDate = startDate.time,
-                onDateSelected = { timestamp ->
-                    endDate = Date(timestamp) // Convert the Long timestamp to a Date object
-                    isEndDateSelected = true
-                },
-                isEndDateSelected = isEndDateSelected
-            )
 
-            Spacer(modifier = Modifier.padding(4.dp))
+            if (isRecurring) {
+
+                RecurrenceDropdownMenu(
+                    recurrence = { selectedRecurrence ->
+                        recurrence = selectedRecurrence
+                        isRecurrenceSelected = true
+                    },
+                    isRecurrenceSelected = isRecurrenceSelected
+                )
+
+                Spacer(modifier = Modifier.padding(4.dp))
+                EndDateTextField(
+                    startDate = startDate.time,
+                    onDateSelected = { timestamp ->
+                        endDate = Date(timestamp) // Convert the Long timestamp to a Date object
+                        isEndDateSelected = true
+                    },
+                    isEndDateSelected = isEndDateSelected
+                )
+
+                Spacer(modifier = Modifier.padding(4.dp))
+            }
 
             Text(
                 color = Color.Black,
@@ -310,6 +363,12 @@ fun AddMedicationScreenUI(
                     onClick = {
                         if (isTimerButtonEnabled) {
                             addTime(CalendarInformation(Calendar.getInstance()))
+
+
+                            scope.launch {
+                                val maxScroll = scrollState.maxValue + 150 // 버튼 크기만큼 더 스크롤
+                                scrollState.animateScrollTo(maxScroll)
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(

@@ -58,10 +58,9 @@ import java.util.Calendar
 fun RecurrenceDropdownMenu(recurrence: (String) -> Unit,
                            isRecurrenceSelected: Boolean) {
     val recurrenceMap = mapOf(
-        Recurrence.None to "선택 안함",
         Recurrence.Daily to "매일",
         Recurrence.Weekly to "매주",
-        Recurrence.Monthly to "매달"
+        Recurrence.Monthly to "매달",
     )
 
     val options = getRecurrenceList().map { recurrenceMap[it] ?: "" }
@@ -151,6 +150,7 @@ fun DoseUnitDropdownMenu(
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded },
+
         ) {
             OutlinedTextField(
                 value = selectedOptionText,
