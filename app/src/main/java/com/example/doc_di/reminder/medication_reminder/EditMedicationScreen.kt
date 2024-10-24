@@ -99,13 +99,14 @@ fun EditMedicationScreen(
     var endDate by remember { mutableStateOf(Date()) }
     var existingDate by remember { mutableStateOf(Date()) } // 기존 날짜 저장
     var medicationTime by remember { mutableStateOf("") }
+    var isRecurring by rememberSaveable { mutableStateOf(false) }
 
     // 데이터 로드 후 상태 초기화
     LaunchedEffect(reminder) {
         reminder?.let {
             name = it.medicineName
 
-            val dosageParts = it.dosage.toString().split(" ")
+            val dosageParts = it.dosage.split(" ")
             if (dosageParts.size >= 2) {
                 dose = dosageParts[0].toIntOrNull() ?: 0  // Extract the dose and convert it to Int
                 doseUnit = dosageParts.subList(1, dosageParts.size).joinToString(" ")  // Handle multi-word units
@@ -125,7 +126,6 @@ fun EditMedicationScreen(
     var isNameEntered by remember { mutableStateOf(true) }
     var isDoseEntered by remember { mutableStateOf(true) }
     var isDoseUnitSelected by remember { mutableStateOf(false) }
-    var isRecurring by rememberSaveable { mutableStateOf(false) }
     var isRecurrenceSelected by remember { mutableStateOf(true) }
     var isEndDateSelected by remember { mutableStateOf(true) }
 
