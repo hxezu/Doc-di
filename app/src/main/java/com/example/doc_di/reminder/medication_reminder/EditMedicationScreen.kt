@@ -18,6 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -87,6 +89,7 @@ fun EditMedicationScreen(
     val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
     val reminder by remember(reminderId) { mutableStateOf(reminderId?.let { reminderViewModel.getReminderById(it) }) }
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
 
     var name by remember { mutableStateOf("") }
@@ -96,13 +99,14 @@ fun EditMedicationScreen(
     var endDate by remember { mutableStateOf(Date()) }
     var existingDate by remember { mutableStateOf(Date()) } // 기존 날짜 저장
     var medicationTime by remember { mutableStateOf("") }
+    var isRecurring by rememberSaveable { mutableStateOf(false) }
 
     // 데이터 로드 후 상태 초기화
     LaunchedEffect(reminder) {
         reminder?.let {
             name = it.medicineName
 
-            val dosageParts = it.dosage.toString().split(" ")
+            val dosageParts = it.dosage.split(" ")
             if (dosageParts.size >= 2) {
                 dose = dosageParts[0].toIntOrNull() ?: 0  // Extract the dose and convert it to Int
                 doseUnit = dosageParts.subList(1, dosageParts.size).joinToString(" ")  // Handle multi-word units
@@ -138,7 +142,11 @@ fun EditMedicationScreen(
     fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
 
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
-    val isSaveButtonEnabled = isDoseUnitSelected && isNameEntered && isDoseEntered && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
+    val isSaveButtonEnabled = when{
+        isRecurring -> isNameEntered && isDoseEntered && isDoseUnitSelected && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
+        else -> isNameEntered && isDoseEntered && isDoseUnitSelected && selectedTimes.isNotEmpty()
+    }
+
 
 
     Scaffold(
@@ -204,7 +212,7 @@ fun EditMedicationScreen(
                             medicineName = name,
                             dosage = "$dose $doseUnit",
                             recurrence = recurrence,
-                            endDate = endDate.toFormattedDateString(),
+                            endDate = if (isRecurring) endDate.toFormattedDateString() else existingDate.toFormattedDateString(),
                             medicationTime = updatedTimes.joinToString(", ") // 시간을 문자열로 결합
                         )
 
@@ -250,7 +258,7 @@ fun EditMedicationScreen(
                 .fillMaxSize()
                 .padding(paddingValues)  // Apply paddingValues here to avoid overlapping with the TopAppBar
                 .padding(horizontal = 20.dp)  // Additional padding as needed
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
@@ -258,7 +266,7 @@ fun EditMedicationScreen(
                     .fillMaxWidth()
                     .padding(bottom = 25.dp),
                 verticalAlignment = CenterVertically // Aligns the image and text vertically in the center
-            ){
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.pillemoji),
                     contentDescription = "Icon",
@@ -294,7 +302,7 @@ fun EditMedicationScreen(
                     })
                 EditDoseUnit(
                     selectedDoseUnit = doseUnit,
-                    isDoseUnitSelected = isDoseUnitSelected,
+                    isDoseUnitSelected = true,
                     doseUnit = { selectedDoseUnit ->
                         doseUnit = selectedDoseUnit
                         isDoseUnitSelected = true
@@ -305,7 +313,40 @@ fun EditMedicationScreen(
 
             Spacer(modifier = Modifier.padding(4.dp))
 
-            EditRecurrence (
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    color = Color.Black,
+                    text = "정기 복용",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Switch(
+                    modifier = Modifier.padding(end = 20.dp),
+                    checked = isRecurring,
+                    onCheckedChange = { checked ->
+                        isRecurring = checked
+                        if (checked) {
+                            scope.launch {
+                                val maxScroll = scrollState.maxValue + 600 // 버튼 크기만큼 더 스크롤
+                                scrollState.animateScrollTo(maxScroll)
+                            }
+                        }
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MainBlue,
+                        checkedTrackColor = MainBlue.copy(alpha = 0.5f)
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
+            if (isRecurring) {
+
+            EditRecurrence(
                 selectedRecurrence = recurrence,
                 recurrence = { selectedRecurrence ->
                     recurrence = selectedRecurrence
@@ -325,6 +366,7 @@ fun EditMedicationScreen(
             )
 
             Spacer(modifier = Modifier.padding(4.dp))
+        }
 
             Text(
                 color = Color.Black,
@@ -362,6 +404,11 @@ fun EditMedicationScreen(
                     onClick = {
                         if (isTimerButtonEnabled) {
                             addTime(CalendarInformation(Calendar.getInstance()))
+
+                            scope.launch {
+                                val maxScroll = scrollState.maxValue + 150 // 버튼 크기만큼 더 스크롤
+                                scrollState.animateScrollTo(maxScroll)
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(

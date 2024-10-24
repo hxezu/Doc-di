@@ -2,6 +2,7 @@ package com.example.doc_di.reminder.booked_reminder
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.FabPosition
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -83,6 +85,7 @@ fun AddScheduleScreen(
     val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
     val userEmail = userViewModel.userInfo.value?.email ?: ""
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
 
     var clinicName by rememberSaveable { mutableStateOf("") }
@@ -122,7 +125,7 @@ fun AddScheduleScreen(
     }
 
     val isSaveButtonEnabled = when {
-        isRecurring -> isClinicEntered && isDoctorEntered && isDepartmentSelected && isRecurrenceSelected && isTimeSelected && isEndDateSelected
+            isRecurring -> isClinicEntered && isDoctorEntered && isDepartmentSelected && isRecurrenceSelected && isTimeSelected && isEndDateSelected
         else -> isClinicEntered && isDoctorEntered && isDepartmentSelected && isTimeSelected
     }
     val defaultDate = selectedDate?.let {
@@ -211,7 +214,7 @@ fun AddScheduleScreen(
                 .fillMaxSize()
                 .padding(paddingValues)  // Apply paddingValues here to avoid overlapping with the TopAppBar
                 .padding(horizontal = 20.dp)  // Additional padding as needed
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
@@ -298,7 +301,15 @@ fun AddScheduleScreen(
                 Switch(
                     modifier = Modifier.padding(end = 20.dp),
                     checked = isRecurring,
-                    onCheckedChange = { checked -> isRecurring = checked },
+                    onCheckedChange = { checked ->
+                        isRecurring = checked
+                        if (checked) {
+                            scope.launch {
+                                val maxScroll = scrollState.maxValue + 600 // 버튼 크기만큼 더 스크롤
+                                scrollState.animateScrollTo(maxScroll)
+                            }
+                        }
+                                      },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MainBlue,
                         checkedTrackColor = MainBlue.copy(alpha = 0.5f)
@@ -308,6 +319,7 @@ fun AddScheduleScreen(
             Spacer(modifier = Modifier.padding(4.dp))
 
             if (isRecurring) {
+
                 AppointmentRecurrenceDropdownMenu (
                     recurrence = { selectedRecurrence ->
                         recurrence = selectedRecurrence
