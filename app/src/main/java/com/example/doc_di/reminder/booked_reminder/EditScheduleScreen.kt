@@ -57,6 +57,7 @@ import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.reminder.booked_reminder.utils.EditAppointmentRecurrence
 import com.example.doc_di.reminder.booked_reminder.utils.EditDepartment
 import com.example.doc_di.reminder.booked_reminder.utils.EditDoctorName
 import com.example.doc_di.reminder.booked_reminder.utils.EditEndDate
@@ -89,7 +90,7 @@ fun EditScheduleScreen(
 
     var clinicName by rememberSaveable { mutableStateOf("") }
     var doctorName by rememberSaveable { mutableStateOf("") }
-    var isRecurring by rememberSaveable { mutableStateOf(false) }  // Add state for toggle
+    var recurrence by remember { mutableStateOf("") }
     var department by rememberSaveable { mutableStateOf(Department.InternalMedicine.name) }
     var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
     var existingDate by remember { mutableStateOf(Date()) }
@@ -99,7 +100,9 @@ fun EditScheduleScreen(
     var isDoctorEntered by remember { mutableStateOf(true) }
     var isDepartmentSelected by remember { mutableStateOf(true) }
     var isTimeSelected by remember { mutableStateOf(true) }
+    var isRecurrenceSelected by remember { mutableStateOf(true) }
     var isEndDateSelected by remember { mutableStateOf(false) }
+    var isEndDateDisabled by remember { mutableStateOf(false) }
 
     val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
     var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
@@ -112,15 +115,17 @@ fun EditScheduleScreen(
 
     fun addTime(time: CalendarInformation) { selectedTimes.add(time) }
     fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
-    val isSaveButtonEnabled = isClinicEntered && isDoctorEntered && isDepartmentSelected && isTimeSelected
+    val isSaveButtonEnabled = isClinicEntered && isDoctorEntered && (isEndDateSelected || isEndDateDisabled) && isDepartmentSelected && isTimeSelected
 
     LaunchedEffect(booked) {
         booked?.let {
             clinicName = it.hospitalName
             doctorName = it.doctorName
             department = it.subject
+            recurrence = "선택 안함"
             bookTime = it.bookTime
 
+            isEndDateDisabled = (recurrence == "선택 안함")
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val parts = it.bookTime.split(" ")
             existingDate = dateFormat.parse(parts[0]) ?: Date() // 기존 날짜 추출
@@ -304,48 +309,35 @@ fun EditScheduleScreen(
             }
 
             Spacer(modifier = Modifier.padding(4.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    color = Color.Black,
-                    text = "정기 진료",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Switch(
-                    modifier = Modifier.padding(end = 20.dp),
-                    checked = isRecurring,
-                    onCheckedChange = { checked ->
-                        isRecurring = checked
-                        if (checked) {
-                            scope.launch {
-                                val maxScroll = scrollState.maxValue + 600 // 버튼 크기만큼 더 스크롤
-                                scrollState.animateScrollTo(maxScroll)
-                            }
-                        }
-                                      },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MainBlue,
-                        checkedTrackColor = MainBlue.copy(alpha = 0.5f)
-                    )
-                )
-            }
-            Spacer(modifier = Modifier.padding(4.dp))
 
-            if (isRecurring) {
-                EditEndDate(
-                    endDate = Date(endDate), // Pass endDate as Date
-                    onDateSelected = { selectedEndDate ->
+            Spacer(modifier = Modifier.padding(4.dp))
+            EditAppointmentRecurrence(
+                selectedRecurrence = recurrence,
+                recurrence = { selectedRecurrence ->
+                    recurrence = selectedRecurrence
+                    isRecurrenceSelected = true
+                },
+                isRecurrenceSelected = isRecurrenceSelected,
+                onDisableEndDate = { disableEndDate ->
+                    isEndDateDisabled = disableEndDate
+                    if (disableEndDate) {
+                        endDate = existingDate.time
+                        isEndDateSelected = false
+                    }
+                }
+            )
+            Spacer(modifier = Modifier.padding(4.dp))
+            EditEndDate(
+                endDate = Date(endDate), // Pass endDate as Date
+                onDateSelected = { selectedEndDate ->
                         endDate = selectedEndDate
                         isEndDateSelected = true
                     },
-                    isEndDateSelected = isEndDateSelected
+                isEndDateSelected = isEndDateSelected,
+                isDisabled = isEndDateDisabled
             )
                 Spacer(modifier = Modifier.padding(4.dp))
             }
-        }
     }
 }
 

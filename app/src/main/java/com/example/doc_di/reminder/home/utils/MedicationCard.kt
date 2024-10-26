@@ -142,7 +142,7 @@ fun MedicationCard(
                 }
 
                 Text(
-                    text = "주기: " + reminder.recurrence,
+                    text =  reminder.recurrence,
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier

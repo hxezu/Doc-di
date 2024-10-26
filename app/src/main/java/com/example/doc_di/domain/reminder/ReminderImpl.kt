@@ -34,13 +34,13 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
             CoroutineScope(Dispatchers.IO).launch {
                 try{
                     val interval = when (recurrence) {
+                        "선택 안함" -> null
                         "매일" -> 1
                         "매주" -> 7
                         "매달" -> 30
                         else -> throw IllegalArgumentException("Invalid recurrence: $recurrence")
                     }
                     val oneDayInMillis = 86400 * 1000 // Number of milliseconds in one day
-                    val numOccurrences = ((endDate.time - startDate.time) / (interval * oneDayInMillis)).toInt() + 1
 
                     // 시작 날짜 설정 (시간 부분은 0으로 설정)
                     val calendar = Calendar.getInstance().apply {
@@ -60,14 +60,10 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                         set(Calendar.MILLISECOND, 99)
                     }
 
-                    for (i in 0 until numOccurrences) {
+                    if (interval == null) {
+                        // "선택 안함"일 때: 단일 알림만 생성
                         for (medicationTime in medicationTimes) {
                             val medicationTimeDate = getReminderTime(medicationTime, calendar)
-
-                            if (calendar.timeInMillis >= endCalendar.timeInMillis) {
-                                continue
-                            }
-
                             val reminderDTO = ReminderDTO(
                                 email = email,
                                 medicineName = medicineName,
@@ -87,8 +83,38 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                                 }
                             }
                         }
-                        // Increment the date by the recurrence interval (daily/weekly/monthly)
-                        calendar.add(Calendar.DAY_OF_YEAR, interval)
+                    } else {
+                        // "매일", "매주", "매달"일 때: 반복 알림 생성
+                        val numOccurrences = ((endDate.time - startDate.time) / (interval * oneDayInMillis)).toInt() + 1
+                        for (i in 0 until numOccurrences) {
+                            for (medicationTime in medicationTimes) {
+                                val medicationTimeDate = getReminderTime(medicationTime, calendar)
+
+                                if (calendar.timeInMillis >= endCalendar.timeInMillis) {
+                                    continue
+                                }
+
+                                val reminderDTO = ReminderDTO(
+                                    email = email,
+                                    medicineName = medicineName,
+                                    dosage = dosage,
+                                    recurrence = recurrence,
+                                    endDate = endDate.toFormattedDateString(),
+                                    medicationTime = medicationTimeDate.toFormattedDateTimeString(),
+                                    medicationTaken = "false"
+                                )
+
+                                val reminderResponse = reminderApi.createReminder(reminderDTO)
+                                if (!reminderResponse.isSuccessful) {
+                                    withContext(Dispatchers.Main) {
+                                        println("알림 등록 실패")
+                                        Toast.makeText(context, "알림 등록 실패", Toast.LENGTH_SHORT).show()
+                                        return@withContext
+                                    }
+                                }
+                            }
+                            calendar.add(Calendar.DAY_OF_YEAR, interval)
+                        }
                     }
                     withContext(Dispatchers.Main) {
                         println("알림 등록 성공")
@@ -167,7 +193,6 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
         subject: String,
         startDate: Date,
         recurrence: String,
-        isRecurring: Boolean,
         endDate: Date,
         bookTimes: List<CalendarInformation>,
         context: Context,
@@ -178,7 +203,7 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
         if (isAllWritten && isAllAvailable) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    if(!isRecurring){
+                    if(recurrence == "선택 안함"){
                         for (bookTime in bookTimes) {
                             val bookTimeDate = getReminderTime(bookTime, Calendar.getInstance().apply {
                                 time = startDate

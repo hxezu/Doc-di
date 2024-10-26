@@ -43,8 +43,10 @@ import androidx.compose.ui.unit.dp
 import com.example.doc_di.R
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
+import com.example.doc_di.reminder.util.BookedRecurrence
 import com.example.doc_di.reminder.util.Department
 import com.example.doc_di.reminder.util.Recurrence
+import com.example.doc_di.reminder.util.getBookedRecurrenceList
 import com.example.doc_di.reminder.util.getDepartmentList
 import com.example.doc_di.reminder.util.getRecurrenceList
 import com.example.doc_di.ui.theme.MainBlue
@@ -205,7 +207,9 @@ fun TimerTextField(
 fun EndDateTextField(
     bookDate: Long,
     onDateSelected: (Long) -> Unit,
-    isEndDateSelected: Boolean) {
+    isEndDateSelected: Boolean,
+    isDisabled: Boolean
+) {
     Text(
         color = Color.Black,
         text = "정기 진료 종료일",
@@ -297,7 +301,8 @@ fun EndDateTextField(
             disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
             textColor = if (isEndDateSelected) Color.Black else Color.Gray,
         ),
-        interactionSource = interactionSource
+        interactionSource = interactionSource,
+        enabled = !isDisabled
     )
 }
 
@@ -406,9 +411,13 @@ fun AddHospitalName(isHospitalEntered: Boolean,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppointmentRecurrenceDropdownMenu(recurrence: (String) -> Unit,
-                           isRecurrenceSelected: Boolean) {
+fun AppointmentRecurrenceDropdownMenu(
+    recurrence: (String) -> Unit,
+    isRecurrenceSelected: Boolean,
+    onDisableEndDate: (Boolean) -> Unit
+) {
     val recurrenceMap = mapOf(
+        Recurrence.None to "선택 안함",
         Recurrence.Daily to "매일",
         Recurrence.Weekly to "매주",
         Recurrence.Monthly to "매달"
@@ -470,6 +479,7 @@ fun AppointmentRecurrenceDropdownMenu(recurrence: (String) -> Unit,
                             selectedOptionText = recurrenceMap[recurrenceOption] ?: ""
                             recurrence(selectedOptionText)
                             expanded = false
+                            onDisableEndDate(recurrenceOption == Recurrence.None)
                         }
                     )
                 }

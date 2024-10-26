@@ -54,12 +54,16 @@ import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecurrenceDropdownMenu(recurrence: (String) -> Unit,
-                           isRecurrenceSelected: Boolean) {
+fun RecurrenceDropdownMenu(
+    recurrence: (String) -> Unit,
+    isRecurrenceSelected: Boolean,
+    onDisableEndDate: (Boolean) -> Unit
+    ) {
     val recurrenceMap = mapOf(
+        Recurrence.None to "선택 안함",
         Recurrence.Daily to "매일",
         Recurrence.Weekly to "매주",
-        Recurrence.Monthly to "매달",
+        Recurrence.Monthly to "매달"
     )
 
     val options = getRecurrenceList().map { recurrenceMap[it] ?: "" }
@@ -118,6 +122,7 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit,
                             selectedOptionText = recurrenceMap[recurrenceOption] ?: ""
                             recurrence(selectedOptionText)
                             expanded = false
+                            onDisableEndDate(recurrenceOption == Recurrence.None)
                         }
                     )
                 }
@@ -271,7 +276,8 @@ fun TimerTextField(
 fun EndDateTextField(
     startDate: Long,
     onDateSelected: (Long) -> Unit,
-    isEndDateSelected: Boolean
+    isEndDateSelected: Boolean,
+    isDisabled: Boolean
 ) {
     Text(
         color = Color.Black,
@@ -363,7 +369,8 @@ fun EndDateTextField(
             disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
             textColor = if (isEndDateSelected) Color.Black else Color.Gray,
         ),
-        interactionSource = interactionSource
+        interactionSource = interactionSource,
+        enabled = !isDisabled
     )
 }
 
@@ -372,12 +379,10 @@ fun EndDateTextField(
 @Composable
 fun DoseInputField(
     isDoseEntered: Boolean,
-    maxDose: Int,
     onValueChange: (String) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var text by rememberSaveable { mutableStateOf("") }
-    var isMaxDoseError by rememberSaveable { mutableStateOf(false) }
     var isInvalidInputError by rememberSaveable { mutableStateOf(false) }
     var isFocused by rememberSaveable { mutableStateOf(false) }
 
@@ -385,7 +390,7 @@ fun DoseInputField(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
         Text(
-            text = "1회 투약량",
+            text = "1회 복용량",
             style = MaterialTheme.typography.bodyLarge,
             color = Color.Black
         )
@@ -397,22 +402,16 @@ fun DoseInputField(
             onValueChange = {
                 if (it.isEmpty()) {
                     isInvalidInputError = false
-                    isMaxDoseError = false
                     text = ""
                     onValueChange("")
                 } else {
                     // Check if the input is a valid number
                     val numericValue = it.toIntOrNull()
                     if (numericValue != null) {
-                        if (numericValue <= maxDose) {
-                            isMaxDoseError = false
                             isInvalidInputError = false
                             text = it
                             onValueChange(it) // Pass the updated value to the parent composable
-                        } else {
-                            isMaxDoseError = true
-                            text = ""
-                        }
+
                     } else {
                         // Invalid input (not a number)
                         isInvalidInputError = true
@@ -421,7 +420,7 @@ fun DoseInputField(
                 }
             },
             trailingIcon = {
-                if (isMaxDoseError || isInvalidInputError) {
+                if ( isInvalidInputError) {
                     Icon(
                         imageVector = Icons.Filled.Info,
                         contentDescription = "Error",
@@ -436,7 +435,7 @@ fun DoseInputField(
                     style = MaterialTheme.typography.labelMedium
                 )
             },
-            isError = isMaxDoseError || isInvalidInputError,
+            isError = isInvalidInputError,
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
                 keyboardType = KeyboardType.Number
@@ -459,21 +458,10 @@ fun DoseInputField(
                 }
             )
         )
-        if (isMaxDoseError) {
-            LaunchedEffect(isMaxDoseError) {
-                delay(1000L) // Delay for 1 second
-                isMaxDoseError = false // Reset the error state
-            }
-            Text(
-                text = "과다복용",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-            )
-    }
+
         if (isInvalidInputError) {
             LaunchedEffect(isInvalidInputError) {
                 delay(1000L) // Delay for 1 second
-                isMaxDoseError = false // Reset the error state
             }
             Text(
                 text = "숫자만 입력 가능합니다.",

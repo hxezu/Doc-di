@@ -97,15 +97,14 @@ fun AddMedicationScreenUI(
     var dose by rememberSaveable { mutableStateOf("") }
     var doseUnit by rememberSaveable { mutableStateOf("") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
-    var isRecurring by rememberSaveable { mutableStateOf(false) }
     var endDate by rememberSaveable { mutableStateOf(Date()) }
-
 
     var isNameEntered by remember { mutableStateOf(false) }
     var isDoseEntered by remember { mutableStateOf(false) }
     var isDoseUnitSelected by remember { mutableStateOf(false) }
     var isRecurrenceSelected by remember { mutableStateOf(false) }
     var isEndDateSelected by remember { mutableStateOf(false) }
+    var isEndDateDisabled by remember { mutableStateOf(false) }
 
     val selectedDate = selectedDateString?.let { LocalDate.parse(it) }
     val startDate = selectedDate?.let {
@@ -131,17 +130,8 @@ fun AddMedicationScreenUI(
 
     // Check if the last TimerTextField is selected
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
-    val isSaveButtonEnabled = when{
-        isRecurring -> isNameEntered && isDoseEntered && isDoseUnitSelected && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
-        else -> isNameEntered && isDoseEntered && isDoseUnitSelected && selectedTimes.isNotEmpty()
-    }
-
-    val defaultDate = selectedDate?.let {
-        Calendar.getInstance().apply {
-            set(it.year, it.monthValue - 1, it.dayOfMonth, 23, 59, 59)
-            set(Calendar.MILLISECOND, 999) // 밀리초를 999로 설정
-        }.time
-    } ?: Date()
+    val isSaveButtonEnabled = isNameEntered && isDoseEntered && isDoseUnitSelected && isRecurrenceSelected && selectedTimes.isNotEmpty() &&
+            (isEndDateSelected || isEndDateDisabled)
 
 
     Scaffold(
@@ -186,7 +176,7 @@ fun AddMedicationScreenUI(
                                 dosage = dosageString,
                                 recurrence = recurrence,
                                 startDate = startDate,
-                                endDate = if (isRecurring) endDate else defaultDate,
+                                endDate = endDate,
                                 medicationTimes = selectedTimes,
                                 context = context,
                                 isAllWritten  = isSaveButtonEnabled,
@@ -257,7 +247,6 @@ fun AddMedicationScreenUI(
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 DoseInputField(
                     isDoseEntered = isDoseEntered,
-                    maxDose = 99,
                     onValueChange = { doseValue ->
                         dose = doseValue
                         isDoseEntered = doseValue.isNotEmpty()
@@ -273,59 +262,33 @@ fun AddMedicationScreenUI(
 
             Spacer(modifier = Modifier.padding(4.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    color = Color.Black,
-                    text = "정기 복용",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Switch(
-                    modifier = Modifier.padding(end = 20.dp),
-                    checked = isRecurring,
-                    onCheckedChange = { checked ->
-                        isRecurring = checked
-                        if (checked) {
-                            scope.launch {
-                                val maxScroll = scrollState.maxValue + 600 // 버튼 크기만큼 더 스크롤
-                                scrollState.animateScrollTo(maxScroll)
-                            }
-                        }
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MainBlue,
-                        checkedTrackColor = MainBlue.copy(alpha = 0.5f)
-                    )
-                )
-            }
+            RecurrenceDropdownMenu(
+                recurrence = { selectedRecurrence ->
+                    recurrence = selectedRecurrence
+                    isRecurrenceSelected = true
+                },
+                isRecurrenceSelected = isRecurrenceSelected,
+                onDisableEndDate = { disableEndDate ->
+                    isEndDateDisabled = disableEndDate
+                    if (disableEndDate) {
+                        endDate = startDate
+                        isEndDateSelected = false
+                    }
+                }
+            )
 
             Spacer(modifier = Modifier.padding(4.dp))
-
-            if (isRecurring) {
-
-                RecurrenceDropdownMenu(
-                    recurrence = { selectedRecurrence ->
-                        recurrence = selectedRecurrence
-                        isRecurrenceSelected = true
-                    },
-                    isRecurrenceSelected = isRecurrenceSelected
-                )
-
-                Spacer(modifier = Modifier.padding(4.dp))
-                EndDateTextField(
-                    startDate = startDate.time,
-                    onDateSelected = { timestamp ->
-                        endDate = Date(timestamp) // Convert the Long timestamp to a Date object
-                        isEndDateSelected = true
-                    },
-                    isEndDateSelected = isEndDateSelected
-                )
+            EndDateTextField(
+                startDate = startDate.time,
+                onDateSelected = { timestamp ->
+                    endDate = Date(timestamp)
+                    isEndDateSelected = true
+                },
+                isEndDateSelected = isEndDateSelected,
+                isDisabled = isEndDateDisabled
+            )
 
                 Spacer(modifier = Modifier.padding(4.dp))
-            }
 
             Text(
                 color = Color.Black,

@@ -90,8 +90,7 @@ fun AddScheduleScreen(
 
     var clinicName by rememberSaveable { mutableStateOf("") }
     var doctorName by rememberSaveable { mutableStateOf("") }
-    var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
-    var isRecurring by rememberSaveable { mutableStateOf(false) }  // Add state for toggle
+    var recurrence by rememberSaveable { mutableStateOf(Recurrence.None.name) }
     var department by rememberSaveable { mutableStateOf(Department.InternalMedicine.name) }
     var endDate by rememberSaveable { mutableStateOf(Date()) }
 
@@ -101,7 +100,7 @@ fun AddScheduleScreen(
     var isRecurrenceSelected by remember { mutableStateOf(false) }
     var isTimeSelected by remember { mutableStateOf(false) }
     var isEndDateSelected by remember { mutableStateOf(false) }
-
+    var isEndDateDisabled by remember { mutableStateOf(false) }
 
     val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
     var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
@@ -124,10 +123,7 @@ fun AddScheduleScreen(
         isTimeSelected = selectedTimeIndices.isNotEmpty()
     }
 
-    val isSaveButtonEnabled = when {
-            isRecurring -> isClinicEntered && isDoctorEntered && isDepartmentSelected && isRecurrenceSelected && isTimeSelected && isEndDateSelected
-        else -> isClinicEntered && isDoctorEntered && isDepartmentSelected && isTimeSelected
-    }
+    val isSaveButtonEnabled = isClinicEntered && isDoctorEntered && isDepartmentSelected && isRecurrenceSelected && isTimeSelected && (isEndDateSelected || isEndDateDisabled)
     val defaultDate = selectedDate?.let {
         Calendar.getInstance().apply {
             set(it.year, it.monthValue - 1, it.dayOfMonth, 23, 59, 59)
@@ -177,10 +173,9 @@ fun AddScheduleScreen(
                                 subject = department,
                                 startDate = bookDate,
                                 recurrence = recurrence,
-                                endDate = if (isRecurring) endDate else defaultDate,
+                                endDate = endDate,
                                 bookTimes = selectedTimes,
                                 context = context,
-                                isRecurring = isRecurring,
                                 isAllWritten  = isSaveButtonEnabled,
                                 isAllAvailable  = isSaveButtonEnabled,
                                 navController = navController
@@ -288,55 +283,33 @@ fun AddScheduleScreen(
                 )
             }
             Spacer(modifier = Modifier.padding(4.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    color = Color.Black,
-                    text = "정기 진료",
-                    style = MaterialTheme.typography.bodyLarge
+
+            AppointmentRecurrenceDropdownMenu (
+                recurrence = { selectedRecurrence ->
+                    recurrence = selectedRecurrence
+                        isRecurrenceSelected = true
+                             },
+                    isRecurrenceSelected = isRecurrenceSelected,
+                onDisableEndDate = { disableEndDate ->
+                    isEndDateDisabled = disableEndDate
+                    if (disableEndDate) {
+                        endDate = defaultDate
+                        isEndDateSelected = false
+                    }
+                }
                 )
-                Spacer(modifier = Modifier.weight(1f))
-                Switch(
-                    modifier = Modifier.padding(end = 20.dp),
-                    checked = isRecurring,
-                    onCheckedChange = { checked ->
-                        isRecurring = checked
-                        if (checked) {
-                            scope.launch {
-                                val maxScroll = scrollState.maxValue + 600 // 버튼 크기만큼 더 스크롤
-                                scrollState.animateScrollTo(maxScroll)
-                            }
-                        }
-                                      },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MainBlue,
-                        checkedTrackColor = MainBlue.copy(alpha = 0.5f)
-                    )
-                )
-            }
             Spacer(modifier = Modifier.padding(4.dp))
 
-            if (isRecurring) {
-
-                AppointmentRecurrenceDropdownMenu (
-                    recurrence = { selectedRecurrence ->
-                        recurrence = selectedRecurrence
-                        isRecurrenceSelected = true
-                    },
-                    isRecurrenceSelected = isRecurrenceSelected)
-                Spacer(modifier = Modifier.padding(4.dp))
-                EndDateTextField (
+            EndDateTextField (
                     bookDate = bookDate.time,
                     onDateSelected = { selectedEndDate ->
                     endDate = Date(selectedEndDate)
                     isEndDateSelected = true
                 },
-                    isEndDateSelected = isEndDateSelected
+                    isEndDateSelected = isEndDateSelected,
+                    isDisabled = isEndDateDisabled
             )
                 Spacer(modifier = Modifier.padding(4.dp))
             }
         }
-    }
 }

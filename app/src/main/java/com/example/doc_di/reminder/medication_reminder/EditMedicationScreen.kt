@@ -99,7 +99,7 @@ fun EditMedicationScreen(
     var endDate by remember { mutableStateOf(Date()) }
     var existingDate by remember { mutableStateOf(Date()) } // 기존 날짜 저장
     var medicationTime by remember { mutableStateOf("") }
-    var isRecurring by rememberSaveable { mutableStateOf(false) }
+    var isEndDateDisabled by remember { mutableStateOf(false) }
 
     // 데이터 로드 후 상태 초기화
     LaunchedEffect(reminder) {
@@ -114,12 +114,15 @@ fun EditMedicationScreen(
 
             recurrence = it.recurrence
             medicationTime = it.medicationTime
+            println("medication time : " +medicationTime)
 
             // 날짜 추출 및 설정
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val parts = it.medicationTime.split(" ")
             existingDate = dateFormat.parse(parts[0]) ?: Date() // 기존 날짜 추출
             endDate = dateFormat.parse(it.endDate) ?: Date()
+
+            isEndDateDisabled = (recurrence == "선택 안함")
         }
     }
 
@@ -142,10 +145,7 @@ fun EditMedicationScreen(
     fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
 
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
-    val isSaveButtonEnabled = when{
-        isRecurring -> isNameEntered && isDoseEntered && isDoseUnitSelected && isRecurrenceSelected && isEndDateSelected && selectedTimes.isNotEmpty()
-        else -> isNameEntered && isDoseEntered && isDoseUnitSelected && selectedTimes.isNotEmpty()
-    }
+    val isSaveButtonEnabled = isNameEntered && isDoseEntered && isDoseUnitSelected && isRecurrenceSelected && (isEndDateSelected || isEndDateDisabled) && selectedTimes.isNotEmpty()
 
 
 
@@ -212,7 +212,7 @@ fun EditMedicationScreen(
                             medicineName = name,
                             dosage = "$dose $doseUnit",
                             recurrence = recurrence,
-                            endDate = if (isRecurring) endDate.toFormattedDateString() else existingDate.toFormattedDateString(),
+                            endDate = endDate.toFormattedDateString() ,
                             medicationTime = updatedTimes.joinToString(", ") // 시간을 문자열로 결합
                         )
 
@@ -295,7 +295,6 @@ fun EditMedicationScreen(
                 EditDoseInput(
                     dose = dose,
                     isDoseEntered = isDoseEntered,
-                    maxDose = 99,
                     onValueChange = { doseValue ->
                         dose = doseValue
                         isDoseEntered = doseValue > 0
@@ -313,60 +312,35 @@ fun EditMedicationScreen(
 
             Spacer(modifier = Modifier.padding(4.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    color = Color.Black,
-                    text = "정기 복용",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Switch(
-                    modifier = Modifier.padding(end = 20.dp),
-                    checked = isRecurring,
-                    onCheckedChange = { checked ->
-                        isRecurring = checked
-                        if (checked) {
-                            scope.launch {
-                                val maxScroll = scrollState.maxValue + 600 // 버튼 크기만큼 더 스크롤
-                                scrollState.animateScrollTo(maxScroll)
-                            }
-                        }
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MainBlue,
-                        checkedTrackColor = MainBlue.copy(alpha = 0.5f)
-                    )
-                )
-            }
-
-            Spacer(modifier = Modifier.padding(4.dp))
-
-            if (isRecurring) {
-
             EditRecurrence(
                 selectedRecurrence = recurrence,
                 recurrence = { selectedRecurrence ->
                     recurrence = selectedRecurrence
                     isRecurrenceSelected = true
                 },
-                isRecurrenceSelected = isRecurrenceSelected
+                isRecurrenceSelected = isRecurrenceSelected,
+                onDisableEndDate = { disableEndDate ->
+                    isEndDateDisabled = disableEndDate
+                    if (disableEndDate) {
+                        endDate = existingDate
+                        isEndDateSelected = false
+                    }
+                }
             )
+
 
             Spacer(modifier = Modifier.padding(4.dp))
             EditEndDate(
                 endDate = endDate,
                 onDateSelected = { timestamp ->
-                    endDate = Date(timestamp) // Convert the Long timestamp to a Date object
+                    endDate = Date(timestamp)
                     isEndDateSelected = true
                 },
-                isEndDateSelected = isEndDateSelected
+                isEndDateSelected = isEndDateSelected,
+                isDisabled = isEndDateDisabled
             )
 
             Spacer(modifier = Modifier.padding(4.dp))
-        }
 
             Text(
                 color = Color.Black,

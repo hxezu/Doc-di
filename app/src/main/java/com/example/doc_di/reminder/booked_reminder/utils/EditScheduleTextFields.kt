@@ -48,7 +48,9 @@ import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.reminder.util.Department
+import com.example.doc_di.reminder.util.Recurrence
 import com.example.doc_di.reminder.util.getDepartmentList
+import com.example.doc_di.reminder.util.getRecurrenceList
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -210,7 +212,9 @@ fun EditTimerTextField(
 fun EditEndDate(
     endDate: Date,
     onDateSelected: (Long) -> Unit,
-    isEndDateSelected: Boolean) {
+    isEndDateSelected: Boolean,
+    isDisabled: Boolean
+) {
     Text(
         color = Color.Black,
         text = "정기 진료 종료일",
@@ -220,9 +224,7 @@ fun EditEndDate(
     var shouldDisplay by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed: Boolean by interactionSource.collectIsPressedAsState()
-    if (isPressed) {
-        shouldDisplay = true
-    }
+    if (isPressed && !isDisabled) { shouldDisplay = true }
 
     val context = LocalContext.current
 
@@ -294,14 +296,93 @@ fun EditEndDate(
         shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
-            unfocusedBorderColor = if (isEndDateSelected) MainBlue else Color.Gray,
-            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unfocusedBorderColor = if (!isDisabled) MainBlue else Color.Gray,
+            disabledTextColor = Color.Gray,
             textColor = if (isEndDateSelected) Color.Black else Color.Gray,
         ),
-        interactionSource = interactionSource
+        interactionSource = interactionSource,
+        enabled = !isDisabled
     )
 }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditAppointmentRecurrence(
+    selectedRecurrence: String,
+    recurrence: (String) -> Unit,
+    isRecurrenceSelected: Boolean,
+    onDisableEndDate: (Boolean) -> Unit
+) {
+    val recurrenceMap = mapOf(
+        Recurrence.None to "선택 안함",
+        Recurrence.Daily to "매일",
+        Recurrence.Weekly to "매주",
+        Recurrence.Monthly to "매달"
+    )
 
+    val options = getRecurrenceList().map { recurrenceMap[it] ?: "" }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(selectedRecurrence) }
+    var isFocused by rememberSaveable { mutableStateOf(false) }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            color = Color.Black,
+            text = "진료 주기",
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+        ) {
+            OutlinedTextField(
+                value = selectedRecurrence,
+                onValueChange = {},
+                readOnly = true,
+                singleLine = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        tint = Color.Black // 아이콘 색상 설정
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+                    .onFocusChanged { focusState ->
+                        isFocused = focusState.isFocused
+                    },
+                shape = RoundedCornerShape(topEnd = 12.dp, bottomStart = 12.dp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = if (isRecurrenceSelected) Color.Black else Color.Gray,
+                    focusedBorderColor = if (isFocused) MainBlue else Color.Gray,
+                    unfocusedBorderColor = if (isRecurrenceSelected) MainBlue else Color.Gray
+                )
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Color(0xFFDEEFF5))
+            ) {
+                getRecurrenceList().forEach { recurrenceOption ->
+                    DropdownMenuItem(
+                        text = { Text(recurrenceMap[recurrenceOption] ?: selectedRecurrence) },
+                        onClick = {
+                            selectedOptionText = recurrenceMap[recurrenceOption] ?: selectedRecurrence
+                            recurrence(selectedOptionText)
+                            expanded = false
+                            onDisableEndDate(recurrenceOption == Recurrence.None)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun EditDoctorName(
@@ -355,6 +436,7 @@ fun EditDoctorName(
     )
 
 }
+
 
 @Composable
 fun EditHospitalName(
