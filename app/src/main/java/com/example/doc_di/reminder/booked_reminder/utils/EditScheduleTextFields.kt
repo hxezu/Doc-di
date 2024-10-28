@@ -148,6 +148,7 @@ fun EditDepartment(
 fun EditTimerTextField(
     isLastItem: Boolean,
     isOnlyItem: Boolean,
+    selectedTimes: List<CalendarInformation>,
     time: (CalendarInformation) -> Unit,
     onDeleteClick: () -> Unit,
     logEvent: () -> Unit,
@@ -155,17 +156,15 @@ fun EditTimerTextField(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed: Boolean by interactionSource.collectIsPressedAsState()
-    val currentTime = CalendarInformation(Calendar.getInstance())
-    var selectedTime by rememberSaveable(stateSaver = CalendarInformation.getStateSaver()) { mutableStateOf(currentTime) }
-
+    var selectedTime by remember { mutableStateOf(selectedTimes.firstOrNull() ?: CalendarInformation(Calendar.getInstance())) }
 
     TimePickerDialogComponent(
         showDialog = isPressed,
         selectedDate = selectedTime,
-        onSelectedTime = {
+        onSelectedTime = {newTime ->
             logEvent.invoke()
-            selectedTime = it
-            time(it)
+            selectedTime = newTime
+            time(newTime)
         }
     )
 

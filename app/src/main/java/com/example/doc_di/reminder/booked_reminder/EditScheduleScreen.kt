@@ -95,27 +95,18 @@ fun EditScheduleScreen(
     var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
     var existingDate by remember { mutableStateOf(Date()) }
     var bookTime by rememberSaveable { mutableStateOf("") }
-
-    var isClinicEntered by remember { mutableStateOf(true) }
-    var isDoctorEntered by remember { mutableStateOf(true) }
-    var isDepartmentSelected by remember { mutableStateOf(true) }
-    var isTimeSelected by remember { mutableStateOf(true) }
-    var isRecurrenceSelected by remember { mutableStateOf(true) }
     var isEndDateSelected by remember { mutableStateOf(false) }
     var isEndDateDisabled by remember { mutableStateOf(false) }
 
-    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
+    var isModified by remember { mutableStateOf(false) }
+
+    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf<CalendarInformation>() }
     var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
     var lastSelectedIndex by remember { mutableStateOf<Int?>(null) }
 
-    fun setTimeSelected(index: Int, isSelected: Boolean) {
-        selectedTimeIndices = if (isSelected) { selectedTimeIndices + index } else { selectedTimeIndices - index }
-        lastSelectedIndex = if (isSelected) index else lastSelectedIndex
+    fun markModified() {
+        isModified = true
     }
-
-    fun addTime(time: CalendarInformation) { selectedTimes.add(time) }
-    fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
-    val isSaveButtonEnabled = isClinicEntered && isDoctorEntered && (isEndDateSelected || isEndDateDisabled) && isDepartmentSelected && isTimeSelected
 
     LaunchedEffect(booked) {
         booked?.let {
@@ -125,12 +116,32 @@ fun EditScheduleScreen(
             recurrence = "선택 안함"
             bookTime = it.bookTime
 
+            println("bookTime : " + bookTime)
+
             isEndDateDisabled = (recurrence == "선택 안함")
+
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val parts = it.bookTime.split(" ")
             existingDate = dateFormat.parse(parts[0]) ?: Date() // 기존 날짜 추출
+
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val timePart = parts[1]
+            val calendar = Calendar.getInstance().apply {
+                time = timeFormat.parse(timePart) ?: Date() // 시간 부분만 설정
+            }
+            selectedTimes.clear()
+            selectedTimes.add(CalendarInformation(calendar))
+            selectedTimeIndices = setOf(0)
+
+            isModified = false
         }
     }
+
+    fun setTimeSelected(index: Int, isSelected: Boolean) {
+        selectedTimeIndices = if (isSelected) { selectedTimeIndices + index } else { selectedTimeIndices - index }
+        lastSelectedIndex = if (isSelected) index else lastSelectedIndex
+    }
+    val isSaveButtonEnabled = isModified
 
 
     Scaffold(
@@ -257,20 +268,20 @@ fun EditScheduleScreen(
 
             EditHospitalName(
                 hospitalName = clinicName,
-                isHospitalEntered = isClinicEntered,
-                onHospitalChange = { hospital ->
-                    clinicName = hospital
-                    isClinicEntered = hospital.isNotEmpty()
+                isHospitalEntered = clinicName.isNotEmpty(),
+                onHospitalChange = {
+                    clinicName = it
+                    markModified()
                 }
             )
             Spacer(modifier = Modifier.padding(4.dp))
 
             EditDoctorName(
                 doctorName = doctorName,
-                isDoctorEntered = isDoctorEntered,
-                onDoctorChange = { doctor ->
-                    doctorName = doctor
-                    isDoctorEntered = doctor.isNotEmpty()
+                isDoctorEntered = doctorName.isNotEmpty(),
+                onDoctorChange = {
+                    doctorName = it
+                    markModified()
                 }
             )
             Spacer(modifier = Modifier.padding(4.dp))
@@ -279,9 +290,9 @@ fun EditScheduleScreen(
                 selectedDepartment = department,
                 department = { selectedDepartment ->
                     department = selectedDepartment
-                    isDepartmentSelected = true
+                    markModified()
                 },
-                isDepartmentSelected = isDepartmentSelected
+                isDepartmentSelected = department.isNotEmpty()
             )
             Spacer(modifier = Modifier.padding(4.dp))
 
@@ -295,29 +306,30 @@ fun EditScheduleScreen(
                 EditTimerTextField(
                     isLastItem = selectedTimes.lastIndex == index,
                     isOnlyItem = selectedTimes.size == 1,
+                    selectedTimes = selectedTimes,
                     time = {
                         selectedTimes[index] = it
                         setTimeSelected(index, true)
+                        markModified()
                     },
                     onDeleteClick = {
                     },
                     logEvent = {
                         //viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
                     },
-                    isTimeSelected = true
+                    isTimeSelected = selectedTimeIndices.contains(index)
                 )
             }
 
             Spacer(modifier = Modifier.padding(4.dp))
 
-            Spacer(modifier = Modifier.padding(4.dp))
             EditAppointmentRecurrence(
                 selectedRecurrence = recurrence,
                 recurrence = { selectedRecurrence ->
                     recurrence = selectedRecurrence
-                    isRecurrenceSelected = true
+                    markModified()
                 },
-                isRecurrenceSelected = isRecurrenceSelected,
+                isRecurrenceSelected = recurrence.isNotEmpty(),
                 onDisableEndDate = { disableEndDate ->
                     isEndDateDisabled = disableEndDate
                     if (disableEndDate) {
@@ -330,9 +342,10 @@ fun EditScheduleScreen(
             EditEndDate(
                 endDate = Date(endDate), // Pass endDate as Date
                 onDateSelected = { selectedEndDate ->
-                        endDate = selectedEndDate
-                        isEndDateSelected = true
-                    },
+                    endDate = selectedEndDate
+                    isEndDateSelected = true
+                    markModified()
+                                 },
                 isEndDateSelected = isEndDateSelected,
                 isDisabled = isEndDateDisabled
             )

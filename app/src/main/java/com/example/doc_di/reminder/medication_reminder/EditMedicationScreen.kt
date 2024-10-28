@@ -1,6 +1,7 @@
 package com.example.doc_di.reminder.medication_reminder
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -100,6 +101,13 @@ fun EditMedicationScreen(
     var existingDate by remember { mutableStateOf(Date()) } // 기존 날짜 저장
     var medicationTime by remember { mutableStateOf("") }
     var isEndDateDisabled by remember { mutableStateOf(false) }
+    var isEndDateSelected by remember { mutableStateOf(true) }
+
+    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf<CalendarInformation>() }
+    var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
+    var lastSelectedIndex by remember { mutableStateOf<Int?>(null) }
+
+    var isModified by remember { mutableStateOf(false) }
 
     // 데이터 로드 후 상태 초기화
     LaunchedEffect(reminder) {
@@ -114,39 +122,41 @@ fun EditMedicationScreen(
 
             recurrence = it.recurrence
             medicationTime = it.medicationTime
-            println("medication time : " +medicationTime)
 
-            // 날짜 추출 및 설정
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val parts = it.medicationTime.split(" ")
             existingDate = dateFormat.parse(parts[0]) ?: Date() // 기존 날짜 추출
             endDate = dateFormat.parse(it.endDate) ?: Date()
 
             isEndDateDisabled = (recurrence == "선택 안함")
+
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val timePart = parts[1]
+            val calendar = Calendar.getInstance().apply {
+                time = timeFormat.parse(timePart) ?: Date() // 시간 부분만 설정
+            }
+            selectedTimes.clear()
+            selectedTimes.add(CalendarInformation(calendar))
+            selectedTimeIndices = setOf(0)
+
+            isModified = false
         }
     }
 
-    var isNameEntered by remember { mutableStateOf(true) }
-    var isDoseEntered by remember { mutableStateOf(true) }
-    var isDoseUnitSelected by remember { mutableStateOf(false) }
-    var isRecurrenceSelected by remember { mutableStateOf(true) }
-    var isEndDateSelected by remember { mutableStateOf(true) }
+    fun markModified() {
+        isModified = true
+    }
 
-    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf(CalendarInformation(Calendar.getInstance())) }
-    var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
-    var lastSelectedIndex by remember { mutableStateOf<Int?>(null) }
 
     fun setTimeSelected(index: Int, isSelected: Boolean) {
         selectedTimeIndices = if (isSelected) { selectedTimeIndices + index } else { selectedTimeIndices - index }
         lastSelectedIndex = if (isSelected) index else lastSelectedIndex
     }
-
     fun addTime(time: CalendarInformation) { selectedTimes.add(time) }
     fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
 
     val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
-    val isSaveButtonEnabled = isNameEntered && isDoseEntered && isDoseUnitSelected && isRecurrenceSelected && (isEndDateSelected || isEndDateDisabled) && selectedTimes.isNotEmpty()
-
+    val isSaveButtonEnabled = isModified
 
 
     Scaffold(
@@ -215,6 +225,7 @@ fun EditMedicationScreen(
                             endDate = endDate.toFormattedDateString() ,
                             medicationTime = updatedTimes.joinToString(", ") // 시간을 문자열로 결합
                         )
+                        println("updatedReminder : " +updatedTimes.joinToString(", "))
 
 
                         updatedReminder?.let {
@@ -284,27 +295,29 @@ fun EditMedicationScreen(
 
             EditMedicationName(
                 medicationName = name,
-                isNameEntered = isNameEntered,
-                onNameChange = { nameValue ->
-                    name = nameValue
-                    isNameEntered = nameValue.isNotEmpty()
-                })
+                isNameEntered = name.isNotEmpty(),
+                onNameChange = {
+                    name = it
+                    markModified() // Mark as modified
+                }
+            )
             Spacer(modifier = Modifier.padding(4.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 EditDoseInput(
                     dose = dose,
-                    isDoseEntered = isDoseEntered,
-                    onValueChange = { doseValue ->
-                        dose = doseValue
-                        isDoseEntered = doseValue > 0
-                    })
+                    isDoseEntered = dose > 0,
+                    onValueChange = {
+                        dose = it
+                        markModified() // Mark as modified
+                    }
+                )
                 EditDoseUnit(
                     selectedDoseUnit = doseUnit,
-                    isDoseUnitSelected = true,
-                    doseUnit = { selectedDoseUnit ->
-                        doseUnit = selectedDoseUnit
-                        isDoseUnitSelected = true
+                    isDoseUnitSelected = doseUnit.isNotEmpty(),
+                    doseUnit = { unit ->
+                        doseUnit = unit
+                        markModified() // Mark as modified
                     }
                 )
 
@@ -314,11 +327,11 @@ fun EditMedicationScreen(
 
             EditRecurrence(
                 selectedRecurrence = recurrence,
-                recurrence = { selectedRecurrence ->
-                    recurrence = selectedRecurrence
-                    isRecurrenceSelected = true
+                recurrence = { rec ->
+                    recurrence = rec
+                    markModified() // Mark as modified
                 },
-                isRecurrenceSelected = isRecurrenceSelected,
+                isRecurrenceSelected = recurrence.isNotEmpty(),
                 onDisableEndDate = { disableEndDate ->
                     isEndDateDisabled = disableEndDate
                     if (disableEndDate) {
@@ -335,6 +348,7 @@ fun EditMedicationScreen(
                 onDateSelected = { timestamp ->
                     endDate = Date(timestamp)
                     isEndDateSelected = true
+                    markModified() // Mark as modified
                 },
                 isEndDateSelected = isEndDateSelected,
                 isDisabled = isEndDateDisabled
@@ -352,13 +366,16 @@ fun EditMedicationScreen(
                 EditTimerText(
                     isLastItem = selectedTimes.lastIndex == index,
                     isOnlyItem = selectedTimes.size == 1,
+                    selectedTimes = selectedTimes,
                     time = {
                         selectedTimes[index] = it
                         setTimeSelected(index, true)
+                        markModified()
                     },
                     onDeleteClick = {
                         removeTime(selectedTimes[index])
                         setTimeSelected(index, false)
+                        markModified()
                     },
                     logEvent = {
                         //viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
