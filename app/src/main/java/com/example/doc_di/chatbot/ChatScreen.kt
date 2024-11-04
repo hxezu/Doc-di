@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -76,9 +77,19 @@ fun ChatScreen(
     val messages by chatBotViewModel.messages.observeAsState(emptyList()) // messages를 observe
     var message by remember { mutableStateOf("") }
 
+    val listState = rememberLazyListState()
+
     LaunchedEffect(chatId) {
         chatId?.let {
             chatBotViewModel.loadMessages(it) // 메시지 하위 컬렉션을 로드
+            listState.animateScrollToItem(messages.size)
+        }
+    }
+
+    LaunchedEffect(messages) {
+        // Scroll to bottom when new messages arrive
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.size)
         }
     }
 
@@ -142,6 +153,7 @@ fun ChatScreen(
                     ) {
                         Spacer(modifier = Modifier.height(10.dp))
                         LazyColumn(
+                            state = listState,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(start = 20.dp, top = 15.dp, end = 20.dp)
@@ -335,8 +347,12 @@ fun ChatTitleRow(
                 Icon(Icons.Default.MoreVert, contentDescription = "", tint = MainBlue)
             }
             DropdownMenu(
-                    expanded = expanded,
-            onDismissRequest = { expanded = false }
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .background(Color.White)
+                    .align(Alignment.TopEnd)
+
             ) {
             DropdownMenuItem(
                 onClick = {

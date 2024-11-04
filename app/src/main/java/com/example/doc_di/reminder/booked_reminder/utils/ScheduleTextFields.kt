@@ -118,7 +118,7 @@ fun DepartmentDropdownMenu(department: (String) -> Unit,
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Color(0xFFDEEFF5))
+                modifier = Modifier.background(Color.White)
             ) {
                 getDepartmentList().forEach { departmentOption ->
                     DropdownMenuItem(
@@ -470,7 +470,7 @@ fun AppointmentRecurrenceDropdownMenu(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Color(0xFFdeeff5))
+                modifier = Modifier.background(Color.White)
             ) {
                 getRecurrenceList().forEach { recurrenceOption ->
                     DropdownMenuItem(

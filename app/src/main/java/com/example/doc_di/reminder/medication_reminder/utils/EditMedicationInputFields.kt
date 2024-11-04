@@ -115,7 +115,7 @@ fun EditRecurrence(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Color(0xFFDEEFF5))
+                modifier = Modifier.background(Color.White)
             ) {
                 getRecurrenceList().forEach { recurrenceOption ->
                     DropdownMenuItem(
@@ -187,7 +187,7 @@ fun EditDoseUnit(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Color(0xFFDEEFF5))
+                modifier = Modifier.background(Color.White)
             ) {
                 doseUnitOptions.forEach { unitOption ->
                     DropdownMenuItem(
