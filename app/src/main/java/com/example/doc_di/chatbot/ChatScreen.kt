@@ -150,6 +150,7 @@ fun ChatScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.Transparent)
+                            .imePadding()
                     ) {
                         Spacer(modifier = Modifier.height(10.dp))
                         LazyColumn(
