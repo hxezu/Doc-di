@@ -18,8 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -42,11 +45,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -60,7 +67,9 @@ import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.domain.model.Message
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.login.rememberImeState
 import com.example.doc_di.ui.theme.*
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -76,9 +85,26 @@ fun ChatScreen(
     val messages by chatBotViewModel.messages.observeAsState(emptyList()) // messages를 observe
     var message by remember { mutableStateOf("") }
 
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val imeState = rememberImeState()
+
     LaunchedEffect(chatId) {
         chatId?.let {
             chatBotViewModel.loadMessages(it) // 메시지 하위 컬렉션을 로드
+            listState.animateScrollToItem(messages.size)
+        }
+    }
+
+    LaunchedEffect(messages) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.size)
+        }
+    }
+
+    LaunchedEffect(imeState) {
+        if (imeState.value) {  // Keyboard is visible
+                listState.animateScrollToItem(messages.size)
         }
     }
 
@@ -107,16 +133,18 @@ fun ChatScreen(
             )
         },
         bottomBar = {
-        BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
-    },
+            BottomNavigationBar(navController = navController, btmBarViewModel = btmBarViewModel)
+        },
 
-    ) { paddingValues ->
+        ) { paddingValues ->
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Transparent)
                 .padding(paddingValues)
+//                .verticalScroll(scrollState)
+//                .imePadding()
         ) {
             Column(
                 modifier = Modifier
@@ -139,12 +167,17 @@ fun ChatScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.Transparent)
+                            .imePadding()
+                            .consumeWindowInsets(paddingValues)
                     ) {
                         Spacer(modifier = Modifier.height(10.dp))
                         LazyColumn(
+                            state = listState,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(start = 20.dp, top = 15.dp, end = 20.dp)
+                                .consumeWindowInsets(paddingValues)
+                                .imePadding()
                         ) {
                             items(messages, key = { it.id }) { message ->
                                 ChatRow(chat = message) // Firestore에서 불러온 messages 리스트 사용
@@ -154,8 +187,6 @@ fun ChatScreen(
                             }
                         }
                     }
-
-                    // 3. CustomTextField도 imePadding으로 키보드 따라 움직임
                     CustomTextField(
                         text = message,
                         onValueChange = { message = it },
@@ -188,12 +219,14 @@ fun ChatRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.Transparent),
+
         horizontalAlignment = if (chat.user) Alignment.End else Alignment.Start
     ) {
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(100.dp))
-                .background(if (chat.user) MainBlue else LightGray),
+                .background(if (chat.user) MainBlue else LightGray)
+            ,
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
@@ -270,19 +303,19 @@ fun CustomTextField(
                 textStyle = TextStyle(fontSize = 14.sp)
             )
             IconButton(
-                    onClick = onSendClick,
-            modifier = Modifier
-                .size(36.dp)
-                .padding(end = 10.dp)
-                .clip(CircleShape)
-                .background(MainBlue)
+                onClick = onSendClick,
+                modifier = Modifier
+                    .size(36.dp)
+                    .padding(end = 10.dp)
+                    .clip(CircleShape)
+                    .background(MainBlue)
             ) {
-            Icon(
-                imageVector = Icons.Default.Send,
-                contentDescription = "Send",
-                tint = Color.White,
-                modifier = Modifier.size(20.dp)
-            )
+                Icon(
+                    imageVector = Icons.Default.Send,
+                    contentDescription = "Send",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }
@@ -335,18 +368,22 @@ fun ChatTitleRow(
                 Icon(Icons.Default.MoreVert, contentDescription = "", tint = MainBlue)
             }
             DropdownMenu(
-                    expanded = expanded,
-            onDismissRequest = { expanded = false }
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .background(Color.White)
+                    .align(Alignment.TopEnd)
+
             ) {
-            DropdownMenuItem(
-                onClick = {
-                    onDeleteClick() // 삭제 클릭 시 호출
-                    expanded = false // 드롭다운 메뉴 닫기
+                DropdownMenuItem(
+                    onClick = {
+                        onDeleteClick() // 삭제 클릭 시 호출
+                        expanded = false // 드롭다운 메뉴 닫기
+                    }
+                ) {
+                    Text(text = "삭제")
                 }
-            ) {
-                Text(text = "삭제")
             }
-        }
         }
 
     }

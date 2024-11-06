@@ -219,7 +219,7 @@ fun NaviGraph(navController: NavHostController) {
 
         composable(route = "editMedicationScreen/{reminderId}") { backStackEntry ->
             val reminderId = backStackEntry.arguments?.getString("reminderId")?.toIntOrNull()
-            EditMedicationScreen(navController, btmBarViewModel, reminderViewModel, reminderId)
+            EditMedicationScreen(navController, btmBarViewModel, userViewModel, reminderViewModel, reminderId)
         }
 
         composable(route = "editScheduleScreen/{reminderId}") { backStackEntry ->

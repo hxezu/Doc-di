@@ -115,7 +115,7 @@ fun EditRecurrence(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Color(0xFFDEEFF5))
+                modifier = Modifier.background(Color.White)
             ) {
                 getRecurrenceList().forEach { recurrenceOption ->
                     DropdownMenuItem(
@@ -187,7 +187,7 @@ fun EditDoseUnit(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Color(0xFFDEEFF5))
+                modifier = Modifier.background(Color.White)
             ) {
                 doseUnitOptions.forEach { unitOption ->
                     DropdownMenuItem(
@@ -207,6 +207,7 @@ fun EditDoseUnit(
 
 @Composable
 fun EditTimerText(
+    index: Int,
     isLastItem: Boolean,
     isOnlyItem: Boolean,
     selectedTimes: List<CalendarInformation>,
@@ -217,8 +218,7 @@ fun EditTimerText(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed: Boolean by interactionSource.collectIsPressedAsState()
-
-    var selectedTime by remember { mutableStateOf(selectedTimes.firstOrNull() ?: CalendarInformation(Calendar.getInstance())) }
+    var selectedTime by remember { mutableStateOf(selectedTimes.getOrNull(index) ?: CalendarInformation(Calendar.getInstance())) }
 
     TimePickerDialogComponent(
         showDialog = isPressed,
@@ -272,6 +272,7 @@ fun EditTimerText(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditEndDate(
+    startDate: Long,
     endDate: Date,
     onDateSelected: (Long) -> Unit,
     isEndDateSelected: Boolean,
@@ -290,12 +291,14 @@ fun EditEndDate(
 
     val context = LocalContext.current
 
-    val currentDayMillis = Calendar.getInstance().apply {
+    val startCalendar = Calendar.getInstance().apply {
+        timeInMillis = startDate
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 0)
-    }.timeInMillis
+    }
+    val startDayMillis = startCalendar.timeInMillis
 
     var selectedDate by rememberSaveable {
         mutableStateOf(endDate.toFormattedDateString())
@@ -308,18 +311,18 @@ fun EditEndDate(
                 R.style.CustomDatePickerTheme, // Apply your custom style here
                 { _, year, month, dayOfMonth ->
                     val selectedCalendar = Calendar.getInstance()
-                    selectedCalendar.set(year, month, dayOfMonth)
+                    selectedCalendar.set(year, month, dayOfMonth, 23, 59, 59)  // 23:59:59 설정
+
                     val selectedDateInMillis = selectedCalendar.timeInMillis
                     selectedDate = selectedDateInMillis.toFormattedDateString()
                     onDateSelected(selectedDateInMillis)
                     shouldDisplay = false
                 },
-                endDate.year + 1900, // Adjusting for deprecated method
-                endDate.month,
-                endDate.date
+                startCalendar.get(Calendar.YEAR),
+                startCalendar.get(Calendar.MONTH),
+                startCalendar.get(Calendar.DAY_OF_MONTH)
             ).apply {
-                // Set the minimum selectable date
-                datePicker.minDate = currentDayMillis
+                datePicker.minDate = startDayMillis
 
                 setOnDismissListener {
                     shouldDisplay = false

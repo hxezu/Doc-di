@@ -131,7 +131,9 @@ fun BookedCard(
                     // 점 세 개 아이콘 버튼
                     IconButton(
                         onClick = { expanded = true },
-                        modifier = Modifier.align(Alignment.CenterEnd)
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .background(Color.White)
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
@@ -145,7 +147,7 @@ fun BookedCard(
                         onDismissRequest = { expanded = false },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
-                            .background(Color(0xFFDEEFF5))
+                            .background(Color.White)
                     ) {
                         DropdownMenuItem(
                             onClick = {

@@ -11,6 +11,6 @@ data class Reminder(
     val dosage: String,
     val recurrence: String,
     val endDate: String,
-    val medicationTaken: Boolean,
+    val medicationTaken: String,
     val medicationTime: String
 ) : Parcelable

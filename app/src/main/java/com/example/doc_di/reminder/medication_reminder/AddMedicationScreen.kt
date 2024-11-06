@@ -73,6 +73,7 @@ import com.example.doc_di.reminder.medication_reminder.utils.TimerTextField
 import com.example.doc_di.ui.theme.MainBlue
 import com.example.doc_di.reminder.util.Recurrence
 import kotlinx.coroutines.launch
+import java.security.MessageDigest
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Calendar
@@ -98,6 +99,7 @@ fun AddMedicationScreenUI(
     var doseUnit by rememberSaveable { mutableStateOf("") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
     var endDate by rememberSaveable { mutableStateOf(Date()) }
+    var medicationTaken by rememberSaveable { mutableStateOf("") }
 
     var isNameEntered by remember { mutableStateOf(false) }
     var isDoseEntered by remember { mutableStateOf(false) }
@@ -169,6 +171,7 @@ fun AddMedicationScreenUI(
                     if (isSaveButtonEnabled) {
                         scope.launch {
                             val dosageString = "$dose $doseUnit"
+                            val groupId = generateGroupId(userEmail, System.currentTimeMillis())
 
                             reminderImpl.createReminder(
                                 email = userEmail,
@@ -178,6 +181,7 @@ fun AddMedicationScreenUI(
                                 startDate = startDate,
                                 endDate = endDate,
                                 medicationTimes = selectedTimes,
+                                medicationTaken = groupId,
                                 context = context,
                                 isAllWritten  = isSaveButtonEnabled,
                                 isAllAvailable  = isSaveButtonEnabled,
@@ -354,4 +358,11 @@ fun AddMedicationScreenUI(
             Spacer(modifier = Modifier.weight(1f))
         }
     }
+}
+
+private fun generateGroupId(email: String, registrationTime: Long): String {
+    val input = "$email-$registrationTime"
+    val md = MessageDigest.getInstance("SHA-256")
+    val hash = md.digest(input.toByteArray())
+    return hash.joinToString("") { "%02x".format(it) }
 }

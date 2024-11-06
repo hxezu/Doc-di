@@ -171,7 +171,7 @@ fun MedicationCard(
                         onDismissRequest = { expanded = false },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
-                            .background(Color(0xFFDEEFF5))
+                            .background(Color.White)
                     ) {
                         DropdownMenuItem(
                             onClick = {
