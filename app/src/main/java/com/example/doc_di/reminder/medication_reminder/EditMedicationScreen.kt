@@ -107,7 +107,7 @@ fun EditMedicationScreen(
     var endDate by remember { mutableStateOf(Date()) }
     var startDate by remember { mutableStateOf(Date()) }
     var isEndDateDisabled by remember { mutableStateOf(false) }
-    var selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf<CalendarInformation>() }
+    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf<CalendarInformation>() }
 
     var isModified by remember { mutableStateOf(false) }
 
@@ -321,8 +321,8 @@ fun EditMedicationScreen(
             )
 
             for (index in selectedTimes.indices) {
-                println("selectedTimes : $selectedTimes")
                 EditTimerText(
+                    index = index,
                     isLastItem = selectedTimes.lastIndex == index,
                     isOnlyItem = selectedTimes.size == 1,
                     selectedTimes = selectedTimes,

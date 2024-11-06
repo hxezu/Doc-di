@@ -207,6 +207,7 @@ fun EditDoseUnit(
 
 @Composable
 fun EditTimerText(
+    index: Int,
     isLastItem: Boolean,
     isOnlyItem: Boolean,
     selectedTimes: List<CalendarInformation>,
@@ -217,8 +218,7 @@ fun EditTimerText(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed: Boolean by interactionSource.collectIsPressedAsState()
-
-    var selectedTime by remember { mutableStateOf(selectedTimes.firstOrNull() ?: CalendarInformation(Calendar.getInstance())) }
+    var selectedTime by remember { mutableStateOf(selectedTimes.getOrNull(index) ?: CalendarInformation(Calendar.getInstance())) }
 
     TimePickerDialogComponent(
         showDialog = isPressed,
