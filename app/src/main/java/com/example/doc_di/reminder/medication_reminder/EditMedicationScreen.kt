@@ -107,7 +107,7 @@ fun EditMedicationScreen(
     var endDate by remember { mutableStateOf(Date()) }
     var startDate by remember { mutableStateOf(Date()) }
     var isEndDateDisabled by remember { mutableStateOf(false) }
-    val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf<CalendarInformation>() }
+    var selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf<CalendarInformation>() }
 
     var isModified by remember { mutableStateOf(false) }
 
@@ -133,9 +133,7 @@ fun EditMedicationScreen(
 
             val uniqueTimes = groupReminders
                 ?.mapNotNull { reminder ->
-                    val timePart = reminder.medicationTime.split(" ").getOrNull(1)
-                    Log.d("EditMedicationScreen", "Extracted timePart: $timePart from ${reminder.medicationTime}")
-                    timePart
+                    reminder.medicationTime.split(" ").getOrNull(1)
                 }
                 ?.distinct() // 중복 시간 제거
                 ?.sorted()   // 정렬
@@ -168,6 +166,7 @@ fun EditMedicationScreen(
                 groupReminders?.forEach { reminder ->
                     reminderViewModel.deleteReminder(reminder.id!!)
                 }
+                println("endDate : $endDate")
 
                 // 업데이트된 리마인더 그룹 생성
                 reminderImpl.createReminder(
@@ -303,6 +302,7 @@ fun EditMedicationScreen(
 
             Spacer(modifier = Modifier.padding(4.dp))
             EditEndDate(
+                startDate = startDate.time,
                 endDate = endDate,
                 onDateSelected = { timestamp ->
                     endDate = Date(timestamp)
