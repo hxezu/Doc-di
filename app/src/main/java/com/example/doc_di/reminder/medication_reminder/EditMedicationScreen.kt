@@ -57,11 +57,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.domain.RetrofitInstance
+import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.extension.toFormattedDateString
+import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.reminder.medication_reminder.utils.EditDoseInput
@@ -83,62 +85,73 @@ import java.util.Locale
 fun EditMedicationScreen(
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
+    userViewModel: UserViewModel,
     reminderViewModel: ReminderViewModel = hiltViewModel(),
     reminderId: Int?
 ) {
 
     val reminderImpl = ReminderImpl(RetrofitInstance.reminderApi)
     val reminder by remember(reminderId) { mutableStateOf(reminderId?.let { reminderViewModel.getReminderById(it) }) }
+    var groupReminders by remember { mutableStateOf<List<Reminder>?>(null) }
+
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     val context = LocalContext.current
+
+    val userEmail = userViewModel.userInfo.value?.email ?: ""
 
     var name by remember { mutableStateOf("") }
     var dose by remember { mutableStateOf(0) }
     var doseUnit by rememberSaveable { mutableStateOf("") }
     var recurrence by remember { mutableStateOf("") }
     var endDate by remember { mutableStateOf(Date()) }
-    var existingDate by remember { mutableStateOf(Date()) } // 기존 날짜 저장
-    var medicationTime by remember { mutableStateOf("") }
+    var startDate by remember { mutableStateOf(Date()) }
     var isEndDateDisabled by remember { mutableStateOf(false) }
-    var isEndDateSelected by remember { mutableStateOf(true) }
-
     val selectedTimes = rememberSaveable(saver = CalendarInformation.getStateListSaver()) { mutableStateListOf<CalendarInformation>() }
-    var selectedTimeIndices by remember { mutableStateOf(setOf<Int>()) }
-    var lastSelectedIndex by remember { mutableStateOf<Int?>(null) }
 
     var isModified by remember { mutableStateOf(false) }
 
-    // 데이터 로드 후 상태 초기화
     LaunchedEffect(reminder) {
-        reminder?.let {
-            name = it.medicineName
+        reminder?.let { selectedReminder ->
+            name = selectedReminder.medicineName
+            dose = selectedReminder.dosage.split(" ")[0].toIntOrNull() ?: 0
+            doseUnit = selectedReminder.dosage.split(" ").drop(1).joinToString(" ")
+            recurrence = selectedReminder.recurrence
+            endDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(selectedReminder.endDate) ?: Date()
 
-            val dosageParts = it.dosage.split(" ")
-            if (dosageParts.size >= 2) {
-                dose = dosageParts[0].toIntOrNull() ?: 0  // Extract the dose and convert it to Int
-                doseUnit = dosageParts.subList(1, dosageParts.size).joinToString(" ")  // Handle multi-word units
+            // 해당 그룹의 리마인더 데이터 로드
+            groupReminders = selectedReminder.medicationTaken?.let { groupId ->
+                reminderViewModel.getRemindersByGroupId(groupId)
             }
 
-            recurrence = it.recurrence
-            medicationTime = it.medicationTime
+            // 그룹의 가장 빠른 날짜를 startDate로 설정
+            startDate = groupReminders?.minOfOrNull { reminder ->
+                SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).parse(reminder.medicationTime) ?: Date()
+            } ?: Date()
 
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val parts = it.medicationTime.split(" ")
-            existingDate = dateFormat.parse(parts[0]) ?: Date() // 기존 날짜 추출
-            endDate = dateFormat.parse(it.endDate) ?: Date()
+            selectedTimes.clear()
+
+            val uniqueTimes = groupReminders
+                ?.mapNotNull { reminder ->
+                    val timePart = reminder.medicationTime.split(" ").getOrNull(1)
+                    Log.d("EditMedicationScreen", "Extracted timePart: $timePart from ${reminder.medicationTime}")
+                    timePart
+                }
+                ?.distinct() // 중복 시간 제거
+                ?.sorted()   // 정렬
+                ?: emptyList()
+
+            uniqueTimes.forEach { timePart ->
+                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val calendar = Calendar.getInstance().apply {
+                    time = timeFormat.parse(timePart) ?: Date()
+                }
+                Log.d("EditMedicationScreen", "Adding to selectedTimes: $timePart as CalendarInformation(${calendar.time})")
+                selectedTimes.add(CalendarInformation(calendar))
+            }
+
 
             isEndDateDisabled = (recurrence == "선택 안함")
-
-            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-            val timePart = parts[1]
-            val calendar = Calendar.getInstance().apply {
-                time = timeFormat.parse(timePart) ?: Date() // 시간 부분만 설정
-            }
-            selectedTimes.clear()
-            selectedTimes.add(CalendarInformation(calendar))
-            selectedTimeIndices = setOf(0)
-
             isModified = false
         }
     }
@@ -148,40 +161,46 @@ fun EditMedicationScreen(
     }
 
 
-    fun setTimeSelected(index: Int, isSelected: Boolean) {
-        selectedTimeIndices = if (isSelected) { selectedTimeIndices + index } else { selectedTimeIndices - index }
-        lastSelectedIndex = if (isSelected) index else lastSelectedIndex
-    }
-    fun addTime(time: CalendarInformation) { selectedTimes.add(time) }
-    fun removeTime(time: CalendarInformation) { selectedTimes.remove(time) }
+    fun updateGroupReminders() {
+        if (isModified) {
+            scope.launch {
+                // 기존 그룹 리마인더 삭제
+                groupReminders?.forEach { reminder ->
+                    reminderViewModel.deleteReminder(reminder.id!!)
+                }
 
-    val isTimerButtonEnabled = selectedTimes.isNotEmpty() && selectedTimeIndices.contains(selectedTimes.lastIndex)
-    val isSaveButtonEnabled = isModified
+                // 업데이트된 리마인더 그룹 생성
+                reminderImpl.createReminder(
+                    email = userEmail,
+                    medicineName = name,
+                    dosage = "$dose $doseUnit",
+                    recurrence = recurrence,
+                    startDate = startDate,
+                    endDate = endDate,
+                    medicationTimes = selectedTimes,
+                    medicationTaken = reminder?.medicationTaken ?: "",
+                    context = context,
+                    isAllWritten = true,
+                    isAllAvailable = true,
+                    navController = navController
+                )
+                navController.navigate(Routes.managementScreen.route)
+            }
+        }
+    }
 
 
     Scaffold(
         backgroundColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                ),
+                title = {  },
                 navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navController.navigate(Routes.managementScreen.route) {
-                                navController.popBackStack()
-                            }
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.Black
-                        )
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         },
         bottomBar = {
@@ -189,75 +208,15 @@ fun EditMedicationScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = {
-                    Text(
-                        "수정 완료",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White
-                    )
-                },
-                onClick = {
-                    if (isSaveButtonEnabled) {
-                        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-
-                        // 기존 날짜에서 Calendar 객체 생성
-                        val existingCalendar = Calendar.getInstance().apply {
-                            time = existingDate // 기존 날짜를 설정
-                        }
-
-                        val updatedTimes = selectedTimes.map { calendarInfo ->
-                            val calendar = calendarInfo.getCalendar()
-                            val hour = calendar.get(Calendar.HOUR_OF_DAY)
-                            val minute = calendar.get(Calendar.MINUTE)
-
-                            // 기존 날짜의 시간 부분을 새로운 시간으로 업데이트
-                            existingCalendar.set(Calendar.HOUR_OF_DAY, hour)
-                            existingCalendar.set(Calendar.MINUTE, minute)
-
-                            // 최종적으로 포맷팅하여 문자열로 변환
-                            dateFormat.format(existingCalendar.time)
-                        }
-
-                        val updatedReminder = reminder?.copy(
-                            medicineName = name,
-                            dosage = "$dose $doseUnit",
-                            recurrence = recurrence,
-                            endDate = endDate.toFormattedDateString() ,
-                            medicationTime = updatedTimes.joinToString(", ") // 시간을 문자열로 결합
-                        )
-                        println("updatedReminder : " +updatedTimes.joinToString(", "))
-
-
-                        updatedReminder?.let {
-                            scope.launch {
-                                reminderImpl.editReminder(
-                                    reminder = it,
-                                    context = context,
-                                    isAllWritten  = isSaveButtonEnabled,
-                                    isAllAvailable  = isSaveButtonEnabled,
-                                    navController = navController
-                                )
-                            }
-                        }
-                        navController.navigate(Routes.managementScreen.route)
-                    }
-                },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Add",
-                        tint = Color.White
-                    )
-                },
-                containerColor = if (isSaveButtonEnabled) MainBlue else Color.Gray,
-                elevation = FloatingActionButtonDefaults.elevation(
-                    defaultElevation = 10.dp,
-                    pressedElevation = 0.dp,
-                ),
+                text = { Text("수정 완료", color = Color.White) },
+                onClick = { updateGroupReminders() },
+                icon = { Icon(imageVector = Icons.Default.Check, contentDescription = "Save", tint = Color.White) },
+                containerColor = if (isModified) MainBlue else Color.Gray,
                 modifier = Modifier
                     .width(200.dp)
                     .height(40.dp),
                 shape = MaterialTheme.shapes.extraLarge,
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 10.dp, pressedElevation = 0.dp)
             )
 
         },
@@ -335,9 +294,9 @@ fun EditMedicationScreen(
                 onDisableEndDate = { disableEndDate ->
                     isEndDateDisabled = disableEndDate
                     if (disableEndDate) {
-                        endDate = existingDate
-                        isEndDateSelected = false
+                        endDate = startDate
                     }
+                    markModified()
                 }
             )
 
@@ -347,10 +306,9 @@ fun EditMedicationScreen(
                 endDate = endDate,
                 onDateSelected = { timestamp ->
                     endDate = Date(timestamp)
-                    isEndDateSelected = true
-                    markModified() // Mark as modified
+                    markModified()
                 },
-                isEndDateSelected = isEndDateSelected,
+                isEndDateSelected = true,
                 isDisabled = isEndDateDisabled
             )
 
@@ -363,24 +321,23 @@ fun EditMedicationScreen(
             )
 
             for (index in selectedTimes.indices) {
+                println("selectedTimes : $selectedTimes")
                 EditTimerText(
                     isLastItem = selectedTimes.lastIndex == index,
                     isOnlyItem = selectedTimes.size == 1,
                     selectedTimes = selectedTimes,
                     time = {
                         selectedTimes[index] = it
-                        setTimeSelected(index, true)
                         markModified()
                     },
                     onDeleteClick = {
-                        removeTime(selectedTimes[index])
-                        setTimeSelected(index, false)
+                        selectedTimes.removeAt(index)
                         markModified()
                     },
                     logEvent = {
                         //viewModel.logEvent(AnalyticsEvents.ADD_MEDICATION_NEW_TIME_SELECTED)
                     },
-                    isTimeSelected = selectedTimeIndices.contains(index)
+                    isTimeSelected = true
                 )
             }
             Spacer(modifier = Modifier.padding(4.dp))
@@ -393,31 +350,25 @@ fun EditMedicationScreen(
                 Button(
                     modifier = Modifier.padding(bottom = 70.dp),
                     onClick = {
-                        if (isTimerButtonEnabled) {
-                            addTime(CalendarInformation(Calendar.getInstance()))
-
-                            scope.launch {
-                                val maxScroll = scrollState.maxValue + 150 // 버튼 크기만큼 더 스크롤
-                                scrollState.animateScrollTo(maxScroll)
-                            }
+                        selectedTimes.add(CalendarInformation(Calendar.getInstance()))
+                        markModified()
+                        scope.launch {
+                            scrollState.animateScrollTo(scrollState.maxValue + 150)
                         }
                     },
+                    enabled = selectedTimes.isNotEmpty(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
-                        contentColor = if (isTimerButtonEnabled) MainBlue else Color.Gray
+                        contentColor = if (selectedTimes.isNotEmpty()) MainBlue else Color.Gray
                     ),
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 10.dp,
                         pressedElevation = 0.dp,
                         disabledElevation = 0.dp
-                    ),
-                    enabled = isTimerButtonEnabled
+                    )
                 ) {
-                    Icon(imageVector = Icons.Default.Notifications,
-                        contentDescription = "Add",
-                        tint = if (isTimerButtonEnabled) MainBlue else Color.Gray)
-                    Text("시간 추가", color = if (isTimerButtonEnabled) MainBlue else Color.Gray, modifier = Modifier.padding(start = 10.dp))
-                }
+                    Icon(imageVector = Icons.Default.Notifications, contentDescription = "Add", tint = if (selectedTimes.isNotEmpty()) MainBlue else Color.Gray)
+                    Text("시간 추가", color = if (selectedTimes.isNotEmpty()) MainBlue else Color.Gray, modifier = Modifier.padding(start = 10.dp))                }
             }
             Spacer(modifier = Modifier.weight(1f))
         }

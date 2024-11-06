@@ -55,6 +55,12 @@ class ReminderViewModel @Inject constructor(
     fun getReminderById(id: Int): Reminder? {
         return _reminders.value.find { it.id == id }
     }
+
+    fun getRemindersByGroupId(groupId: String): List<Reminder>?{
+        return _reminders.value.filter { it.medicationTaken == groupId }
+    }
+
+
     fun getBookedReminderById(id: Int): Booked? {
         return _bookedReminders.value.find { it.id == id }
     }
