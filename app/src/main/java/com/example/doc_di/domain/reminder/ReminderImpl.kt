@@ -25,6 +25,7 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
         startDate: Date,
         endDate: Date,
         medicationTimes:  List<CalendarInformation>,
+        medicationTaken : String,
         context: Context,
         isAllWritten: Boolean,
         isAllAvailable: Boolean,
@@ -71,7 +72,7 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                                 recurrence = recurrence,
                                 endDate = endDate.toFormattedDateString(),
                                 medicationTime = medicationTimeDate.toFormattedDateTimeString(),
-                                medicationTaken = "false"
+                                medicationTaken = medicationTaken
                             )
 
                             val reminderResponse = reminderApi.createReminder(reminderDTO)
@@ -101,7 +102,7 @@ class ReminderImpl(private val reminderApi: ReminderApi) {
                                     recurrence = recurrence,
                                     endDate = endDate.toFormattedDateString(),
                                     medicationTime = medicationTimeDate.toFormattedDateTimeString(),
-                                    medicationTaken = "false"
+                                    medicationTaken = medicationTaken
                                 )
 
                                 val reminderResponse = reminderApi.createReminder(reminderDTO)
