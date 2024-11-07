@@ -1,6 +1,7 @@
 package com.example.doc_di.chatbot
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,9 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -41,6 +45,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -51,10 +56,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -65,11 +68,18 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.domain.model.Message
+import com.example.doc_di.domain.pill.SearchHistoryDto
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.etc.Routes
 import com.example.doc_di.login.rememberImeState
+import com.example.doc_di.search.SearchViewModel
+import com.example.doc_di.search.pillsearch.searchresult.ShowPillList
+import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import com.example.doc_di.ui.theme.*
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -79,6 +89,8 @@ fun ChatScreen(
     btmBarViewModel: BtmBarViewModel,
     userViewModel: UserViewModel,
     chatBotViewModel: ChatBotViewModel,
+    searchViewModel: SearchViewModel,
+    reviewViewModel: ReviewViewModel,
     chatId: Int? = null
 ) {
     val userInfo by userViewModel.userInfo.observeAsState()
@@ -86,8 +98,9 @@ fun ChatScreen(
     var message by remember { mutableStateOf("") }
 
     val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
     val imeState = rememberImeState()
+
+    val context = LocalContext.current
 
     LaunchedEffect(chatId) {
         chatId?.let {
@@ -180,7 +193,13 @@ fun ChatScreen(
                                 .imePadding()
                         ) {
                             items(messages, key = { it.id }) { message ->
-                                ChatRow(chat = message) // Firestore에서 불러온 messages 리스트 사용
+                                ChatRow(chat = message,
+                                    navController = navController, // 추가
+                                    searchViewModel = searchViewModel,
+                                    reviewViewModel = reviewViewModel, // 추가
+                                    userViewModel = userViewModel,
+                                    context = context
+                                ) // Firestore에서 불러온 messages 리스트 사용
                             }
                             item {
                                 Spacer(modifier = Modifier.height(90.dp))
@@ -212,8 +231,22 @@ fun ChatScreen(
 
 @Composable
 fun ChatRow(
-    chat: Message
+    chat: Message,
+    navController: NavController,
+    searchViewModel: SearchViewModel,
+    userViewModel: UserViewModel,
+    reviewViewModel: ReviewViewModel,
+    context: Context
 ) {
+
+    val isMedicineInfoMessage = chat.content.startsWith("제품명:")
+    val pillList = searchViewModel.pills.collectAsState().value
+    val isLoading = searchViewModel.isLoading.collectAsState().value
+
+    LaunchedEffect(navController.currentBackStackEntry) {
+        searchViewModel.resetPillInfo()
+        searchViewModel.resetPills()
+    }
 
     Column(
         modifier = Modifier
@@ -224,18 +257,17 @@ fun ChatRow(
     ) {
         Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(100.dp))
+                .clip(RoundedCornerShape(16.dp))
                 .background(if (chat.user) MainBlue else LightGray)
-            ,
+                .padding(horizontal = 15.dp, vertical = 10.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
                 text = chat.content,
                 style = TextStyle(
                     color = if(chat.user) Color.White else Color.Black,
-                    fontSize = 15.sp
+                    fontSize = 14.sp
                 ),
-                modifier = Modifier.padding(vertical = 8.dp, horizontal = 15.dp),
                 textAlign = TextAlign.Start
             )
         }
@@ -251,6 +283,23 @@ fun ChatRow(
             ),
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 15.dp),
         )
+
+        if(isMedicineInfoMessage){
+            val pillName = chat.content.split("\n")[0].removePrefix("제품명: ")
+            searchViewModel.setSelectedPillByPillName(pillName)
+            Button(
+                onClick = {
+                    navController.navigate(Routes.searchResult.route)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MainBlue,
+                    contentColor = Color.White
+                ),
+                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+            ) {
+                Text("더 자세한 정보 보기")
+            }
+        }
     }
 
 }

@@ -6,5 +6,6 @@ data class FindByMedicineChartDto(
     val color2: String,
     val shape: String,
     val txt1: String,
-    val txt2: String
+    val txt2: String,
+    val query: String
 )

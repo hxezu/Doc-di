@@ -105,7 +105,14 @@ class ChatBotViewModel(
                     // 챗봇 응답 처리
                     if (responseBody != null && responseBody.data != null) {
                         responseBody.data.forEach { rasaDto ->
-                            rasaDto.text?.let { text ->
+
+//                            rasaDto.text?.let { text ->
+//                                addMessageToChat(email, text, isUser = false, chatId) // 챗봇 메시지 저장
+//                                loadMessages(chatId)
+//                            }
+
+                            if (rasaDto.text != null) {
+                                val text = rasaDto.text
                                 addMessageToChat(email, text, isUser = false, chatId) // 챗봇 메시지 저장
                                 loadMessages(chatId)
                             }

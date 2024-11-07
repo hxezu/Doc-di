@@ -180,7 +180,9 @@ fun NaviGraph(navController: NavHostController) {
                 btmBarViewModel = btmBarViewModel,
                 userViewModel = userViewModel,
                 chatBotViewModel = chatBotViewModel,
-                chatId = chatId
+                chatId = chatId,
+                searchViewModel = searchViewModel,
+                reviewViewModel = reviewViewModel
             )
         }
 
@@ -191,7 +193,9 @@ fun NaviGraph(navController: NavHostController) {
                 btmBarViewModel = btmBarViewModel,
                 userViewModel = userViewModel,
                 chatBotViewModel = chatBotViewModel,
-                chatId = null
+                chatId = null,
+                searchViewModel = searchViewModel,
+                reviewViewModel = reviewViewModel
             )
         }
 
