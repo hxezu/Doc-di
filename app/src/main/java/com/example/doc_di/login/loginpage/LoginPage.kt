@@ -1,5 +1,6 @@
 package com.example.doc_di.login.loginpage
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -38,6 +39,7 @@ import com.example.doc_di.R
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.login.LoginImpl
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.login.GradientButton
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.login.rememberImeState
@@ -117,20 +119,25 @@ fun LoginPage(
             }
             GradientButton(
                 onClick = {
-                    scope.launch {
-                        try {
-                            loginImpl.login(
-                                email.value,
-                                password.value,
-                                context,
-                                navController,
-                                loginCheck,
-                                userViewModel,
-                                reminderViewModel
-                            )
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+                    if (isNetworkAvailable(context)) {
+                        scope.launch {
+                            try {
+                                loginImpl.login(
+                                    email.value,
+                                    password.value,
+                                    context,
+                                    navController,
+                                    loginCheck,
+                                    userViewModel,
+                                    reminderViewModel
+                                )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
+                    }
+                    else {
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
                 },
                 gradientColors = gradientColor,
@@ -146,7 +153,7 @@ fun LoginPage(
                 onClick = {
                     navController.navigate(Routes.register.route)
                     keyboardController?.hide()
-                }
+                },
             ) {
                 Text(
                     text = "회원가입",
@@ -160,7 +167,7 @@ fun LoginPage(
                 onClick = {
                     navController.navigate(Routes.resetPassword.route)
                     keyboardController?.hide()
-                }
+                },
             ) {
                 Text(
                     text = "비밀번호 찾기",

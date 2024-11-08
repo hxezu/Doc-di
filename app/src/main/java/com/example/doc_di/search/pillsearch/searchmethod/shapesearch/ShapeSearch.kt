@@ -1,5 +1,6 @@
 package com.example.doc_di.search.pillsearch.searchmethod.shapesearch
 
+import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,12 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.search.SearchViewModel
 
 @Composable
@@ -34,6 +37,7 @@ fun ShapeSearch(navController: NavController, searchViewModel: SearchViewModel) 
     val selectedShape = remember { mutableStateOf("타원형") }
     val selectedColor = remember { mutableStateOf("하양") }
     val mainSearchColor = Color(0xFF1892FA)
+    val context = LocalContext.current
 
     val options = mutableMapOf<String, String>()
     val focusManager = LocalFocusManager.current
@@ -54,13 +58,19 @@ fun ShapeSearch(navController: NavController, searchViewModel: SearchViewModel) 
         SelectShapeColor(selectedShape, selectedColor, focusManager)
         Button(
             onClick = {
-                options["txt1"] = preIdentifier.value
-                options["txt2"] = sufIdentifier.value
-                options["shape"] = selectedShape.value
-                options["color1"] = selectedColor.value
-                searchViewModel.setOptions(options)
-                searchViewModel.searchPillsByOptions()
-                navController.navigate(Routes.searchResult.route)
+                if (isNetworkAvailable(context)) {
+                    options["txt1"] = preIdentifier.value
+                    options["txt2"] = sufIdentifier.value
+                    options["shape"] = selectedShape.value
+                    options["color1"] = selectedColor.value
+                    searchViewModel.setOptions(options)
+                    searchViewModel.searchPillsByOptions()
+                    navController.navigate(Routes.searchResult.route)
+                }
+                else {
+                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                }
+
             },
             colors = ButtonDefaults.textButtonColors(mainSearchColor),
             modifier = Modifier

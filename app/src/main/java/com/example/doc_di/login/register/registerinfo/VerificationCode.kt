@@ -1,6 +1,7 @@
 package com.example.doc_di.login.register.registerinfo
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.register.RegisterImpl
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.ui.theme.LightBlue
 import com.example.doc_di.ui.theme.MainBlue
 import kotlinx.coroutines.launch
@@ -81,8 +83,13 @@ fun VerificationCode(
                 .padding(top = 9.dp)
                 .width(100.dp)
                 .clickable {
-                    scope.launch {
-                        registerImpl.makeCode(email.value, context)
+                    if (isNetworkAvailable(context)) {
+                        scope.launch {
+                            registerImpl.makeCode(email.value, context)
+                        }
+                    }
+                    else {
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
                 }
         )

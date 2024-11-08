@@ -1,6 +1,7 @@
 package com.example.doc_di.search
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.doc_di.domain.review.SearchHistory
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.login.UserViewModel
 
 @Composable
@@ -43,8 +45,13 @@ fun PastSearchList(
             items(pastHistory){history ->
                 Button(
                     onClick = {
-                        searchViewModel.setSelectedPillByPillName(history.medicineName)
-                        navController.navigate(Routes.searchResult.route)
+                        if (isNetworkAvailable(context)) {
+                            searchViewModel.setSelectedPillByPillName(history.medicineName)
+                            navController.navigate(Routes.searchResult.route)
+                        }
+                        else {
+                            Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(Color.Transparent),
                     border = BorderStroke(1.dp, Color.Gray),
@@ -61,7 +68,12 @@ fun PastSearchList(
                             tint = Color.Gray,
                             modifier = Modifier
                                 .clickable {
-                                    userViewModel.deletePillHistory(history.id, context, navController)
+                                    if (isNetworkAvailable(context)) {
+                                        userViewModel.deletePillHistory(history.id, context, navController)
+                                    }
+                                    else {
+                                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                                    }
                                 }
                         )
                     }

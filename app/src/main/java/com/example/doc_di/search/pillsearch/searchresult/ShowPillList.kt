@@ -1,5 +1,6 @@
 package com.example.doc_di.search.pillsearch.searchresult
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.domain.model.Pill
 import com.example.doc_di.domain.pill.SearchHistoryDto
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
@@ -59,29 +61,35 @@ fun ShowPillList(
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
                     .clickable {
-                        reviewViewModel.showSearch[0] = true
-                        reviewViewModel.showSearch[1] = false
-                        reviewViewModel.showSearch[2] = false
-                        reviewViewModel.showSearch[3] = false
-                        searchViewModel.setSelectedPill(pill)
-                        val searchHistoryDto = SearchHistoryDto(
-                            userViewModel.userInfo.value!!.email,
-                            pill.itemName,
-                            pill.itemSeq.toString(),
-                            LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-                        )
-                        searchViewModel.setPillInfo(searchHistoryDto)
-                        reviewViewModel.fetchReviewInfo(
-                            context,
-                            navController,
-                            userViewModel,
-                            pill.itemName
-                        )
-                        navController.navigate(Routes.pillInformation.route) {
-                            popUpTo(Routes.searchMethod.route) {
-                                inclusive = false
+                        if (isNetworkAvailable(context)) {
+                            reviewViewModel.showSearch[0] = true
+                            reviewViewModel.showSearch[1] = false
+                            reviewViewModel.showSearch[2] = false
+                            reviewViewModel.showSearch[3] = false
+                            searchViewModel.setSelectedPill(pill)
+                            val searchHistoryDto = SearchHistoryDto(
+                                userViewModel.userInfo.value!!.email,
+                                pill.itemName,
+                                pill.itemSeq.toString(),
+                                LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+                            )
+                            searchViewModel.setPillInfo(searchHistoryDto)
+                            reviewViewModel.fetchReviewInfo(
+                                context,
+                                navController,
+                                userViewModel,
+                                pill.itemName
+                            )
+                            navController.navigate(Routes.pillInformation.route) {
+                                popUpTo(Routes.searchMethod.route) {
+                                    inclusive = false
+                                }
                             }
                         }
+                        else {
+                            Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                        }
+
                     }
             ) {
                 Column(

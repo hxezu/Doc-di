@@ -3,6 +3,7 @@ package com.example.doc_di.home.account_manage.modify_profile
 import ModifyName
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -43,6 +44,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.account.AccountImpl
 import com.example.doc_di.etc.GoBack
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.login.rememberImeState
@@ -121,19 +123,25 @@ fun Profile(navController: NavController, userViewModel: UserViewModel) {
         Spacer(modifier = Modifier.weight(2f))
         Button(
             onClick = {
-                scope.launch {
-                    accountImpl.modifyProfile(
-                        userInfo!!.email,
-                        password.value,
-                        name.value,
-                        context,
-                        isAllWritten,
-                        isAllAvailable,
-                        navController,
-                        bitmap,
-                        userViewModel
-                    )
+                if (isNetworkAvailable(context)) {
+                    scope.launch {
+                        accountImpl.modifyProfile(
+                            userInfo!!.email,
+                            password.value,
+                            name.value,
+                            context,
+                            isAllWritten,
+                            isAllAvailable,
+                            navController,
+                            bitmap,
+                            userViewModel
+                        )
+                    }
                 }
+                else {
+                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                }
+
             },
             colors = ButtonDefaults.textButtonColors(Color(0xFF007AEB)),
             modifier = Modifier

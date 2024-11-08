@@ -1,5 +1,6 @@
 package com.example.doc_di.search.pillsearch.searchresult.pill_information.contents.pill_review
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.domain.review.ReviewData
 import com.example.doc_di.domain.review.ReviewImpl
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
@@ -134,15 +136,20 @@ fun Review(
                         }
                         DropdownMenuItem(
                             onClick = {
-                                expanded = false
-                                scope.launch {
-                                    reviewImpl.deleteReview(
-                                        review,
-                                        context,
-                                        navController,
-                                        userViewModel,
-                                        reviewViewModel
-                                    )
+                                if (isNetworkAvailable(context)) {
+                                    expanded = false
+                                    scope.launch {
+                                        reviewImpl.deleteReview(
+                                            review,
+                                            context,
+                                            navController,
+                                            userViewModel,
+                                            reviewViewModel
+                                        )
+                                    }
+                                }
+                                else {
+                                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                                 }
                             },
                         ) {

@@ -1,5 +1,6 @@
 package com.example.doc_di.home.appointment_schedule
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.reminder.data.AppointmentData
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 
@@ -50,6 +53,7 @@ fun UpcomingAppointmentList(
 ) {
     var dropdownStates by remember { mutableStateOf(List(upcomingAppointment.size) { false }) }
     val options = listOf("수정", "삭제")
+    val context = LocalContext.current
 
     val dateColor = Color(0xFF191D30)
     val textColor = Color(0xFF333333)
@@ -112,7 +116,13 @@ fun UpcomingAppointmentList(
                                             if (option == "수정") {
                                                 navController.navigate(Routes.editScheduleScreen.route + "/${appointmentData.appointmentId}")
                                             } else if (option == "삭제") {
-                                                reminderViewModel.deleteBookedReminder(appointmentData.appointmentId)
+                                                if (isNetworkAvailable(context)) {
+                                                    reminderViewModel.deleteBookedReminder(appointmentData.appointmentId)
+                                                }
+                                                else {
+                                                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                                                }
+
                                             }
                                             dropdownStates = dropdownStates.map { false }
                                         }

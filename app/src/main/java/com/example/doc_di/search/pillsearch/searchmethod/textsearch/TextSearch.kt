@@ -1,5 +1,6 @@
 package com.example.doc_di.search.pillsearch.searchmethod.textsearch
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.search.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +49,7 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
     val mainSearchColor = Color(0xFF1892FA)
 
     var nameSearch by rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current
 
     fun doSearch() {
         searchViewModel.setSelectedPillByPillName(nameSearch)
@@ -103,7 +107,14 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
         )
 
         Button(
-            onClick = { doSearch() },
+            onClick = {
+                if (isNetworkAvailable(context)) {
+                    doSearch()
+                }
+                else {
+                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                }
+            },
             colors = ButtonDefaults.textButtonColors(mainSearchColor),
             modifier = Modifier
                 .fillMaxWidth()

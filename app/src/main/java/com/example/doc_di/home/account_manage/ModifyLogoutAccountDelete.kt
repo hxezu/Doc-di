@@ -1,5 +1,6 @@
 package com.example.doc_di.home.account_manage
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.account.AccountImpl
 import com.example.doc_di.etc.GoBack
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.login.UserViewModel
 import kotlinx.coroutines.launch
 
@@ -62,9 +64,15 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
                 .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 4.dp)
                 .clickable {
-                    scope.launch {
-                        accountImpl.logoutAccount(context, navController, userViewModel)
+                    if (isNetworkAvailable(context)) {
+                        scope.launch {
+                            accountImpl.logoutAccount(context, navController, userViewModel)
+                        }
                     }
+                    else {
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                    }
+
                 }
         )
         Divider(color = Color.LightGray)
@@ -83,9 +91,15 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
             ResignDialog(
                 onDismissRequest = { showResignDialog = false },
                 onConfirmation = {
-                    scope.launch {
-                        accountImpl.deleteAccount(context, navController, userViewModel)
+                    if (isNetworkAvailable(context)) {
+                        scope.launch {
+                            accountImpl.deleteAccount(context, navController, userViewModel)
+                        }
                     }
+                    else {
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                    }
+
                 }
             )
         }

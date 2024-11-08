@@ -1,5 +1,6 @@
 package com.example.doc_di.home.dosage
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,6 +27,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.reminder.data.MedicationData
 import com.example.doc_di.search.SearchViewModel
 
@@ -39,13 +42,19 @@ fun MedicationCardForToday(
     val alarmColor = Color(0xFF979C9E)
     val pinColor = Color(0xFF979C9E)
     val cardTextColor = Color(0xFF72777A)
+    val context = LocalContext.current
 
     Card(
         onClick = {
-            searchViewModel.setSelectedPillByPillName(medication.name)
-            btmBarViewModel.btmNavBarItems[0].selected = false
-            btmBarViewModel.btmNavBarItems[1].selected = true
-            navController.navigate(Routes.searchResult.route)
+            if (isNetworkAvailable(context)) {
+                searchViewModel.setSelectedPillByPillName(medication.name)
+                btmBarViewModel.btmNavBarItems[0].selected = false
+                btmBarViewModel.btmNavBarItems[1].selected = true
+                navController.navigate(Routes.searchResult.route)
+            }
+            else {
+                Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+            }
         },
         colors = CardDefaults.cardColors(Color.White),
         elevation = CardDefaults.cardElevation(1.dp),
@@ -105,7 +114,7 @@ fun MedicationCardForToday(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "${medication.dosage}",
+                    text = medication.dosage,
                     color = cardTextColor
                 )
             }

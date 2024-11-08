@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.register.RegisterImpl
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.login.GradientButton
 import com.example.doc_di.login.register.registerinfo.RegisterEmail
 import com.example.doc_di.login.register.registerinfo.RegisterName
@@ -117,18 +119,23 @@ fun RegisterPage(navController: NavController) {
             Spacer(modifier = Modifier.weight(2f))
             GradientButton(
                 onClick = {
-                    scope.launch {
-                        registerImpl.register(
-                            email.value,
-                            verifyCode.value,
-                            password.value,
-                            name.value,
-                            context,
-                            isAllWritten,
-                            isAllAvailable,
-                            navController,
-                            bitmap
-                        )
+                    if (isNetworkAvailable(context)) {
+                        scope.launch {
+                            registerImpl.register(
+                                email.value,
+                                verifyCode.value,
+                                password.value,
+                                name.value,
+                                context,
+                                isAllWritten,
+                                isAllAvailable,
+                                navController,
+                                bitmap
+                            )
+                        }
+                    }
+                    else {
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
                 },
                 gradientColors = gradientColor,

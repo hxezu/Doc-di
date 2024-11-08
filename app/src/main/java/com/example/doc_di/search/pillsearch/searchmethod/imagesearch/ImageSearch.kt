@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.home.account_manage.modify_profile.ImagePickerDialog
 import com.example.doc_di.search.SearchViewModel
 
@@ -153,8 +155,13 @@ fun ImageSearch(navController: NavController, searchViewModel: SearchViewModel) 
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-                    searchViewModel.searchPillsByImage(context, bitmap!!)
-                    navController.navigate(Routes.searchResult.route)
+                    if (isNetworkAvailable(context)) {
+                        searchViewModel.searchPillsByImage(context, bitmap!!)
+                        navController.navigate(Routes.searchResult.route)
+                    }
+                    else {
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                    }
                 },
                 colors = ButtonDefaults.textButtonColors(mainSearchColor),
                 modifier = Modifier

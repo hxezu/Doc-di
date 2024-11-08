@@ -1,5 +1,6 @@
 package com.example.doc_di.login.resetpassword
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.domain.resetpw.ResetImpl
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.login.GradientButton
 import com.example.doc_di.login.rememberImeState
 import com.example.doc_di.ui.theme.LightBlue
@@ -65,8 +67,8 @@ fun ResetPassword(navController: NavController) {
             .padding(16.dp)
             .verticalScroll(scrollState)
             .imePadding()
-            .clickable (
-                interactionSource = remember { MutableInteractionSource()},
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = { focusManager.clearFocus() }
             )
@@ -80,9 +82,15 @@ fun ResetPassword(navController: NavController) {
         EmailTextField(email)
         GradientButton(
             onClick = {
-                scope.launch {
-                    resetImpl.resetPassword(email.value, context, navController)
+                if(isNetworkAvailable(context)) {
+                    scope.launch {
+                        resetImpl.resetPassword(email.value, context, navController)
+                    }
                 }
+                else{
+                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                }
+
             },
             gradientColors = gradientColor,
             cornerRadius = cornerRadius,
