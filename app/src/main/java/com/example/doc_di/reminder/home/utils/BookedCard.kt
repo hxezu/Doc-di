@@ -97,7 +97,7 @@ fun BookedCard(
 
                 Column(
                     modifier = Modifier
-                        .weight(3f),
+                        .weight(5f),
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
@@ -125,7 +125,7 @@ fun BookedCard(
 
                 Box(
                     modifier = Modifier
-                        .weight(2.5f)
+                        .weight(1f)
                         .align(Alignment.CenterVertically)
                 ) {
                     // 점 세 개 아이콘 버튼

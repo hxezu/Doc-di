@@ -124,7 +124,7 @@ fun MedicationCard(
 
                 Column(
                     modifier = Modifier
-                        .weight(3f),
+                        .weight(5f),
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
@@ -146,13 +146,13 @@ fun MedicationCard(
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
-                        .weight(2.5f)
+                        .weight(1f)
                         .align(Alignment.CenterVertically)
                 )
 
                 Box(
                     modifier = Modifier
-                        .weight(2.5f)
+                        .weight(1f)
                         .align(Alignment.CenterVertically)
                 ) {
 
