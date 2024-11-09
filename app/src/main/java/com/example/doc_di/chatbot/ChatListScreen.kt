@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -193,7 +194,7 @@ fun ChatEachRow(
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row {
+                Row (modifier = Modifier.weight(1f)){
                     Spacer(modifier = Modifier.width(10.dp))
                     Icon(
                         painter = painterResource(id = R.drawable.icon),
@@ -203,6 +204,7 @@ fun ChatEachRow(
                     )
                     Spacer(modifier = Modifier.width(20.dp))
                     Column(
+                        modifier = Modifier.weight(1f)
                     ) {
                         Text(
                             text =  chatName , style = TextStyle(
@@ -214,7 +216,9 @@ fun ChatEachRow(
                             text = lastMessageContent,
                             style = TextStyle(
                                 color = Gray, fontSize = 14.sp
-                            )
+                            ),
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
@@ -223,7 +227,8 @@ fun ChatEachRow(
                     text = lastMessageTime,
                     style = TextStyle(
                         color = Gray, fontSize = 12.sp
-                    )
+                    ),
+                    modifier = Modifier.padding(start = 8.dp)
                 )
             }
             Spacer(modifier = Modifier.height(15.dp))

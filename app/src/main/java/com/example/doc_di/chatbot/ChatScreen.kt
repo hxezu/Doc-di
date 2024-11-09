@@ -297,7 +297,7 @@ fun ChatRow(
                 ),
                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
             ) {
-                Text("더 자세한 정보 보기")
+                Text("$pillName 의 정보 보기")
             }
         }
     }
