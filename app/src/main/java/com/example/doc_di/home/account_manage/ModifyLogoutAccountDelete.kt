@@ -58,6 +58,15 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
         )
         Divider(color = Color.LightGray)
         Text(
+            text = "이용 가이드",
+            color = Color.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 4.dp)
+                .clickable { navController.navigate(Routes.appDescription.route) }
+        )
+        Divider(color = Color.LightGray)
+        Text(
             text = "로그아웃",
             color = Color.Black,
             modifier = Modifier
@@ -68,9 +77,10 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
                         scope.launch {
                             accountImpl.logoutAccount(context, navController, userViewModel)
                         }
-                    }
-                    else {
-                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast
+                            .makeText(context, "네트워크 오류", Toast.LENGTH_SHORT)
+                            .show()
                     }
 
                 }

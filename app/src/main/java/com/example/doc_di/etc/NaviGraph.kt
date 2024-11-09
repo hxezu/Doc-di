@@ -22,6 +22,7 @@ import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.chatbot.ChatRepository
 import com.example.doc_di.domain.pill.PillsSearchRepositoryImpl
 import com.example.doc_di.home.Home
+import com.example.doc_di.home.account_manage.AppDescription
 import com.example.doc_di.home.account_manage.ModifyLogoutAccountDelete
 import com.example.doc_di.home.account_manage.modify_profile.Profile
 import com.example.doc_di.home.appointment_schedule.AppointmentSchedule
@@ -128,6 +129,10 @@ fun NaviGraph(navController: NavHostController) {
 
         composable(route = Routes.profile.route) {
             Profile(navController, userViewModel)
+        }
+
+        composable(route = Routes.appDescription.route){
+            AppDescription(navController)
         }
 
         composable(route = Routes.search.route) {

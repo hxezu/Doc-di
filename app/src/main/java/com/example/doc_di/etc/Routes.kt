@@ -19,4 +19,5 @@ sealed class Routes(val route: String) {
     object addScheduleScreen: Routes("AddScheduleScreen")
     object profile: Routes("profile")
     object modifyLogoutAccountDelete: Routes("ModifyLogoutAccountDelete")
+    object appDescription: Routes("AppDescription")
 }
