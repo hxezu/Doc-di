@@ -2,6 +2,7 @@ package com.example.doc_di.chatbot
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -39,6 +40,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -52,6 +54,7 @@ import com.example.doc_di.domain.model.Chat
 import com.example.doc_di.domain.model.Message
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.ui.theme.Line
 import com.example.doc_di.ui.theme.MainBlue
 import java.time.LocalDateTime
@@ -66,6 +69,8 @@ fun ChatListScreen(
     userViewModel: UserViewModel,
     chatBotViewModel: ChatBotViewModel
 ) {
+    val context = LocalContext.current
+
     val chatList by chatBotViewModel.chatList.observeAsState()
     val userInfo by userViewModel.userInfo.observeAsState()
 
@@ -87,11 +92,16 @@ fun ChatListScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    userInfo?.email?.let { email ->
-                        chatBotViewModel.createNewChat(email) { newChatId ->
-                            navController.navigate("chat_screen/$newChatId") // 생성된 채팅 ID를 사용해 채팅 화면으로 이동
+                    if(isNetworkAvailable(context)){
+                        userInfo?.email?.let { email ->
+                            chatBotViewModel.createNewChat(email) { newChatId ->
+                                navController.navigate("chat_screen/$newChatId") // 생성된 채팅 ID를 사용해 채팅 화면으로 이동
+                            }
                         }
+                    }else{
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
+
                           },
                 backgroundColor = MainBlue,
                 modifier = Modifier.padding(bottom = 20.dp),

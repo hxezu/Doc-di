@@ -2,6 +2,7 @@ package com.example.doc_di.chatbot
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -72,6 +73,7 @@ import com.example.doc_di.domain.pill.SearchHistoryDto
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.login.rememberImeState
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.ShowPillList
@@ -165,9 +167,13 @@ fun ChatScreen(
                     .background(Color.Transparent)
             ) {
                 ChatTitleRow(modifier = Modifier.padding(start = 20.dp, end = 20.dp)){
-                    chatId?.let {
-                        chatBotViewModel.deleteChat(userInfo?.email ?: "", it) // Firebase에서 대화 삭제
-                        navController.popBackStack() // 이전 화면으로 돌아감
+                    if(isNetworkAvailable(context)){
+                        chatId?.let {
+                            chatBotViewModel.deleteChat(userInfo?.email ?: "", it) // Firebase에서 대화 삭제
+                            navController.popBackStack() // 이전 화면으로 돌아감
+                        }
+                    }else{
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
                 }
                 Box(
@@ -199,7 +205,7 @@ fun ChatScreen(
                                     reviewViewModel = reviewViewModel, // 추가
                                     userViewModel = userViewModel,
                                     context = context
-                                ) // Firestore에서 불러온 messages 리스트 사용
+                                )
                             }
                             item {
                                 Spacer(modifier = Modifier.height(90.dp))
@@ -210,12 +216,17 @@ fun ChatScreen(
                         text = message,
                         onValueChange = { message = it },
                         onSendClick = {
-                            userInfo?.email?.let { email ->
-                                if (message.isNotBlank() && chatId != null) {
-                                    chatBotViewModel.sendMessage(email, message, chatId)
-                                    message = ""
+                            if(isNetworkAvailable(context)){
+                                userInfo?.email?.let { email ->
+                                    if (message.isNotBlank() && chatId != null) {
+                                        chatBotViewModel.sendMessage(email, message, chatId)
+                                        message = ""
+                                    }
                                 }
+                            }else{
+                                Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                             }
+
                         },
                         modifier = Modifier
                             .padding(horizontal = 20.dp, vertical = 20.dp)

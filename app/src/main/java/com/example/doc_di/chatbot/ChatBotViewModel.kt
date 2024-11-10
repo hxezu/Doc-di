@@ -106,6 +106,7 @@ class ChatBotViewModel(
                     if (responseBody != null && responseBody.data != null) {
                         responseBody.data.forEach { rasaDto ->
 
+
                             if (rasaDto.text != null) {
                                 val text = rasaDto.text
                                 addMessageToChat(email, text, isUser = false, chatId) // 챗봇 메시지 저장
@@ -136,18 +137,6 @@ class ChatBotViewModel(
                                     loadMessages(chatId)
                                 }
                             }
-
-//                            rasaDto.medicineList?.let { medicineList ->
-//                                medicineList.forEach { medicine ->
-//                                    val formattedMessage = buildString {
-//                                        append("제품명: ${medicine.itemName}\n")
-//                                        append("제품 분류: ${medicine.className}\n")
-//                                        append("성상: ${medicine.chart}")
-//                                    }
-//                                    addMessageToChat(email, formattedMessage, isUser = false, chatId)
-//                                    loadMessages(chatId)
-//                                }
-//                            }
                         }
                     } else {
                         addMessageToChat(email, "챗봇으로부터 응답이 없습니다.", isUser = false, chatId)

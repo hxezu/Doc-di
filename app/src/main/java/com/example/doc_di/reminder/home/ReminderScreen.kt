@@ -1,6 +1,7 @@
 package com.example.doc_di.reminder.home
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -30,6 +32,7 @@ import com.example.doc_di.analytics.AnalyticsEvents
 import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.reminder.data.ReminderItem
 import com.example.doc_di.reminder.home.utils.BookedCard
@@ -168,6 +171,8 @@ fun DailyMedications(
     reviewViewModel: ReviewViewModel
 ) {
 
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -234,7 +239,13 @@ fun DailyMedications(
                             MedicationCard(
                                 reminder = reminderItem.reminder,
                                 navigateToMedicationDetail = { medication -> navigateToMedicationDetail(medication) },
-                                deleteReminder = { reminderId -> reminderViewModel.deleteReminder(reminderId) },
+                                deleteReminder = { reminderId ->
+                                        if(isNetworkAvailable(context)){
+                                            reminderViewModel.deleteReminder(reminderId)
+                                        }else{
+                                            Toast.makeText(context, " 네트워크 오류", Toast.LENGTH_SHORT).show()
+                                        }
+                                     },
                                 navController = navController,
                                 searchViewModel = searchViewModel,
                                 reviewViewModel = reviewViewModel
@@ -244,7 +255,12 @@ fun DailyMedications(
                             BookedCard(
                                 booked = reminderItem.booked,
                                 navigateToMedicationDetail = { bookedDetail -> /* Navigate to booked detail */ },
-                                deleteBookedReminder = { bookedId -> reminderViewModel.deleteBookedReminder(bookedId) },
+                                deleteBookedReminder = { bookedId ->
+                                    if(isNetworkAvailable(context)){
+                                        reminderViewModel.deleteBookedReminder(bookedId)
+                                    } else{
+                                        Toast.makeText(context, " 네트워크 오류", Toast.LENGTH_SHORT).show()
+                                    } },
                                 navController = navController
                             )
                         }

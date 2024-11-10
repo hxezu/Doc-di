@@ -1,6 +1,7 @@
 package com.example.doc_di.reminder.booked_reminder
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -57,6 +58,7 @@ import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.reminder.booked_reminder.utils.AddDoctorName
 import com.example.doc_di.reminder.booked_reminder.utils.AddHospitalName
 import com.example.doc_di.reminder.booked_reminder.utils.AppointmentRecurrenceDropdownMenu
@@ -164,25 +166,30 @@ fun AddScheduleScreen(
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White) },
                 onClick = {
-                    if (isSaveButtonEnabled) {
-                        scope.launch {
-                            reminderImpl.createBookedReminder(
-                                email = userEmail,
-                                hospitalName = clinicName,
-                                doctorName = doctorName,
-                                subject = department,
-                                startDate = bookDate,
-                                recurrence = recurrence,
-                                endDate = endDate,
-                                bookTimes = selectedTimes,
-                                context = context,
-                                isAllWritten  = isSaveButtonEnabled,
-                                isAllAvailable  = isSaveButtonEnabled,
-                                navController = navController
-                            )
+                    if (isNetworkAvailable(context)) {
+                        if (isSaveButtonEnabled) {
+                            scope.launch {
+                                reminderImpl.createBookedReminder(
+                                    email = userEmail,
+                                    hospitalName = clinicName,
+                                    doctorName = doctorName,
+                                    subject = department,
+                                    startDate = bookDate,
+                                    recurrence = recurrence,
+                                    endDate = endDate,
+                                    bookTimes = selectedTimes,
+                                    context = context,
+                                    isAllWritten  = isSaveButtonEnabled,
+                                    isAllAvailable  = isSaveButtonEnabled,
+                                    navController = navController
+                                )
+                            }
+                            navController.navigate(Routes.managementScreen.route)
                         }
-                        navController.navigate(Routes.managementScreen.route)
+                    }else{
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
+
                 },
                 icon = {
                     Icon(imageVector = Icons.Default.Check,

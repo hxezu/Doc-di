@@ -2,6 +2,7 @@ package com.example.doc_di.reminder.medication_reminder
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +63,7 @@ import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
@@ -161,30 +163,35 @@ fun EditMedicationScreen(
 
     fun updateGroupReminders() {
         if (isModified) {
-            scope.launch {
-                // 기존 그룹 리마인더 삭제
-                groupReminders?.forEach { reminder ->
-                    reminderViewModel.deleteReminder(reminder.id!!)
-                }
-                println("endDate : $endDate")
+            if (isNetworkAvailable(context)) {
+                scope.launch {
+                    // 기존 그룹 리마인더 삭제
+                    groupReminders?.forEach { reminder ->
+                        reminderViewModel.deleteReminder(reminder.id!!)
+                    }
+                    println("endDate : $endDate")
 
-                // 업데이트된 리마인더 그룹 생성
-                reminderImpl.createReminder(
-                    email = userEmail,
-                    medicineName = name,
-                    dosage = "$dose $doseUnit",
-                    recurrence = recurrence,
-                    startDate = startDate,
-                    endDate = endDate,
-                    medicationTimes = selectedTimes,
-                    medicationTaken = reminder?.medicationTaken ?: "",
-                    context = context,
-                    isAllWritten = true,
-                    isAllAvailable = true,
-                    navController = navController
-                )
-                navController.navigate(Routes.managementScreen.route)
+                    // 업데이트된 리마인더 그룹 생성
+                    reminderImpl.createReminder(
+                        email = userEmail,
+                        medicineName = name,
+                        dosage = "$dose $doseUnit",
+                        recurrence = recurrence,
+                        startDate = startDate,
+                        endDate = endDate,
+                        medicationTimes = selectedTimes,
+                        medicationTaken = reminder?.medicationTaken ?: "",
+                        context = context,
+                        isAllWritten = true,
+                        isAllAvailable = true,
+                        navController = navController
+                    )
+                    navController.navigate(Routes.managementScreen.route)
+                }
+            }else{
+                Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
             }
+
         }
     }
 
