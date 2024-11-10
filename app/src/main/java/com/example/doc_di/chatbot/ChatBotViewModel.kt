@@ -106,9 +106,7 @@ class ChatBotViewModel(
                     if (responseBody != null && responseBody.data != null) {
                         responseBody.data.forEach { rasaDto ->
 
-
-                            if (rasaDto.text != null) {
-                                val text = rasaDto.text
+                            rasaDto.text?.let { text ->
                                 addMessageToChat(email, text, isUser = false, chatId) // 챗봇 메시지 저장
                                 loadMessages(chatId)
                             }
@@ -123,8 +121,8 @@ class ChatBotViewModel(
                                             append("성상: ${medicine.chart}")
                                         }
                                         addMessageToChat(email, formattedMessage, isUser = false, chatId)
-                                        loadMessages(chatId)
                                     }
+                                        //loadMessages(chatId)
                                     }
 
                                 }else{
@@ -134,7 +132,7 @@ class ChatBotViewModel(
                                         isUser = false,
                                         chatId
                                     )
-                                    loadMessages(chatId)
+                                    //loadMessages(chatId)
                                 }
                             }
                         }
