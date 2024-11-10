@@ -1,7 +1,6 @@
 package com.example.doc_di.search.pillsearch
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +24,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.SnappingLazyRow
+import com.example.doc_di.etc.clickableThrottleFirst
 import com.example.doc_di.search.SearchViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -69,7 +69,7 @@ fun PillSearch(navController: NavController, searchViewModel: SearchViewModel) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(280.dp, 340.dp)
-                    .clickable {
+                    .clickableThrottleFirst {
                         scope.launch {
                             listState.animateScrollToItem(index)
                             navController.navigate(Routes.searchMethod.route)

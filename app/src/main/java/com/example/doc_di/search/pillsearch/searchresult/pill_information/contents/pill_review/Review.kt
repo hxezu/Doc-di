@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.domain.review.ReviewData
 import com.example.doc_di.domain.review.ReviewImpl
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
@@ -128,29 +129,32 @@ fun Review(
                     ) {
                         DropdownMenuItem(
                             onClick = {
-                                expanded = false
-                                showEditPillReviewDialog = true
+                                {
+                                    expanded = false
+                                    showEditPillReviewDialog = true
+                                }.throttleFirst()
                             },
                         ) {
                             Text(text = "수정")
                         }
                         DropdownMenuItem(
                             onClick = {
-                                if (isNetworkAvailable(context)) {
-                                    expanded = false
-                                    scope.launch {
-                                        reviewImpl.deleteReview(
-                                            review,
-                                            context,
-                                            navController,
-                                            userViewModel,
-                                            reviewViewModel
-                                        )
+                                {
+                                    if (isNetworkAvailable(context)) {
+                                        scope.launch {
+                                            reviewImpl.deleteReview(
+                                                review,
+                                                context,
+                                                navController,
+                                                userViewModel,
+                                                reviewViewModel
+                                            )
+                                        }
+                                        expanded = false
+                                    } else {
+                                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                                     }
-                                }
-                                else {
-                                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-                                }
+                                }.throttleFirst()
                             },
                         ) {
                             Text(text = "삭제")

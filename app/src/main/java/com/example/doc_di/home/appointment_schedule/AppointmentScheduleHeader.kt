@@ -1,7 +1,6 @@
 package com.example.doc_di.home.appointment_schedule
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.clickableThrottleFirst
 
 @Composable
 fun AppointmentScheduleHeader(navController: NavController) {
@@ -38,7 +38,7 @@ fun AppointmentScheduleHeader(navController: NavController) {
             contentDescription = "진료 일정 추가",
             modifier = Modifier
                 .size(42.dp)
-                .clickable {
+                .clickableThrottleFirst {
                     navController.navigate(Routes.addScheduleScreen.route)
                 }
         )

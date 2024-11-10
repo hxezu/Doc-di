@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.reminder.data.AppointmentData
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import java.time.LocalDate
@@ -77,8 +78,10 @@ fun AppointmentCard(
     Box(modifier = Modifier.width(280.dp)) {
         Card(
             onClick = {
-                reminderViewModel.reservedTreatment = true
-                navController.navigate(Routes.appointmentSchedule.route)
+                {
+                    reminderViewModel.reservedTreatment = true
+                    navController.navigate(Routes.appointmentSchedule.route)
+                }.throttleFirst()
             },
             colors = CardDefaults.cardColors(cardColor[appointmentData.subject]!!),
             elevation = CardDefaults.cardElevation(1.dp),

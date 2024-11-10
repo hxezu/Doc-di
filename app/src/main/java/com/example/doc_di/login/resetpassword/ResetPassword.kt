@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.domain.resetpw.ResetImpl
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.login.GradientButton
 import com.example.doc_di.login.rememberImeState
 import com.example.doc_di.ui.theme.LightBlue
@@ -102,11 +103,13 @@ fun ResetPassword(navController: NavController) {
         )
         TextButton(
             onClick = {
-                navController.navigate("RegisterPage") {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-                keyboardController?.hide()
+                {
+                    keyboardController?.hide()
+                    navController.navigate("RegisterPage") {
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                }.throttleFirst()
             },
         ) {
             Text(

@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.throttleFirst
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,10 +26,12 @@ fun RegisterTopBar(navController: NavController) {
         ),
         navigationIcon = {
             IconButton(onClick = {
-                keyboardController?.hide()
-                navController.navigate(Routes.login.route) {
-                    navController.popBackStack()
-                }
+                {
+                    keyboardController?.hide()
+                    navController.navigate(Routes.login.route) {
+                        navController.popBackStack()
+                    }
+                }.throttleFirst()
             }) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,

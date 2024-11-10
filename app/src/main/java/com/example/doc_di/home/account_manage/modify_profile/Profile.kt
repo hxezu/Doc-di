@@ -44,8 +44,10 @@ import androidx.navigation.NavController
 import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.account.AccountImpl
 import com.example.doc_di.etc.GoBack
+import com.example.doc_di.etc.clickableThrottleFirst
 import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.etc.observeAsState
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.login.rememberImeState
 import kotlinx.coroutines.launch
@@ -110,7 +112,7 @@ fun Profile(navController: NavController, userViewModel: UserViewModel) {
             modifier = Modifier
                 .size(30.dp)
                 .align(Alignment.Start)
-                .clickable {
+                .clickableThrottleFirst {
                     keyboardController?.hide()
                     navController.popBackStack()
                 }
@@ -123,25 +125,26 @@ fun Profile(navController: NavController, userViewModel: UserViewModel) {
         Spacer(modifier = Modifier.weight(2f))
         Button(
             onClick = {
-                if (isNetworkAvailable(context)) {
-                    scope.launch {
-                        accountImpl.modifyProfile(
-                            userInfo!!.email,
-                            password.value,
-                            name.value,
-                            context,
-                            isAllWritten,
-                            isAllAvailable,
-                            navController,
-                            bitmap,
-                            userViewModel
-                        )
+                {
+                    if (isNetworkAvailable(context)) {
+                        scope.launch {
+                            accountImpl.modifyProfile(
+                                userInfo!!.email,
+                                password.value,
+                                name.value,
+                                context,
+                                isAllWritten,
+                                isAllAvailable,
+                                navController,
+                                bitmap,
+                                userViewModel
+                            )
+                        }
+                        val nothing = ""
+                    } else {
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
-                }
-                else {
-                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-                }
-
+                }.throttleFirst()
             },
             colors = ButtonDefaults.textButtonColors(Color(0xFF007AEB)),
             modifier = Modifier

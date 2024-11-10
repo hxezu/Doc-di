@@ -1,7 +1,6 @@
 package com.example.doc_di.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +33,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.clickableThrottleFirst
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.reminder.data.AppointmentData
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 
@@ -59,7 +60,7 @@ fun UpcomingAppointment(
             Spacer(modifier = Modifier.weight(1f))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
+                modifier = Modifier.clickableThrottleFirst {
                     reminderViewModel.reservedTreatment = false
                     navController.navigate(Routes.appointmentSchedule.route)
                 }
@@ -96,7 +97,7 @@ fun UpcomingAppointment(
                         color = Color(0xFF4A4A4A)
                     )
                     Button(
-                        onClick = { navController.navigate(Routes.addScheduleScreen.route) },
+                        onClick = { { navController.navigate(Routes.addScheduleScreen.route) }.throttleFirst() },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B69FD))
                     ) {
                         Text(

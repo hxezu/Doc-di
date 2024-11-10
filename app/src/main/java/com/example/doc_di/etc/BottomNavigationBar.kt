@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.doc_di.etc.BtmBarViewModel
 
 @Composable
 fun BottomNavigationBar(navController: NavController, btmBarViewModel: BtmBarViewModel) {
@@ -25,12 +24,14 @@ fun BottomNavigationBar(navController: NavController, btmBarViewModel: BtmBarVie
             BottomNavigationItem(
                 selected = selected,
                 onClick = {
-                    navController.navigate(navItem.route){
-                        restoreState = true
-                    }
-                    btmBarViewModel.btmNavBarItems.forEach{ afterRecomposeBtmBarItem ->
-                        afterRecomposeBtmBarItem.selected = afterRecomposeBtmBarItem.route == navItem.route
-                    }
+                    {
+                        navController.navigate(navItem.route){
+                            restoreState = true
+                        }
+                        btmBarViewModel.btmNavBarItems.forEach{ afterRecomposeBtmBarItem ->
+                            afterRecomposeBtmBarItem.selected = afterRecomposeBtmBarItem.route == navItem.route
+                        }
+                    }.throttleFirst()
                 },
                 icon = {
                     Icon(

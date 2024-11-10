@@ -1,7 +1,6 @@
 package com.example.doc_di.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -18,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.clickableThrottleFirst
 import com.example.doc_di.etc.observeAsState
 import com.example.doc_di.login.UserViewModel
 
@@ -36,7 +36,7 @@ fun HomeGreeting(navController: NavController, userViewModel: UserViewModel) {
             modifier = Modifier
                 .size(66.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .clickable {
+                .clickableThrottleFirst {
                     navController.navigate(Routes.modifyLogoutAccountDelete.route)
                 }
         )

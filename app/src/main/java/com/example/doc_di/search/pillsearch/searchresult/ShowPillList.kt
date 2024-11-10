@@ -1,7 +1,6 @@
 package com.example.doc_di.search.pillsearch.searchresult
 
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +30,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.domain.model.Pill
 import com.example.doc_di.domain.pill.SearchHistoryDto
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.clickableThrottleFirst
 import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.search.SearchViewModel
@@ -60,7 +60,7 @@ fun ShowPillList(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
-                    .clickable {
+                    .clickableThrottleFirst {
                         if (isNetworkAvailable(context)) {
                             reviewViewModel.showSearch[0] = true
                             reviewViewModel.showSearch[1] = false

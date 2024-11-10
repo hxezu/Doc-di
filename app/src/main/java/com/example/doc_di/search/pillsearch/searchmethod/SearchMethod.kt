@@ -3,7 +3,6 @@ package com.example.doc_di.search.pillsearch.searchmethod
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +19,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.GoBack
+import com.example.doc_di.etc.clickableThrottleFirst
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchmethod.imagesearch.ImageSearch
 import com.example.doc_di.search.pillsearch.searchmethod.shapesearch.ShapeSearch
@@ -48,7 +48,7 @@ fun SearchMethod(
                     .padding(start = 40.dp)
                     .size(30.dp)
                     .align(Alignment.Start)
-                    .clickable { navController.popBackStack() }
+                    .clickableThrottleFirst { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.height(40.dp))
             SearchMethodBar(searchViewModel)

@@ -18,18 +18,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.doc_di.etc.throttleFirst
 
 @Composable
 fun UpcomingOrPastButton(reservedTreatment: MutableState<Boolean>) {
     val reservedCardColor = if (reservedTreatment.value) Color.White else Color(0xFFF6F7FA)
-    val reservedCardTextColor = if (reservedTreatment.value) Color(0xFF242B42) else Color(0xFF1D1E25)
-    val reservedCardTextFontWeight = if (reservedTreatment.value) FontWeight.Bold else FontWeight.Normal
-    val reservedCardElevation = if (reservedTreatment.value) CardDefaults.cardElevation(2.dp) else CardDefaults.cardElevation(0.dp)
+    val reservedCardTextColor =
+        if (reservedTreatment.value) Color(0xFF242B42) else Color(0xFF1D1E25)
+    val reservedCardTextFontWeight =
+        if (reservedTreatment.value) FontWeight.Bold else FontWeight.Normal
+    val reservedCardElevation =
+        if (reservedTreatment.value) CardDefaults.cardElevation(2.dp) else CardDefaults.cardElevation(
+            0.dp
+        )
 
     val pastCardColor = if (!reservedTreatment.value) Color.White else Color(0xFFF6F7FA)
     val pastCardTextColor = if (!reservedTreatment.value) Color(0xFF242B42) else Color(0xFF1D1E25)
-    val pastCardTextFontWeight = if (!reservedTreatment.value) FontWeight.Bold else FontWeight.Normal
-    val pastCardElevation = if (!reservedTreatment.value) CardDefaults.cardElevation(2.dp) else CardDefaults.cardElevation(0.dp)
+    val pastCardTextFontWeight =
+        if (!reservedTreatment.value) FontWeight.Bold else FontWeight.Normal
+    val pastCardElevation =
+        if (!reservedTreatment.value) CardDefaults.cardElevation(2.dp) else CardDefaults.cardElevation(
+            0.dp
+        )
 
     Card(
         shape = RoundedCornerShape(40.dp),
@@ -48,7 +58,7 @@ fun UpcomingOrPastButton(reservedTreatment: MutableState<Boolean>) {
                 shape = RoundedCornerShape(40.dp),
                 colors = CardDefaults.cardColors(reservedCardColor),
                 elevation = reservedCardElevation,
-                onClick = { reservedTreatment.value = true },
+                onClick = { { reservedTreatment.value = true }.throttleFirst() },
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(1f)
@@ -68,7 +78,7 @@ fun UpcomingOrPastButton(reservedTreatment: MutableState<Boolean>) {
                 shape = RoundedCornerShape(40.dp),
                 colors = CardDefaults.cardColors(pastCardColor),
                 elevation = pastCardElevation,
-                onClick = { reservedTreatment.value = false },
+                onClick = { { reservedTreatment.value = false }.throttleFirst() },
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(1f)

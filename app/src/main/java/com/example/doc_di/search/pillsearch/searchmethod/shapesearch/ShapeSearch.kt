@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.search.SearchViewModel
 
 @Composable
@@ -58,19 +59,19 @@ fun ShapeSearch(navController: NavController, searchViewModel: SearchViewModel) 
         SelectShapeColor(selectedShape, selectedColor, focusManager)
         Button(
             onClick = {
-                if (isNetworkAvailable(context)) {
-                    options["txt1"] = preIdentifier.value
-                    options["txt2"] = sufIdentifier.value
-                    options["shape"] = selectedShape.value
-                    options["color1"] = selectedColor.value
-                    searchViewModel.setOptions(options)
-                    searchViewModel.searchPillsByOptions()
-                    navController.navigate(Routes.searchResult.route)
-                }
-                else {
-                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-                }
-
+                {
+                    if (isNetworkAvailable(context)) {
+                        options["txt1"] = preIdentifier.value
+                        options["txt2"] = sufIdentifier.value
+                        options["shape"] = selectedShape.value
+                        options["color1"] = selectedColor.value
+                        searchViewModel.setOptions(options)
+                        searchViewModel.searchPillsByOptions()
+                        navController.navigate(Routes.searchResult.route)
+                    } else {
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                    }
+                }.throttleFirst()
             },
             colors = ButtonDefaults.textButtonColors(mainSearchColor),
             modifier = Modifier

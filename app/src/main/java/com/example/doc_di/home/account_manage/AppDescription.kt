@@ -1,6 +1,5 @@
 package com.example.doc_di.home.account_manage
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.etc.GoBack
+import com.example.doc_di.etc.clickableThrottleFirst
 
 @Composable
 fun AppDescription(navController: NavController) {
@@ -33,7 +33,7 @@ fun AppDescription(navController: NavController) {
             modifier = Modifier
                 .size(30.dp)
                 .align(Alignment.Start)
-                .clickable {
+                .clickableThrottleFirst {
                     navController.popBackStack()
                 }
         )

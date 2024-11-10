@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.home.account_manage.modify_profile.ImagePickerDialog
 import com.example.doc_di.search.SearchViewModel
 
@@ -124,7 +125,7 @@ fun ImageSearch(navController: NavController, searchViewModel: SearchViewModel) 
                 )
             } else {
                 OutlinedCard(
-                    onClick = { showImagePickerDialog = true },
+                    onClick = { { showImagePickerDialog = true }.throttleFirst() },
                     shape = RoundedCornerShape(25.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = Color.Transparent
@@ -136,7 +137,7 @@ fun ImageSearch(navController: NavController, searchViewModel: SearchViewModel) 
         }
         Spacer(modifier = Modifier.weight(2f))
         Button(
-            onClick = { showImagePickerDialog = true },
+            onClick = { { showImagePickerDialog = true }.throttleFirst() },
             colors = ButtonDefaults.textButtonColors(mainSearchColor),
             modifier = Modifier
                 .fillMaxWidth()
@@ -155,13 +156,14 @@ fun ImageSearch(navController: NavController, searchViewModel: SearchViewModel) 
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-                    if (isNetworkAvailable(context)) {
-                        searchViewModel.searchPillsByImage(context, bitmap!!)
-                        navController.navigate(Routes.searchResult.route)
-                    }
-                    else {
-                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-                    }
+                    {
+                        if (isNetworkAvailable(context)) {
+                            searchViewModel.searchPillsByImage(context, bitmap!!)
+                            navController.navigate(Routes.searchResult.route)
+                        } else {
+                            Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                        }
+                    }.throttleFirst()
                 },
                 colors = ButtonDefaults.textButtonColors(mainSearchColor),
                 modifier = Modifier

@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.search.SearchViewModel
 
 @Composable
@@ -26,9 +27,11 @@ fun SearchMethodBar(searchViewModel: SearchViewModel) {
         for (i in 0 until searchViewModel.showSearch.size) {
             Button(
                 onClick = {
-                    for (j in 0 until searchViewModel.showSearch.size) {
-                        searchViewModel.showSearch[j] = i == j
-                    }
+                    {
+                        for (j in 0 until searchViewModel.showSearch.size) {
+                            searchViewModel.showSearch[j] = i == j
+                        }
+                    }.throttleFirst()
                 },
                 border = if (!searchViewModel.showSearch[i]) BorderStroke(
                     1.dp,

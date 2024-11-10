@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -28,6 +27,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.example.doc_di.etc.clickableThrottleFirst
 
 @RequiresApi(Build.VERSION_CODES.P)
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -67,7 +67,7 @@ fun ModifyProfileImage(
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .size(96.dp)
-            .clickable {
+            .clickableThrottleFirst {
                 showImagePickerDialog = true
             }
             .clip(RoundedCornerShape(24.dp))

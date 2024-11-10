@@ -9,6 +9,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.ui.theme.VeryLightBlue
 
 @Composable
@@ -32,14 +33,14 @@ fun ResignDialog(
         textContentColor = Color.Gray,
         confirmButton = {
             TextButton(
-                onClick = { onConfirmation() }
+                onClick = { { onConfirmation() }.throttleFirst() }
             ) {
                 Text("확인", color = Color.Black)
             }
         },
         dismissButton = {
             TextButton(
-                onClick = { onDismissRequest() }
+                onClick = { { onDismissRequest() }.throttleFirst() }
             ) {
                 Text("취소", color = Color.Black)
             }

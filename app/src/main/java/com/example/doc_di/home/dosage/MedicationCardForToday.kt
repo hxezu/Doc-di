@@ -28,6 +28,7 @@ import com.example.doc_di.R
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.reminder.data.MedicationData
 import com.example.doc_di.search.SearchViewModel
 
@@ -46,15 +47,17 @@ fun MedicationCardForToday(
 
     Card(
         onClick = {
-            if (isNetworkAvailable(context)) {
-                searchViewModel.setSelectedPillByPillName(medication.name)
-                btmBarViewModel.btmNavBarItems[0].selected = false
-                btmBarViewModel.btmNavBarItems[1].selected = true
-                navController.navigate(Routes.searchResult.route)
-            }
-            else {
-                Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-            }
+            {
+                if (isNetworkAvailable(context)) {
+                    searchViewModel.setSelectedPillByPillName(medication.name)
+                    btmBarViewModel.btmNavBarItems[0].selected = false
+                    btmBarViewModel.btmNavBarItems[1].selected = true
+                    navController.navigate(Routes.searchResult.route)
+                }
+                else {
+                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                }
+            }.throttleFirst()
         },
         colors = CardDefaults.cardColors(Color.White),
         elevation = CardDefaults.cardElevation(1.dp),

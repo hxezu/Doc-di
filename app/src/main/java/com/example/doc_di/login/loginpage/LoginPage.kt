@@ -40,6 +40,7 @@ import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.login.LoginImpl
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.login.GradientButton
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.login.rememberImeState
@@ -151,8 +152,10 @@ fun LoginPage(
             Spacer(modifier = Modifier.height(20.dp))
             TextButton(
                 onClick = {
-                    navController.navigate(Routes.register.route)
-                    keyboardController?.hide()
+                    {
+                        keyboardController?.hide()
+                        navController.navigate(Routes.register.route)
+                    }.throttleFirst()
                 },
             ) {
                 Text(
@@ -165,8 +168,10 @@ fun LoginPage(
             Spacer(modifier = Modifier.height(10.dp))
             TextButton(
                 onClick = {
-                    navController.navigate(Routes.resetPassword.route)
-                    keyboardController?.hide()
+                    {
+                        keyboardController?.hide()
+                        navController.navigate(Routes.resetPassword.route)
+                    }.throttleFirst()
                 },
             ) {
                 Text(
@@ -180,3 +185,4 @@ fun LoginPage(
         }
     }
 }
+

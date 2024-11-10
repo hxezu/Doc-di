@@ -2,7 +2,6 @@ package com.example.doc_di.home.dosage
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -31,6 +29,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.reminder.data.MedicationData
 import com.example.doc_di.search.SearchViewModel
 import java.time.LocalDate
@@ -41,7 +40,7 @@ fun DosageList(
     medicationsForToday: List<MedicationData>,
     navController: NavController,
     btmBarViewModel: BtmBarViewModel,
-    searchViewModel: SearchViewModel
+    searchViewModel: SearchViewModel,
 ) {
     val titleColor = Color(0xFF404446)
     Column {
@@ -76,7 +75,7 @@ fun DosageList(
                         color = Color(0xFF4A4A4A)
                     )
                     Button(
-                        onClick = { navController.navigate("${Routes.addMedicationScreen.route}?selectedDate=$formattedDate") },
+                        onClick = { { navController.navigate("${Routes.addMedicationScreen.route}?selectedDate=$formattedDate") }.throttleFirst() },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B69FD))
                     ) {
                         Text(

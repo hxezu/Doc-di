@@ -3,7 +3,6 @@ package com.example.doc_di.search
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.doc_di.domain.review.SearchHistory
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.clickableThrottleFirst
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.login.UserViewModel
 
 @Composable
@@ -45,13 +46,14 @@ fun PastSearchList(
             items(pastHistory){history ->
                 Button(
                     onClick = {
-                        if (isNetworkAvailable(context)) {
-                            searchViewModel.setSelectedPillByPillName(history.medicineName)
-                            navController.navigate(Routes.searchResult.route)
-                        }
-                        else {
-                            Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-                        }
+                        {
+                            if (isNetworkAvailable(context)) {
+                                searchViewModel.setSelectedPillByPillName(history.medicineName)
+                                navController.navigate(Routes.searchResult.route)
+                            } else {
+                                Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                            }
+                        }.throttleFirst()
                     },
                     colors = ButtonDefaults.buttonColors(Color.Transparent),
                     border = BorderStroke(1.dp, Color.Gray),
@@ -67,7 +69,7 @@ fun PastSearchList(
                             contentDescription = "기록 삭제",
                             tint = Color.Gray,
                             modifier = Modifier
-                                .clickable {
+                                .clickableThrottleFirst {
                                     if (isNetworkAvailable(context)) {
                                         userViewModel.deletePillHistory(history.id, context, navController)
                                     }

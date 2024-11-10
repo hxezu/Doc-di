@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.search.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,12 +109,13 @@ fun TextSearch(navController: NavController, searchViewModel: SearchViewModel) {
 
         Button(
             onClick = {
-                if (isNetworkAvailable(context)) {
-                    doSearch()
-                }
-                else {
-                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-                }
+                {
+                    if (isNetworkAvailable(context)) {
+                        doSearch()
+                    } else {
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                    }
+                }.throttleFirst()
             },
             colors = ButtonDefaults.textButtonColors(mainSearchColor),
             modifier = Modifier

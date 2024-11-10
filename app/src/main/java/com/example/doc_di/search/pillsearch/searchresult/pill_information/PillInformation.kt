@@ -2,7 +2,6 @@ package com.example.doc_di.search.pillsearch.searchresult.pill_information
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +40,8 @@ import coil.size.Size
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.GoBack
+import com.example.doc_di.etc.clickableThrottleFirst
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.search.SearchViewModel
@@ -102,7 +103,7 @@ fun PillInformation(
         floatingActionButton = {
             if (isUserTakingPill && reviewViewModel.showSearch[3]) {
                 FloatingActionButton(
-                    onClick = { showPillReviewDialog = true },
+                    onClick = { { showPillReviewDialog = true }.throttleFirst() },
                     containerColor = Color.White,
                     shape = CircleShape,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -128,7 +129,7 @@ fun PillInformation(
                 modifier = Modifier
                     .size(30.dp)
                     .align(Alignment.Start)
-                    .clickable { navController.popBackStack() }
+                    .clickableThrottleFirst { navController.popBackStack() }
             )
             Text(
                 text = selectedPill.itemName,

@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.doc_di.etc.throttleFirst
 
 @Composable
 fun GradientButton(
@@ -28,7 +29,7 @@ fun GradientButton(
     modifier: Modifier
 ) {
     Button(
-        onClick = onClick,
+        onClick = { onClick.throttleFirst() },
         contentPadding = PaddingValues(),
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(cornerRadius),

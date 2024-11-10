@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.ui.theme.VeryLightBlue
 
 @Composable
@@ -40,7 +41,7 @@ fun ImagePickerDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextButton(
-                        onClick = onGalleryClick, modifier = Modifier
+                        onClick = { onGalleryClick.throttleFirst() }, modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp)
                     ) {
@@ -48,7 +49,7 @@ fun ImagePickerDialog(
                     }
                     Divider(color = Color.LightGray)
                     TextButton(
-                        onClick = onCameraClick, modifier = Modifier
+                        onClick = { onCameraClick.throttleFirst() }, modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp)
                     ) {
@@ -70,7 +71,7 @@ fun ImagePickerDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextButton(
-                        onClick = onDismiss,
+                        onClick = { onDismiss.throttleFirst() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp)

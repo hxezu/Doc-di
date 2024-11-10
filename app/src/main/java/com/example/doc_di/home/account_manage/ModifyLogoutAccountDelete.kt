@@ -1,7 +1,6 @@
 package com.example.doc_di.home.account_manage
 
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +25,7 @@ import com.example.doc_di.domain.RetrofitInstance
 import com.example.doc_di.domain.account.AccountImpl
 import com.example.doc_di.etc.GoBack
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.clickableThrottleFirst
 import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.login.UserViewModel
 import kotlinx.coroutines.launch
@@ -46,7 +46,7 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
             modifier = Modifier
                 .size(30.dp)
                 .align(Alignment.Start)
-                .clickable { navController.popBackStack() }
+                .clickableThrottleFirst { navController.popBackStack() }
         )
         Text(
             text = "회원정보 수정",
@@ -54,7 +54,7 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 4.dp)
-                .clickable { navController.navigate(Routes.profile.route) }
+                .clickableThrottleFirst { navController.navigate(Routes.profile.route) }
         )
         Divider(color = Color.LightGray)
         Text(
@@ -63,7 +63,7 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 4.dp)
-                .clickable { navController.navigate(Routes.appDescription.route) }
+                .clickableThrottleFirst { navController.navigate(Routes.appDescription.route) }
         )
         Divider(color = Color.LightGray)
         Text(
@@ -72,17 +72,14 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 4.dp)
-                .clickable {
+                .clickableThrottleFirst {
                     if (isNetworkAvailable(context)) {
                         scope.launch {
                             accountImpl.logoutAccount(context, navController, userViewModel)
                         }
                     } else {
-                        Toast
-                            .makeText(context, "네트워크 오류", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
-
                 }
         )
         Divider(color = Color.LightGray)
@@ -92,7 +89,7 @@ fun ModifyLogoutAccountDelete(navController: NavController, userViewModel: UserV
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 4.dp)
-                .clickable {
+                .clickableThrottleFirst {
                     showResignDialog = true
                 }
         )

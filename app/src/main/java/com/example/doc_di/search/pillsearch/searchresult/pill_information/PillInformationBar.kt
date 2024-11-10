@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.doc_di.etc.throttleFirst
 
 
 @Composable
@@ -33,9 +34,11 @@ fun PillInformationBar(reviewViewModel: ReviewViewModel) {
         items(4) { index ->
             Button(
                 onClick = {
-                    for (j in 0 until reviewViewModel.showSearch.size) {
-                        reviewViewModel.showSearch[j] = index == j
-                    }
+                    {
+                        for (j in 0 until reviewViewModel.showSearch.size) {
+                            reviewViewModel.showSearch[j] = index == j
+                        }
+                    }.throttleFirst()
                 },
                 colors = ButtonDefaults.buttonColors(
                     if (reviewViewModel.showSearch[index]) buttonColor else Color.Transparent

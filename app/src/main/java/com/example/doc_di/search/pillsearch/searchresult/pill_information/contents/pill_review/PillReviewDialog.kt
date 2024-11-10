@@ -3,7 +3,6 @@ package com.example.doc_di.search.pillsearch.searchresult.pill_information.conte
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,8 +41,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.doc_di.domain.review.ReviewImpl
+import com.example.doc_di.etc.clickableThrottleFirst
 import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.etc.observeAsState
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
@@ -99,7 +100,7 @@ fun PillReviewDialog(
                         contentDescription = "닫기",
                         modifier = Modifier
                             .size(24.dp)
-                            .clickable { onDismiss() }
+                            .clickableThrottleFirst { onDismiss() }
                             .align(Alignment.CenterStart)
                     )
                     Text(
@@ -120,7 +121,7 @@ fun PillReviewDialog(
                             tint = if (curStarRating >= i.toShort()) starYellow else starGray,
                             modifier = Modifier
                                 .size(40.dp)
-                                .clickable { curStarRating = i.toShort() }
+                                .clickableThrottleFirst { curStarRating = i.toShort() }
                         )
                         if (i in 1..4) {
                             Spacer(modifier = Modifier.width(8.dp))
@@ -132,24 +133,26 @@ fun PillReviewDialog(
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
                     onClick = {
-                        if (isNetworkAvailable(context)) {
-                            scope.launch {
-                                reviewImpl.createReview(
-                                    userInfo,
-                                    selectedPill,
-                                    reviewText.value,
-                                    curStarRating,
-                                    context,
-                                    navController,
-                                    userViewModel,
-                                    reviewViewModel,
-                                    onDismiss
-                                )
+                        {
+                            if (isNetworkAvailable(context)) {
+                                scope.launch {
+                                    reviewImpl.createReview(
+                                        userInfo,
+                                        selectedPill,
+                                        reviewText.value,
+                                        curStarRating,
+                                        context,
+                                        navController,
+                                        userViewModel,
+                                        reviewViewModel,
+                                        onDismiss
+                                    )
+                                }
+                                val nothing = ""
+                            } else {
+                                Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                             }
-                        }
-                        else {
-                            Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-                        }
+                        }.throttleFirst()
                     },
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(buttonColor),

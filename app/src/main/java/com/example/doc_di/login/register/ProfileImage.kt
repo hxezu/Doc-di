@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.doc_di.R
+import com.example.doc_di.etc.clickableThrottleFirst
 import com.example.doc_di.home.account_manage.modify_profile.ImagePickerDialog
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -78,7 +78,7 @@ fun ProfileImage(
     Box(
         modifier = Modifier
             .size(96.dp)
-            .clickable {
+            .clickableThrottleFirst {
                 showImagePickerDialog = true
             }
             .clip(RoundedCornerShape(24.dp))

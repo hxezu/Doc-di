@@ -1,7 +1,6 @@
 package com.example.doc_di.home.appointment_schedule
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +21,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.GoBack
+import com.example.doc_di.etc.clickableThrottleFirst
 import com.example.doc_di.reminder.data.AppointmentData
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 
@@ -52,7 +52,7 @@ fun AppointmentSchedule(
                 modifier = Modifier
                     .size(30.dp)
                     .align(Alignment.Start)
-                    .clickable { navController.popBackStack() }
+                    .clickableThrottleFirst { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.height(24.dp))
             AppointmentScheduleHeader(navController)

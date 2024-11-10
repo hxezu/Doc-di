@@ -42,6 +42,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.reminder.data.AppointmentData
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 
@@ -67,7 +68,7 @@ fun UpcomingAppointmentList(
     ) {
         itemsIndexed(upcomingAppointment) { index, appointmentData ->
             Card(
-                onClick = { navController.navigate(Routes.editScheduleScreen.route + "/${appointmentData.appointmentId}") },
+                onClick = { { navController.navigate(Routes.editScheduleScreen.route + "/${appointmentData.appointmentId}") }.throttleFirst()},
                 shape = MaterialTheme.shapes.small,
                 colors = CardDefaults.cardColors(Color.White),
                 elevation = CardDefaults.cardElevation(2.dp),
@@ -113,18 +114,19 @@ fun UpcomingAppointmentList(
                                 options.forEach { option ->
                                     DropdownMenuItem(
                                         onClick = {
-                                            if (option == "수정") {
-                                                navController.navigate(Routes.editScheduleScreen.route + "/${appointmentData.appointmentId}")
-                                            } else if (option == "삭제") {
-                                                if (isNetworkAvailable(context)) {
-                                                    reminderViewModel.deleteBookedReminder(appointmentData.appointmentId)
-                                                }
-                                                else {
-                                                    Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-                                                }
+                                            {
+                                                if (option == "수정") {
+                                                    navController.navigate(Routes.editScheduleScreen.route + "/${appointmentData.appointmentId}")
+                                                } else if (option == "삭제") {
+                                                    if (isNetworkAvailable(context)) {
+                                                        reminderViewModel.deleteBookedReminder(appointmentData.appointmentId)
+                                                    } else {
+                                                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                                                    }
 
-                                            }
-                                            dropdownStates = dropdownStates.map { false }
+                                                }
+                                                dropdownStates = dropdownStates.map { false }
+                                            }.throttleFirst()
                                         }
                                     ) {
                                         Text(text = option)
