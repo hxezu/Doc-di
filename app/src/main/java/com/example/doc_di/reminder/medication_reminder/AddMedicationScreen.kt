@@ -1,6 +1,7 @@
 package com.example.doc_di.reminder.medication_reminder
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -63,6 +64,7 @@ import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.reminder.medication_reminder.utils.AddMedicationName
 import com.example.doc_di.reminder.medication_reminder.utils.DoseInputField
@@ -168,28 +170,33 @@ fun AddMedicationScreenUI(
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White )},
                 onClick = {
-                    if (isSaveButtonEnabled) {
-                        scope.launch {
-                            val dosageString = "$dose $doseUnit"
-                            val groupId = generateGroupId(userEmail, System.currentTimeMillis())
+                    if (isNetworkAvailable(context)) {
+                        if (isSaveButtonEnabled) {
+                            scope.launch {
+                                val dosageString = "$dose $doseUnit"
+                                val groupId = generateGroupId(userEmail, System.currentTimeMillis())
 
-                            reminderImpl.createReminder(
-                                email = userEmail,
-                                medicineName = name,
-                                dosage = dosageString,
-                                recurrence = recurrence,
-                                startDate = startDate,
-                                endDate = endDate,
-                                medicationTimes = selectedTimes,
-                                medicationTaken = groupId,
-                                context = context,
-                                isAllWritten  = isSaveButtonEnabled,
-                                isAllAvailable  = isSaveButtonEnabled,
-                                navController = navController
-                            )
+                                reminderImpl.createReminder(
+                                    email = userEmail,
+                                    medicineName = name,
+                                    dosage = dosageString,
+                                    recurrence = recurrence,
+                                    startDate = startDate,
+                                    endDate = endDate,
+                                    medicationTimes = selectedTimes,
+                                    medicationTaken = groupId,
+                                    context = context,
+                                    isAllWritten  = isSaveButtonEnabled,
+                                    isAllAvailable  = isSaveButtonEnabled,
+                                    navController = navController
+                                )
+                            }
+                            navController.navigate(Routes.managementScreen.route)
                         }
-                        navController.navigate(Routes.managementScreen.route)
+                    }else{
+                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
+
                 },
                 icon = {
                     Icon(imageVector = Icons.Default.Check,
@@ -330,7 +337,6 @@ fun AddMedicationScreenUI(
                     onClick = {
                         if (isTimerButtonEnabled) {
                             addTime(CalendarInformation(Calendar.getInstance()))
-
 
                             scope.launch {
                                 val maxScroll = scrollState.maxValue + 150 // 버튼 크기만큼 더 스크롤

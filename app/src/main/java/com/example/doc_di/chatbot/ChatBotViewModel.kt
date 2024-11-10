@@ -106,28 +106,37 @@ class ChatBotViewModel(
                     if (responseBody != null && responseBody.data != null) {
                         responseBody.data.forEach { rasaDto ->
 
-//                            rasaDto.text?.let { text ->
-//                                addMessageToChat(email, text, isUser = false, chatId) // 챗봇 메시지 저장
-//                                loadMessages(chatId)
-//                            }
-
                             if (rasaDto.text != null) {
                                 val text = rasaDto.text
                                 addMessageToChat(email, text, isUser = false, chatId) // 챗봇 메시지 저장
                                 loadMessages(chatId)
                             }
 
-                            rasaDto.medicineList?.let { medicineList ->
-                                medicineList.forEach { medicine ->
-                                    val formattedMessage = buildString {
-                                        append("제품명: ${medicine.itemName}\n")
-                                        append("제품 분류: ${medicine.className}\n")
-                                        append("성상: ${medicine.chart}")
+                            if(rasaDto.text?.contains("알약을 검색한 결과입니다")==true){
+                                if (rasaDto.medicineList != null && rasaDto.medicineList.isNotEmpty()) {
+                                    rasaDto.medicineList?.let { medicineList ->
+                                        rasaDto.medicineList.forEach { medicine ->
+                                        val formattedMessage = buildString {
+                                            append("제품명: ${medicine.itemName}\n")
+                                            append("제품 분류: ${medicine.className}\n")
+                                            append("성상: ${medicine.chart}")
+                                        }
+                                        addMessageToChat(email, formattedMessage, isUser = false, chatId)
+                                        loadMessages(chatId)
                                     }
-                                    addMessageToChat(email, formattedMessage, isUser = false, chatId)
+                                    }
+
+                                }else{
+                                    addMessageToChat(
+                                        email,
+                                        "죄송하지만 해당 약에 대한 정보를 찾지 못했습니다.",
+                                        isUser = false,
+                                        chatId
+                                    )
                                     loadMessages(chatId)
                                 }
                             }
+
                         }
                     } else {
                         addMessageToChat(email, "챗봇으로부터 응답이 없습니다.", isUser = false, chatId)

@@ -1,6 +1,7 @@
 package com.example.doc_di.reminder.booked_reminder
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +58,7 @@ import com.example.doc_di.domain.reminder.ReminderImpl
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.reminder.booked_reminder.utils.EditAppointmentRecurrence
 import com.example.doc_di.reminder.booked_reminder.utils.EditDepartment
 import com.example.doc_di.reminder.booked_reminder.utils.EditDoctorName
@@ -204,15 +206,20 @@ fun EditScheduleScreen(
                         )
 
                         updatedReminder?.let {
-                            scope.launch {
-                                reminderImpl.editBookedReminder(
-                                    booked = it,
-                                    context = context,
-                                    isAllWritten = isSaveButtonEnabled,
-                                    isAllAvailable = isSaveButtonEnabled,
-                                    navController = navController
-                                )
+                            if (isNetworkAvailable(context)) {
+                                scope.launch {
+                                    reminderImpl.editBookedReminder(
+                                        booked = it,
+                                        context = context,
+                                        isAllWritten = isSaveButtonEnabled,
+                                        isAllAvailable = isSaveButtonEnabled,
+                                        navController = navController
+                                    )
+                                }
+                            }else{
+                                Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                             }
+
                         }
                         navController.navigate(Routes.managementScreen.route)
                     }
