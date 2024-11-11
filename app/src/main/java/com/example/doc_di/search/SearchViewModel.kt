@@ -42,6 +42,9 @@ class SearchViewModel(
     private val _pillInfo = MutableStateFlow<PillInfo>(PillInfo())
     val pillInfo = _pillInfo.asStateFlow()
 
+    private val _pillNameList = MutableStateFlow<List<String>>(emptyList())
+    val pillNameList = _pillNameList.asStateFlow()
+
     private val _showErrorToastChannel = Channel<Boolean>()
 
     private val _isLoading = MutableStateFlow(false)
@@ -93,6 +96,15 @@ class SearchViewModel(
         option["name"] = pillName
         setOptions(option)
         searchPillsByOptions()
+    }
+
+    fun setPillNameList(pillNameList: List<String>) {
+        _pillNameList.value = pillNameList
+        Log.d("SearchViewModel", "Received pillNameList: $pillNameList")
+        _pills.value = emptyList()
+        pillNameList.forEach { pillName ->
+            setSelectedPillByPillName(pillName)
+        }
     }
 
     fun setPillInfo(searchHistoryDto: SearchHistoryDto) {

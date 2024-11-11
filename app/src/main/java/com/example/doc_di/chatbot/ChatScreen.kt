@@ -2,6 +2,7 @@ package com.example.doc_di.chatbot
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -97,7 +98,7 @@ fun ChatScreen(
     chatId: Int? = null
 ) {
     val userInfo by userViewModel.userInfo.observeAsState()
-    val messages by chatBotViewModel.messages.observeAsState(emptyList()) // messages를 observe
+    val messages by chatBotViewModel.messages.observeAsState(emptyList())
     var message by remember { mutableStateOf("") }
 
     val listState = rememberLazyListState()
@@ -139,6 +140,7 @@ fun ChatScreen(
                             navController.popBackStack()
                             val nothing = ""
                         }.throttleFirst()
+
                         },
                     ) {
                         androidx.compose.material3.Icon(
@@ -169,17 +171,11 @@ fun ChatScreen(
                     .fillMaxSize()
                     .background(Color.Transparent)
             ) {
-                ChatTitleRow(modifier = Modifier.padding(start = 20.dp, end = 20.dp)){{
-                    if(isNetworkAvailable(context)){
+                ChatTitleRow(modifier = Modifier.padding(start = 20.dp, end = 20.dp)){
                         chatId?.let {
                             chatBotViewModel.deleteChat(userInfo?.email ?: "", it) // Firebase에서 대화 삭제
                             navController.popBackStack() // 이전 화면으로 돌아감
                         }
-                    }else{
-                        Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-                    }
-                    val nothing = ""
-                }.throttleFirst()
                 }
                 Box(
                     modifier = Modifier
@@ -208,7 +204,7 @@ fun ChatScreen(
                                     navController = navController, // 추가
                                     searchViewModel = searchViewModel,
                                     reviewViewModel = reviewViewModel, // 추가
-                                    userViewModel = userViewModel,
+                                    chatBotViewModel = chatBotViewModel,
                                     context = context
                                 )
                             }
@@ -220,19 +216,17 @@ fun ChatScreen(
                     CustomTextField(
                         text = message,
                         onValueChange = { message = it },
-                        onSendClick = {{
-                            if(isNetworkAvailable(context)){
+                        onSendClick = {
                                 userInfo?.email?.let { email ->
                                     if (message.isNotBlank() && chatId != null) {
-                                        chatBotViewModel.sendMessage(email, message, chatId)
+                                        Log.d("ChatScreen", "Send Available")
+                                        chatBotViewModel.sendMessage(email, message, chatId, searchViewModel)
                                         message = ""
+                                    }else{
+                                        Log.d("ChatScreen", "Send Failed")
                                     }
                                 }
-                            }else{
-                                Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
-                            }
-                            val nothing = ""
-                        }.throttleFirst()
+
                         },
                         modifier = Modifier
                             .padding(horizontal = 20.dp, vertical = 20.dp)
@@ -251,12 +245,13 @@ fun ChatRow(
     chat: Message,
     navController: NavController,
     searchViewModel: SearchViewModel,
-    userViewModel: UserViewModel,
+    chatBotViewModel: ChatBotViewModel,
     reviewViewModel: ReviewViewModel,
     context: Context
 ) {
+    val isMedicineInfoMessage = chat.content.contains("알약을 검색한 결과입니다")
+    val pillNameList = chatBotViewModel.pillNameList.collectAsState().value
 
-    val isMedicineInfoMessage = chat.content.startsWith("제품명:")
     val pillList = searchViewModel.pills.collectAsState().value
     val isLoading = searchViewModel.isLoading.collectAsState().value
 
@@ -302,10 +297,10 @@ fun ChatRow(
         )
 
         if(isMedicineInfoMessage){
-            val pillName = chat.content.split("\n")[0].removePrefix("제품명: ")
-            searchViewModel.setSelectedPillByPillName(pillName)
             Button(
                 onClick = {{
+                    Log.d("ChatRow", "Pill names set for search: $pillNameList")
+                    searchViewModel.setPillNameList(pillNameList)
                     navController.navigate(Routes.searchResult.route)
                 }.throttleFirst()
 
@@ -316,7 +311,7 @@ fun ChatRow(
                 ),
                 modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
             ) {
-                Text("$pillName 의 정보 보기")
+                Text("검색 결과 보러 가기")
             }
         }
     }
@@ -372,10 +367,8 @@ fun CustomTextField(
             )
             IconButton(
                 onClick = {
-                    {
-                        onSendClick
-                        val nothing = ""
-                }.throttleFirst()
+                    Log.d("ChatScreen", "Send button clicked")
+                    onSendClick()
                           },
                 modifier = Modifier
                     .size(36.dp)

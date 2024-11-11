@@ -10,6 +10,9 @@ import com.example.doc_di.domain.chatbot.dto.ChatBotClientDto
 import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.chatbot.ChatRepository
 import com.example.doc_di.domain.model.Message
+import com.example.doc_di.search.SearchViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -26,14 +29,8 @@ class ChatBotViewModel(
     private val _messages = MutableLiveData<List<Message>>(emptyList())
     val messages: LiveData<List<Message>> get() = _messages
 
-    // 채팅 ID로 특정 채팅을 가져오는 메서드
-    fun getChatById(email: String, chatId: Int): LiveData<Chat?> {
-        val chat = MutableLiveData<Chat?>()
-        viewModelScope.launch {
-            chat.value = chatRepository.getChatById(email, chatId)
-        }
-        return chat
-    }
+    private val _pillNameList = MutableStateFlow<List<String>>(emptyList())
+    val pillNameList = _pillNameList.asStateFlow()
 
     fun deleteChat(email: String, chatId: Int) {
         viewModelScope.launch {
@@ -89,8 +86,10 @@ class ChatBotViewModel(
         }
     }
     // 메시지 전송 처리
-    fun sendMessage(email: String, message: String, chatId: Int) {
+    fun sendMessage(email: String, message: String, chatId: Int,  searchViewModel: SearchViewModel) {
         // 사용자가 보낸 메시지 저장
+        Log.d("ChatBotViewModel", "sendMessage called with: email=$email, message=$message, chatId=$chatId")
+
         addMessageToChat(email, message, isUser = true, chatId)
         loadMessages(chatId)
 
@@ -112,27 +111,11 @@ class ChatBotViewModel(
                             }
 
                             if(rasaDto.text?.contains("알약을 검색한 결과입니다")==true){
-                                if (rasaDto.medicineList != null && rasaDto.medicineList.isNotEmpty()) {
-                                    rasaDto.medicineList?.let { medicineList ->
-                                        rasaDto.medicineList.forEach { medicine ->
-                                        val formattedMessage = buildString {
-                                            append("제품명: ${medicine.itemName}\n")
-                                            append("제품 분류: ${medicine.className}\n")
-                                            append("성상: ${medicine.chart}")
-                                        }
-                                        addMessageToChat(email, formattedMessage, isUser = false, chatId)
-                                    }
-                                        //loadMessages(chatId)
-                                    }
+                                _pillNameList.value = emptyList()
 
-                                }else{
-                                    addMessageToChat(
-                                        email,
-                                        "죄송하지만 해당 약에 대한 정보를 찾지 못했습니다.",
-                                        isUser = false,
-                                        chatId
-                                    )
-                                    //loadMessages(chatId)
+                                rasaDto.medicineList?.let { medicineList ->
+                                    _pillNameList.value = medicineList.map { it.itemName }
+                                    Log.d("ChatBotViewModel", "Extracted pillNameList: ${_pillNameList.value}")
                                 }
                             }
                         }
