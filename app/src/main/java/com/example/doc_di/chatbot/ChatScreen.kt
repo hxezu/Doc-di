@@ -201,11 +201,9 @@ fun ChatScreen(
                         ) {
                             items(messages, key = { it.id }) { message ->
                                 ChatRow(chat = message,
-                                    navController = navController, // 추가
+                                    navController = navController,
                                     searchViewModel = searchViewModel,
-                                    reviewViewModel = reviewViewModel, // 추가
                                     chatBotViewModel = chatBotViewModel,
-                                    context = context
                                 )
                             }
                             item {
@@ -246,10 +244,11 @@ fun ChatRow(
     navController: NavController,
     searchViewModel: SearchViewModel,
     chatBotViewModel: ChatBotViewModel,
-    reviewViewModel: ReviewViewModel,
-    context: Context
+
 ) {
     val isMedicineInfoMessage = chat.content.contains("알약을 검색한 결과입니다")
+    val pillNameListSnapshot = remember(chat.id) { chatBotViewModel.pillNameList.value }
+
     val pillNameList = chatBotViewModel.pillNameList.collectAsState().value
 
     val pillList = searchViewModel.pills.collectAsState().value
@@ -299,8 +298,8 @@ fun ChatRow(
         if(isMedicineInfoMessage){
             Button(
                 onClick = {{
-                    Log.d("ChatRow", "Pill names set for search: $pillNameList")
-                    searchViewModel.setPillNameList(pillNameList)
+                    Log.d("ChatRow", "Pill names set for search: $pillNameListSnapshot")
+                    searchViewModel.setPillNameList(pillNameListSnapshot)
                     navController.navigate(Routes.searchResult.route)
                 }.throttleFirst()
 

@@ -9,6 +9,7 @@ import com.example.doc_di.domain.model.Chat
 import com.example.doc_di.domain.chatbot.dto.ChatBotClientDto
 import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.chatbot.ChatRepository
+import com.example.doc_di.domain.chatbot.dto.RasaDto
 import com.example.doc_di.domain.model.Message
 import com.example.doc_di.search.SearchViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -111,12 +112,7 @@ class ChatBotViewModel(
                             }
 
                             if(rasaDto.text?.contains("알약을 검색한 결과입니다")==true){
-                                _pillNameList.value = emptyList()
-
-                                rasaDto.medicineList?.let { medicineList ->
-                                    _pillNameList.value = medicineList.map { it.itemName }
-                                    Log.d("ChatBotViewModel", "Extracted pillNameList: ${_pillNameList.value}")
-                                }
+                                handleMedicineSearchResponse(rasaDto)
                             }
                         }
                     } else {
@@ -132,6 +128,12 @@ class ChatBotViewModel(
                 loadMessages(chatId)
             }
         }
+    }
+
+    private fun handleMedicineSearchResponse(rasaDto: RasaDto) {
+        val medicineList = rasaDto.medicineList?.map { it.itemName } ?: emptyList()
+        _pillNameList.value = medicineList
+        Log.d("ChatBotViewModel", "Updated pillNameList: ${_pillNameList.value}")
     }
 
     // Firestore에 메시지를 저장하는 함수
