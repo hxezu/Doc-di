@@ -44,6 +44,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.doc_di.R
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.reminder.util.Recurrence
@@ -120,11 +121,13 @@ fun EditRecurrence(
                 getRecurrenceList().forEach { recurrenceOption ->
                     DropdownMenuItem(
                         text = { Text(recurrenceMap[recurrenceOption] ?: selectedRecurrence) },
-                        onClick = {
+                        onClick = { {
                             selectedOptionText = recurrenceMap[recurrenceOption] ?: selectedRecurrence
                             recurrence(selectedOptionText)
                             expanded = false
                             onDisableEndDate(recurrenceOption == Recurrence.None)
+                        }.throttleFirst()
+
                         }
                     )
                 }
@@ -192,10 +195,12 @@ fun EditDoseUnit(
                 doseUnitOptions.forEach { unitOption ->
                     DropdownMenuItem(
                         text = {  Text(unitOption) },
-                        onClick = {
+                        onClick = {{
                             selectedOptionText = unitOption
                             doseUnit(selectedOptionText)
                             expanded = false
+                        }.throttleFirst()
+
                         }
                     )
                 }
@@ -243,7 +248,11 @@ fun EditTimerText(
             trailingIcon = {
                 if (isLastItem && !isOnlyItem) {
                     IconButton(
-                        onClick = onDeleteClick,
+                        onClick = {{
+                            onDeleteClick
+                            val nothing = ""
+                        }.throttleFirst()
+                                  },
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
                         Icon(

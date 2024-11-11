@@ -55,6 +55,7 @@ import com.example.doc_di.domain.model.Message
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.ui.theme.Line
 import com.example.doc_di.ui.theme.MainBlue
 import java.time.LocalDateTime
@@ -91,7 +92,7 @@ fun ChatListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
+                onClick = {{
                     if(isNetworkAvailable(context)){
                         userInfo?.email?.let { email ->
                             chatBotViewModel.createNewChat(email) { newChatId ->
@@ -101,7 +102,8 @@ fun ChatListScreen(
                     }else{
                         Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
-
+                    val nothing =""
+                }.throttleFirst()
                           },
                 backgroundColor = MainBlue,
                 modifier = Modifier.padding(bottom = 20.dp),
@@ -169,7 +171,9 @@ fun ChatListScreen(
                                 lastMessage = lastMessage,
                                 chatName = chatName
                             ) {
+                                {
                                 navController.navigate("chat_screen/${chat.id}")
+                            }.throttleFirst()
                             }
                         }
                     }

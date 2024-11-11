@@ -11,6 +11,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.extension.toFormattedDateString
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,18 +28,25 @@ fun EndDatePickerDialog(
             confirmButton = {
                 Button(
                     modifier = Modifier.padding(0.dp, 0.dp, 8.dp, 0.dp),
-                    onClick = {
+                    onClick = {{
                         state.selectedDateMillis?.let {
                             onConfirmClicked(it)
                         }
                         dismissRequest()
+                    }.throttleFirst()
+
                     }
                 ) {
                     Text(text = "확인")
                 }
             },
             dismissButton = {
-                TextButton(onClick = dismissRequest) {
+                TextButton(onClick = {
+                    {
+                    dismissRequest
+                    val nothing = ""
+                }.throttleFirst()
+                }) {
                     Text(text = "취소")
                 }
             },

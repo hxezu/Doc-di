@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.doc_di.analytics.AnalyticsEvents
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.extension.toFormattedDateShortString
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.extension.toFormattedKoreanDateString
@@ -122,8 +124,11 @@ fun DateHeader(
             color = Color.Black
         )
         IconButton(onClick = {
-            onPrevClickListener(data.startDate.date)
-        }) {
+            {
+                onPrevClickListener(data.startDate.date)
+            }.throttleFirst()
+        }
+        ) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowLeft,
                 tint = Color.Black,
@@ -131,7 +136,10 @@ fun DateHeader(
             )
         }
         IconButton(onClick = {
-            onNextClickListener(data.endDate.date)
+            {
+                onNextClickListener(data.endDate.date)
+            }.throttleFirst()
+
         }) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowRight,
@@ -177,7 +185,7 @@ fun DateItem(
         Card(
             modifier = Modifier
                 .padding(vertical = 4.dp),
-            onClick = { onClickListener(date) },
+            onClick = { {onClickListener(date)}.throttleFirst() },
             colors = cardColors(
                 containerColor = Color.Transparent
             ),

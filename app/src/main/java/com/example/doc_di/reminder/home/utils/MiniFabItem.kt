@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.throttleFirst
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -39,7 +40,7 @@ fun MiniFabItem(
     ) {
         FloatingActionButton(
             modifier = Modifier.size(40.dp),
-            onClick = {
+            onClick = {{
                 onFabItemClicked(item)
                 val formattedDate = selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
                 println("Button Selected Date: $formattedDate")
@@ -47,6 +48,8 @@ fun MiniFabItem(
                     R.drawable.pillemoji -> navController.navigate("${Routes.addMedicationScreen.route}?selectedDate=$formattedDate")
                     R.drawable.hospitalemoji -> navController.navigate("${Routes.addScheduleScreen.route}?selectedDate=$formattedDate")
                 }
+            }.throttleFirst()
+
                       },
             backgroundColor = miniFabBackgroundColor
         ) {

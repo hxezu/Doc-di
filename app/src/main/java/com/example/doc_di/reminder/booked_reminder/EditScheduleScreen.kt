@@ -59,6 +59,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.reminder.booked_reminder.utils.EditAppointmentRecurrence
 import com.example.doc_di.reminder.booked_reminder.utils.EditDepartment
 import com.example.doc_di.reminder.booked_reminder.utils.EditDoctorName
@@ -156,8 +157,11 @@ fun EditScheduleScreen(
                 ),
                 navigationIcon = {
                     IconButton(
-                        onClick = {
+                        onClick = {{
                             navController.popBackStack()
+                            val nothing = ""
+                        }.throttleFirst()
+
                         },
                     ) {
                         Icon(
@@ -177,7 +181,7 @@ fun EditScheduleScreen(
                 text = { Text("수정 완료",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White) },
-                onClick = {
+                onClick = {{
                     if (isSaveButtonEnabled) {
                         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
@@ -223,6 +227,8 @@ fun EditScheduleScreen(
                         }
                         navController.navigate(Routes.managementScreen.route)
                     }
+                }.throttleFirst()
+
                 },
                 icon = {
                     Icon(imageVector = Icons.Default.Check,

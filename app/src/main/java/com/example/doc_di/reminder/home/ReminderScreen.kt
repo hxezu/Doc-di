@@ -34,6 +34,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.etc.observeAsState
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.reminder.data.ReminderItem
 import com.example.doc_di.reminder.home.utils.BookedCard
 import com.example.doc_di.reminder.home.utils.DatesHeader
@@ -111,7 +112,7 @@ fun ReminderScreen(
                         selectedDate = selectedDate
                     ),
                 ),
-                onFabItemClicked = { println(it)
+                onFabItemClicked = { {println(it)}.throttleFirst()
                 },
                 fabTitle = "MultiFloatActionButton",
                 showFabTitle = false,

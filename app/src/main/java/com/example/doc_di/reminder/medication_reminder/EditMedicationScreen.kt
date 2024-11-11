@@ -64,6 +64,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.reminder.viewmodel.ReminderViewModel
@@ -202,7 +203,12 @@ fun EditMedicationScreen(
             TopAppBar(
                 title = {  },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { {
+                        navController.popBackStack()
+                        val nothing = ""
+                    }.throttleFirst()
+
+                    }) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
                     }
                 },
@@ -215,7 +221,7 @@ fun EditMedicationScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 text = { Text("수정 완료", color = Color.White) },
-                onClick = { updateGroupReminders() },
+                onClick = { {updateGroupReminders()}.throttleFirst() },
                 icon = { Icon(imageVector = Icons.Default.Check, contentDescription = "Save", tint = Color.White) },
                 containerColor = if (isModified) MainBlue else Color.Gray,
                 modifier = Modifier
@@ -356,12 +362,15 @@ fun EditMedicationScreen(
             ) {
                 Button(
                     modifier = Modifier.padding(bottom = 70.dp),
-                    onClick = {
+                    onClick = {{
                         selectedTimes.add(CalendarInformation(Calendar.getInstance()))
                         markModified()
                         scope.launch {
                             scrollState.animateScrollTo(scrollState.maxValue + 150)
                         }
+                        val nothing = ""
+                    }.throttleFirst()
+
                     },
                     enabled = selectedTimes.isNotEmpty(),
                     colors = ButtonDefaults.buttonColors(

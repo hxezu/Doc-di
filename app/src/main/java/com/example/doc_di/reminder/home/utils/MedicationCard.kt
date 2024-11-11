@@ -41,6 +41,7 @@ import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.domain.model.Reminder
 import com.example.doc_di.etc.Routes
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 
@@ -95,9 +96,10 @@ fun MedicationCard(
                     ), // Black border with 2.dp width
                     shape = RoundedCornerShape(30.dp) // Same shape as the card
                 ),
-            onClick = {
+            onClick = {{
                 searchViewModel.setSelectedPillByPillName(reminder.medicineName)
                 navController.navigate(Routes.searchResult.route)
+            }.throttleFirst()
             },
             shape = RoundedCornerShape(30.dp),
             colors = CardDefaults.cardColors(
@@ -157,7 +159,7 @@ fun MedicationCard(
                 ) {
 
                     IconButton(
-                        onClick = { expanded = true },
+                        onClick = { {expanded = true}.throttleFirst() },
                         modifier = Modifier.align(Alignment.CenterEnd)
                     ) {
                         Icon(
@@ -174,17 +176,21 @@ fun MedicationCard(
                             .background(Color.White)
                     ) {
                         DropdownMenuItem(
-                            onClick = {
+                            onClick = {{
                                 expanded = false
                                 navController.navigate("editMedicationScreen/${reminder.id}")
+                            }.throttleFirst()
+
                             }
                         ) {
                             Text("수정")
                         }
                         DropdownMenuItem(
-                            onClick = {
+                            onClick = {{
                                 expanded = false
                                 reminder.id?.let { deleteReminder(it.toInt()) }
+                                val nothing =""
+                            }.throttleFirst()
                             }
                         ) {
                             Text("삭제")

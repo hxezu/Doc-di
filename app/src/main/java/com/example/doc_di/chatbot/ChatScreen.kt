@@ -74,6 +74,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.login.rememberImeState
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.ShowPillList
@@ -134,8 +135,10 @@ fun ChatScreen(
                 ),
                 navigationIcon = {
                     androidx.compose.material3.IconButton(
-                        onClick = {
+                        onClick = {{
                             navController.popBackStack()
+                            val nothing = ""
+                        }.throttleFirst()
                         },
                     ) {
                         androidx.compose.material3.Icon(
@@ -166,7 +169,7 @@ fun ChatScreen(
                     .fillMaxSize()
                     .background(Color.Transparent)
             ) {
-                ChatTitleRow(modifier = Modifier.padding(start = 20.dp, end = 20.dp)){
+                ChatTitleRow(modifier = Modifier.padding(start = 20.dp, end = 20.dp)){{
                     if(isNetworkAvailable(context)){
                         chatId?.let {
                             chatBotViewModel.deleteChat(userInfo?.email ?: "", it) // Firebase에서 대화 삭제
@@ -175,6 +178,8 @@ fun ChatScreen(
                     }else{
                         Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
+                    val nothing = ""
+                }.throttleFirst()
                 }
                 Box(
                     modifier = Modifier
@@ -215,7 +220,7 @@ fun ChatScreen(
                     CustomTextField(
                         text = message,
                         onValueChange = { message = it },
-                        onSendClick = {
+                        onSendClick = {{
                             if(isNetworkAvailable(context)){
                                 userInfo?.email?.let { email ->
                                     if (message.isNotBlank() && chatId != null) {
@@ -226,7 +231,8 @@ fun ChatScreen(
                             }else{
                                 Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                             }
-
+                            val nothing = ""
+                        }.throttleFirst()
                         },
                         modifier = Modifier
                             .padding(horizontal = 20.dp, vertical = 20.dp)
@@ -299,8 +305,10 @@ fun ChatRow(
             val pillName = chat.content.split("\n")[0].removePrefix("제품명: ")
             searchViewModel.setSelectedPillByPillName(pillName)
             Button(
-                onClick = {
+                onClick = {{
                     navController.navigate(Routes.searchResult.route)
+                }.throttleFirst()
+
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MainBlue,
@@ -363,7 +371,12 @@ fun CustomTextField(
                 textStyle = TextStyle(fontSize = 14.sp)
             )
             IconButton(
-                onClick = onSendClick,
+                onClick = {
+                    {
+                        onSendClick
+                        val nothing = ""
+                }.throttleFirst()
+                          },
                 modifier = Modifier
                     .size(36.dp)
                     .padding(end = 10.dp)
@@ -421,7 +434,7 @@ fun ChatTitleRow(
         Spacer(modifier = Modifier.weight(1f))
         Box(modifier = Modifier.align(CenterVertically)){
             IconButton(
-                onClick = { expanded = true },
+                onClick = { {expanded = true }.throttleFirst()},
                 modifier = Modifier
                     .size(24.dp)
             ) {
@@ -436,9 +449,11 @@ fun ChatTitleRow(
 
             ) {
                 DropdownMenuItem(
-                    onClick = {
+                    onClick = { {
                         onDeleteClick() // 삭제 클릭 시 호출
                         expanded = false // 드롭다운 메뉴 닫기
+                    }.throttleFirst()
+
                     }
                 ) {
                     Text(text = "삭제")

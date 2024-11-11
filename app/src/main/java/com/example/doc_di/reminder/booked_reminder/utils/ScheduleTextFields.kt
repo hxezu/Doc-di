@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.doc_di.R
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.extension.toFormattedDateString
 import com.example.doc_di.reminder.medication_reminder.model.CalendarInformation
 import com.example.doc_di.reminder.util.BookedRecurrence
@@ -123,10 +125,11 @@ fun DepartmentDropdownMenu(department: (String) -> Unit,
                 getDepartmentList().forEach { departmentOption ->
                     DropdownMenuItem(
                         text = { Text(departmentMap[departmentOption] ?: "") },
-                        onClick = {
+                        onClick = {{
                             selectedOptionText = departmentMap[departmentOption] ?: ""
                             department(selectedOptionText)
                             expanded = false
+                        }.throttleFirst()
                         }
                     )
                 }
@@ -177,7 +180,12 @@ fun TimerTextField(
             trailingIcon = {
                 if (isLastItem && !isOnlyItem) {
                     IconButton(
-                        onClick = onDeleteClick,
+                        onClick = {
+                            {
+                                onDeleteClick
+                                val nothing = ""
+                            }.throttleFirst()
+                                  },
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
                         Icon(
@@ -475,11 +483,12 @@ fun AppointmentRecurrenceDropdownMenu(
                 getRecurrenceList().forEach { recurrenceOption ->
                     DropdownMenuItem(
                         text = { Text(recurrenceMap[recurrenceOption] ?: "") },
-                        onClick = {
+                        onClick = {{
                             selectedOptionText = recurrenceMap[recurrenceOption] ?: ""
                             recurrence(selectedOptionText)
                             expanded = false
                             onDisableEndDate(recurrenceOption == Recurrence.None)
+                        }.throttleFirst()
                         }
                     )
                 }

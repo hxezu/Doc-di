@@ -59,6 +59,7 @@ import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
 import com.example.doc_di.etc.isNetworkAvailable
+import com.example.doc_di.etc.throttleFirst
 import com.example.doc_di.reminder.booked_reminder.utils.AddDoctorName
 import com.example.doc_di.reminder.booked_reminder.utils.AddHospitalName
 import com.example.doc_di.reminder.booked_reminder.utils.AppointmentRecurrenceDropdownMenu
@@ -143,9 +144,10 @@ fun AddScheduleScreen(
                 ),
                 navigationIcon = {
                     IconButton(
-                        onClick = {
+                        onClick = {{
                             navController.popBackStack()
-
+                            val nothing = ""
+                        }.throttleFirst()
                         },
                     ) {
                         Icon(
@@ -165,7 +167,7 @@ fun AddScheduleScreen(
                 text = { Text("저장",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White) },
-                onClick = {
+                onClick = {{
                     if (isNetworkAvailable(context)) {
                         if (isSaveButtonEnabled) {
                             scope.launch {
@@ -189,7 +191,7 @@ fun AddScheduleScreen(
                     }else{
                         Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
                     }
-
+                }.throttleFirst()
                 },
                 icon = {
                     Icon(imageVector = Icons.Default.Check,

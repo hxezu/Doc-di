@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.doc_di.etc.throttleFirst
 import java.time.LocalDate
 
 @Composable
@@ -79,9 +80,11 @@ fun MultiFloatingActionButton(
             verticalAlignment = Alignment.CenterVertically
         ) {
             FloatingActionButton(
-                onClick = {
+                onClick = { {
                     fabState.value = fabState.value.toggleValue()
                     stateChanged(fabState.value)
+                }.throttleFirst()
+
                 },
                 backgroundColor = fabOption.backgroundTint,
                 contentColor = fabOption.iconTint

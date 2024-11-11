@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.doc_di.R
 import com.example.doc_di.domain.model.Booked
+import com.example.doc_di.etc.throttleFirst
 
 @Composable
 fun BookedCard(
@@ -72,7 +73,9 @@ fun BookedCard(
                     border = BorderStroke(width = 0.5.dp, color = Color(0xFFECEDEF)), // Black border with 2.dp width
                     shape = RoundedCornerShape(30.dp) // Same shape as the card
                 ),
-            onClick = { navigateToMedicationDetail(booked) },
+            onClick = { {
+                navigateToMedicationDetail(booked)
+            }.throttleFirst() },
             shape = RoundedCornerShape(30.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White,
@@ -130,7 +133,7 @@ fun BookedCard(
                 ) {
                     // 점 세 개 아이콘 버튼
                     IconButton(
-                        onClick = { expanded = true },
+                        onClick = { {expanded = true }.throttleFirst()},
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
                             .background(Color.White)
@@ -151,16 +154,21 @@ fun BookedCard(
                     ) {
                         DropdownMenuItem(
                             onClick = {
-                                expanded = false
-                                navController.navigate("editScheduleScreen/${booked.id}")
+                                {
+                                    expanded = false
+                                    navController.navigate("editScheduleScreen/${booked.id}")
+                                }.throttleFirst()
                             }
                         ) {
                             Text("수정")
                         }
                         DropdownMenuItem(
-                            onClick = {
+                            onClick = {{
                                 expanded = false
                                 booked.id?.let { deleteBookedReminder(it.toInt()) }
+                                val nothing = ""
+                            }.throttleFirst()
+
                             }
                         ) {
                             Text("삭제")
