@@ -103,7 +103,34 @@ class SearchViewModel(
         Log.d("SearchViewModel", "Received pillNameList: $pillNameList")
         _pills.value = emptyList()
         pillNameList.forEach { pillName ->
-            setSelectedPillByPillName(pillName)
+            setPillListByPillName(pillName)
+        }
+    }
+
+    fun setPillListByPillName(pillName: String) {
+        val option = mutableMapOf<String, String>()
+        option["name"] = pillName
+        setOptions(option)
+
+        // 누적 방식으로 검색 결과 추가
+        viewModelScope.launch {
+            _isLoading.value = true
+            pillsSearchRepository.getPillSearchList(options).collectLatest { result ->
+                _isLoading.value = false
+                when (result) {
+                    is Result.Error -> {
+                        Log.d("SearchViewModel", "Error searching pill by name: $pillName")
+                        _showErrorToastChannel.send(true)
+                    }
+                    is Result.Success -> {
+                        result.data?.let { pillsList ->
+                            // 기존 리스트에 검색 결과 추가
+                            _pills.update { currentList -> currentList + pillsList }
+                            Log.d("SearchViewModel", "Updated pills list: ${_pills.value}")
+                        }
+                    }
+                }
+            }
         }
     }
 
