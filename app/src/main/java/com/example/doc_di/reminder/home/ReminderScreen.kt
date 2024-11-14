@@ -241,10 +241,12 @@ fun DailyMedications(
                                 reminder = reminderItem.reminder,
                                 navigateToMedicationDetail = { medication -> navigateToMedicationDetail(medication) },
                                 deleteReminder = { reminderId ->
-                                        if(isNetworkAvailable(context)){
-                                            reminderViewModel.deleteReminder(reminderId)
-                                        }else{
-                                            Toast.makeText(context, " 네트워크 오류", Toast.LENGTH_SHORT).show()
+                                        reminderItem.reminder.medicationTaken?.let { groupId ->
+                                            if (isNetworkAvailable(context)) {
+                                                reminderViewModel.deleteRemindersByGroupId(groupId)
+                                            } else {
+                                                Toast.makeText(context, "네트워크 오류", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
                                      },
                                 navController = navController,
