@@ -20,4 +20,5 @@ sealed class Routes(val route: String) {
     object profile: Routes("profile")
     object modifyLogoutAccountDelete: Routes("ModifyLogoutAccountDelete")
     object appDescription: Routes("AppDescription")
+    object chatbotSearchResult: Routes("ChatBotSearchResult")
 }

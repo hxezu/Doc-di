@@ -36,7 +36,7 @@ class ChatRepository {
     }
 
     // Firestore에서 특정 채팅을 ID로 가져옴
-    suspend fun getChatById(email: String, chatId: Int): Chat? {
+    suspend fun getChatById(chatId: Int): Chat? {
         return try {
             val chatDocument = firestore.collection("chats")
                 .document(chatId.toString())
@@ -64,11 +64,12 @@ class ChatRepository {
     }
 
     // Firestore에 새로운 채팅을 생성 (빈 messages 컬렉션도 포함)
-    suspend fun createNewChat(email: String): String {
+    suspend fun createNewChat(email: String, createdAt: String): String {
         val newId = System.currentTimeMillis().toInt()
         val newChat = Chat(
             id = newId,
             email = email,
+            createdAt = createdAt
         )
 
         return try {

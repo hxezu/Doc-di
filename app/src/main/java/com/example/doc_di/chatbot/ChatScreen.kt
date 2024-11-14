@@ -94,7 +94,6 @@ fun ChatScreen(
     userViewModel: UserViewModel,
     chatBotViewModel: ChatBotViewModel,
     searchViewModel: SearchViewModel,
-    reviewViewModel: ReviewViewModel,
     chatId: Int? = null
 ) {
     val userInfo by userViewModel.userInfo.observeAsState()
@@ -203,7 +202,7 @@ fun ChatScreen(
                                 ChatRow(chat = message,
                                     navController = navController,
                                     searchViewModel = searchViewModel,
-                                    chatBotViewModel = chatBotViewModel,
+                                    chatBotViewModel = chatBotViewModel
                                 )
                             }
                             item {
@@ -243,21 +242,15 @@ fun ChatRow(
     chat: Message,
     navController: NavController,
     searchViewModel: SearchViewModel,
-    chatBotViewModel: ChatBotViewModel,
-
+    chatBotViewModel: ChatBotViewModel
 ) {
     val isMedicineInfoMessage = chat.content.contains("알약을 검색한 결과입니다")
-    val pillNameListSnapshot = remember(chat.id) { chatBotViewModel.pillNameList.value }
+    val pillsList = chatBotViewModel.pillsList.collectAsState().value
 
-    val pillNameList = chatBotViewModel.pillNameList.collectAsState().value
-
-    val pillList = searchViewModel.pills.collectAsState().value
-    val isLoading = searchViewModel.isLoading.collectAsState().value
-
-    LaunchedEffect(navController.currentBackStackEntry) {
-        searchViewModel.resetPillInfo()
-        searchViewModel.resetPills()
-    }
+//    LaunchedEffect(navController.currentBackStackEntry) {
+//        searchViewModel.resetPillInfo()
+//        searchViewModel.resetPills()
+//    }
 
     Column(
         modifier = Modifier
@@ -297,10 +290,10 @@ fun ChatRow(
 
         if(isMedicineInfoMessage){
             Button(
-                onClick = {{
-                    Log.d("ChatRow", "Pill names set for search: $pillNameListSnapshot")
-                    searchViewModel.setPillNameList(pillNameListSnapshot)
-                    navController.navigate(Routes.searchResult.route)
+                onClick = {
+                    {
+                        searchViewModel.chatbotSearch(pillsList)
+                        navController.navigate(Routes.chatbotSearchResult.route)
                 }.throttleFirst()
 
                 },

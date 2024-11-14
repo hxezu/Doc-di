@@ -14,6 +14,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.doc_di.chatbot.ChatBotSearchResult
 import com.example.doc_di.chatbot.ChatBotViewModel
 import com.example.doc_di.chatbot.ChatListScreen
 import com.example.doc_di.chatbot.ChatScreen
@@ -154,6 +155,17 @@ fun NaviGraph(navController: NavHostController) {
             )
         }
 
+        composable(route = Routes.chatbotSearchResult.route) {
+            ChatBotSearchResult(
+                navController,
+                btmBarViewModel,
+                userViewModel,
+                searchViewModel,
+                reviewViewModel,
+                reminderViewModel
+            )
+        }
+
         composable(route = Routes.pillInformation.route) {
             PillInformation(
                 navController,
@@ -186,8 +198,7 @@ fun NaviGraph(navController: NavHostController) {
                 userViewModel = userViewModel,
                 chatBotViewModel = chatBotViewModel,
                 chatId = chatId,
-                searchViewModel = searchViewModel,
-                reviewViewModel = reviewViewModel
+                searchViewModel = searchViewModel
             )
         }
 
@@ -199,8 +210,7 @@ fun NaviGraph(navController: NavHostController) {
                 userViewModel = userViewModel,
                 chatBotViewModel = chatBotViewModel,
                 chatId = null,
-                searchViewModel = searchViewModel,
-                reviewViewModel = reviewViewModel
+                searchViewModel = searchViewModel
             )
         }
 

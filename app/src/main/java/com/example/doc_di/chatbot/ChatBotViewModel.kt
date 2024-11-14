@@ -11,6 +11,7 @@ import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.chatbot.ChatRepository
 import com.example.doc_di.domain.chatbot.dto.RasaDto
 import com.example.doc_di.domain.model.Message
+import com.example.doc_di.domain.model.Pill
 import com.example.doc_di.search.SearchViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,8 +31,8 @@ class ChatBotViewModel(
     private val _messages = MutableLiveData<List<Message>>(emptyList())
     val messages: LiveData<List<Message>> get() = _messages
 
-    private val _pillNameList = MutableStateFlow<List<String>>(emptyList())
-    val pillNameList = _pillNameList.asStateFlow()
+    private val _pillsList = MutableStateFlow<List<Pill>>(emptyList())
+    val pillsList = _pillsList.asStateFlow()
 
     fun deleteChat(email: String, chatId: Int) {
         viewModelScope.launch {
@@ -78,7 +79,9 @@ class ChatBotViewModel(
     fun createNewChat(email: String, onChatCreated: (String) -> Unit) {
         viewModelScope.launch {
             try {
-                val newChatId = chatRepository.createNewChat(email) // createNewChat은 채팅 ID를 반환
+                val createdAt = getCurrentTime()
+                val newChatId = chatRepository.createNewChat(email, createdAt) // createNewChat은 채팅 ID를 반환
+
                 onChatCreated(newChatId) // 콜백을 통해 채팅 ID를 전달
                 loadChats(email) // 새로운 채팅 생성 후 목록 갱신
             } catch (e: Exception) {
@@ -96,7 +99,11 @@ class ChatBotViewModel(
 
         viewModelScope.launch {
             try {
-                val chatBotClientDto = ChatBotClientDto(sender = email, message = message)
+
+                val chat = chatRepository.getChatById(chatId) // 채팅 정보를 불러옴
+                val sender = "${email}_${chat?.createdAt}"
+
+                val chatBotClientDto = ChatBotClientDto(sender = sender, message = message)
                 val response = chatBotImpl.chatWithRasa(chatBotClientDto)
 
                 if (response.isSuccessful) {
@@ -111,9 +118,49 @@ class ChatBotViewModel(
                                 loadMessages(chatId)
                             }
 
-                            if(rasaDto.text?.contains("알약을 검색한 결과입니다")==true){
-                                handleMedicineSearchResponse(rasaDto)
+                            rasaDto.medicineList?.let { medicineList ->
+                                val pillList = medicineList.map { medicine ->
+                                    Pill(
+                                        bizrno = medicine.bizrno,
+                                        changeDate = medicine.changeDate,
+                                        chart = medicine.chart,
+                                        className = medicine.className,
+                                        classNo = medicine.classNo,
+                                        colorClass1 = medicine.colorClass1,
+                                        colorClass2 = medicine.colorClass2,
+                                        drugShape = medicine.drugShape,
+                                        ediCode = medicine.ediCode,
+                                        entpName = medicine.entpName,
+                                        entpSeq = medicine.entpSeq,
+                                        etcOtcName = medicine.etcOtcName,
+                                        formCodeName = medicine.formCodeName,
+                                        imgRegistTs = medicine.imgRegistTs,
+                                        itemEngName = medicine.itemEngName,
+                                        itemImage = medicine.itemImage,
+                                        itemName = medicine.itemName,
+                                        itemPermitDate = medicine.itemPermitDate,
+                                        itemSeq = medicine.itemSeq.toInt(),
+                                        lengLong = medicine.lengLong,
+                                        lengShort = medicine.lengShort,
+                                        lineBack = medicine.lineBack,
+                                        lineFront = medicine.lineFront,
+                                        markCodeBack = medicine.markCodeBack,
+                                        markCodeBackAnal = medicine.markCodeBackAnal,
+                                        markCodeBackImg = medicine.markCodeBackImg,
+                                        markCodeFront = medicine.markCodeFront,
+                                        markCodeFrontAnal = medicine.markCodeFrontAnal,
+                                        markCodeFrontImg = medicine.markCodeFrontImg,
+                                        printBack = medicine.printBack,
+                                        printFront = medicine.printFront,
+                                        thick = medicine.thick,
+                                        rateTotal = medicine.rateTotal.toInt(),
+                                        rateAmount = medicine.rateAmount.toInt()
+                                    )
+                                }
+                                Log.d("ChatBotViewModel", "Generated pillList: $pillList")
+                                _pillsList.value = pillList
                             }
+
                         }
                     } else {
                         addMessageToChat(email, "챗봇으로부터 응답이 없습니다.", isUser = false, chatId)
@@ -128,12 +175,6 @@ class ChatBotViewModel(
                 loadMessages(chatId)
             }
         }
-    }
-
-    private fun handleMedicineSearchResponse(rasaDto: RasaDto) {
-        val medicineList = rasaDto.medicineList?.map { it.itemName } ?: emptyList()
-        _pillNameList.value = medicineList
-        Log.d("ChatBotViewModel", "Updated pillNameList: ${_pillNameList.value}")
     }
 
     // Firestore에 메시지를 저장하는 함수
