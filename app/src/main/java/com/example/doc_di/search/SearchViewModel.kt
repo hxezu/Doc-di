@@ -51,6 +51,7 @@ class SearchViewModel(
     fun chatbotSearch(newPillList: List<Pill>) {
         viewModelScope.launch {
             Log.d("SearchViewModel", "Updating pillList with: $newPillList")
+            _pills.value = emptyList()
             _pills.update {newPillList}
         }
     }

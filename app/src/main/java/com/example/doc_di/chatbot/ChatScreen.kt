@@ -247,11 +247,6 @@ fun ChatRow(
     val isMedicineInfoMessage = chat.content.contains("알약을 검색한 결과입니다")
     val pillsList = chatBotViewModel.pillsList.collectAsState().value
 
-//    LaunchedEffect(navController.currentBackStackEntry) {
-//        searchViewModel.resetPillInfo()
-//        searchViewModel.resetPills()
-//    }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()

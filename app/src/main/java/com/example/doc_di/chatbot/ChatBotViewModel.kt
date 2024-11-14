@@ -118,6 +118,8 @@ class ChatBotViewModel(
                                 loadMessages(chatId)
                             }
 
+                            _pillsList.value = emptyList()
+
                             rasaDto.medicineList?.let { medicineList ->
                                 val pillList = medicineList.map { medicine ->
                                     Pill(
