@@ -95,6 +95,31 @@ class ReminderViewModel @Inject constructor(
         }
     }
 
+    fun deleteRemindersByGroupId(groupId: String) {
+        viewModelScope.launch {
+            try {
+                val groupReminders = getRemindersByGroupId(groupId)
+
+                if (groupReminders != null && groupReminders.isNotEmpty()) {
+                    groupReminders.forEach { reminder ->
+                        val response: Response<Unit> = reminderApi.deleteReminder(reminder.id!!)
+                        if (response.isSuccessful) {
+                            _reminders.value = _reminders.value.filterNot { it.id == reminder.id }
+                        } else {
+                            Log.e("ReminderViewModel", "Failed to delete reminder ID: ${reminder.id} - ${response.errorBody()?.string()}")
+                        }
+                    }
+                    updateMedicationsForToday(_reminders.value, _pills.value)
+                } else {
+                    Log.e("ReminderViewModel", "No reminders found for group ID: $groupId")
+                }
+            } catch (e: Exception) {
+                Log.e("ReminderViewModel", "Failed to delete group reminders: ${e.message}")
+            }
+        }
+    }
+
+
 
     fun getBookedReminders(email: String) {
         isLoading.value = true
