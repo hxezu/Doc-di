@@ -39,6 +39,7 @@ import com.example.doc_di.reminder.viewmodel.ReminderViewModel
 import com.example.doc_di.search.Search
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchmethod.SearchMethod
+import com.example.doc_di.search.pillsearch.searchresult.ChatbotSearchResult
 import com.example.doc_di.search.pillsearch.searchresult.SearchResult
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.PillInformation
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
@@ -151,6 +152,18 @@ fun NaviGraph(navController: NavHostController) {
                 searchViewModel,
                 reviewViewModel,
                 reminderViewModel
+            )
+        }
+
+        composable(route = Routes.chatbotSearchResult.route) {
+            ChatbotSearchResult(
+                navController,
+                btmBarViewModel,
+                userViewModel,
+                searchViewModel,
+                reviewViewModel,
+                reminderViewModel,
+                chatBotViewModel
             )
         }
 

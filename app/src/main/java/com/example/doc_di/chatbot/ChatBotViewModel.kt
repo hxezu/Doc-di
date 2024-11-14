@@ -5,15 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.doc_di.domain.model.Chat
-import com.example.doc_di.domain.chatbot.dto.ChatBotClientDto
 import com.example.doc_di.domain.chatbot.ChatBotImpl
 import com.example.doc_di.domain.chatbot.ChatRepository
-import com.example.doc_di.domain.chatbot.dto.RasaDto
+import com.example.doc_di.domain.chatbot.dto.ChatBotClientDto
+import com.example.doc_di.domain.model.Chat
+import com.example.doc_di.domain.model.Medicine
 import com.example.doc_di.domain.model.Message
 import com.example.doc_di.search.SearchViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -30,8 +28,8 @@ class ChatBotViewModel(
     private val _messages = MutableLiveData<List<Message>>(emptyList())
     val messages: LiveData<List<Message>> get() = _messages
 
-    private val _pillNameList = MutableStateFlow<List<String>>(emptyList())
-    val pillNameList = _pillNameList.asStateFlow()
+    private val _medicineList = MutableLiveData<List<Medicine>?>(emptyList())
+    val medicineList: LiveData<List<Medicine>?> get() = _medicineList
 
     fun deleteChat(email: String, chatId: Int) {
         viewModelScope.launch {
@@ -101,39 +99,25 @@ class ChatBotViewModel(
 
                 if (response.isSuccessful) {
                     val responseBody = response.body()
-
                     // 챗봇 응답 처리
-                    if (responseBody != null && responseBody.data != null) {
-                        responseBody.data.forEach { rasaDto ->
-
-                            rasaDto.text?.let { text ->
-                                addMessageToChat(email, text, isUser = false, chatId) // 챗봇 메시지 저장
-                                loadMessages(chatId)
-                            }
-
-                            if(rasaDto.text?.contains("알약을 검색한 결과입니다")==true){
-                                handleMedicineSearchResponse(rasaDto)
-                            }
+                    responseBody?.data?.forEach { rasaDto ->
+                        _medicineList.postValue(rasaDto.medicineList)
+                        rasaDto.text?.let { text ->
+                            addMessageToChat(email, text, isUser = false, chatId) // 챗봇 메시지 저장
+                            loadMessages(chatId)
                         }
-                    } else {
-                        addMessageToChat(email, "챗봇으로부터 응답이 없습니다.", isUser = false, chatId)
-                        loadMessages(chatId)
                     }
                 } else {
                     addMessageToChat(email, "오류 발생: ${response.code()} - ${response.message()}", isUser = false, chatId)
                     loadMessages(chatId)
+                    _medicineList.postValue(null)
                 }
             } catch (e: Exception) {
                 addMessageToChat(email, "예외 발생: ${e.message}", isUser = false, chatId)
                 loadMessages(chatId)
+                _medicineList.postValue(null)
             }
         }
-    }
-
-    private fun handleMedicineSearchResponse(rasaDto: RasaDto) {
-        val medicineList = rasaDto.medicineList?.map { it.itemName } ?: emptyList()
-        _pillNameList.value = medicineList
-        Log.d("ChatBotViewModel", "Updated pillNameList: ${_pillNameList.value}")
     }
 
     // Firestore에 메시지를 저장하는 함수

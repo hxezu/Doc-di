@@ -1,9 +1,7 @@
 package com.example.doc_di.chatbot
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,24 +20,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -52,11 +47,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -68,22 +62,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.doc_di.R
-import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.domain.model.Message
-import com.example.doc_di.domain.pill.SearchHistoryDto
 import com.example.doc_di.etc.BottomNavigationBar
 import com.example.doc_di.etc.BtmBarViewModel
 import com.example.doc_di.etc.Routes
-import com.example.doc_di.etc.isNetworkAvailable
 import com.example.doc_di.etc.throttleFirst
+import com.example.doc_di.login.UserViewModel
 import com.example.doc_di.login.rememberImeState
 import com.example.doc_di.search.SearchViewModel
-import com.example.doc_di.search.pillsearch.searchresult.ShowPillList
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import com.example.doc_di.ui.theme.*
-import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -247,10 +235,6 @@ fun ChatRow(
 
 ) {
     val isMedicineInfoMessage = chat.content.contains("알약을 검색한 결과입니다")
-    val pillNameListSnapshot = remember(chat.id) { chatBotViewModel.pillNameList.value }
-
-    val pillNameList = chatBotViewModel.pillNameList.collectAsState().value
-
     val pillList = searchViewModel.pills.collectAsState().value
     val isLoading = searchViewModel.isLoading.collectAsState().value
 
@@ -298,9 +282,8 @@ fun ChatRow(
         if(isMedicineInfoMessage){
             Button(
                 onClick = {{
-                    Log.d("ChatRow", "Pill names set for search: $pillNameListSnapshot")
-                    searchViewModel.setPillNameList(pillNameListSnapshot)
-                    navController.navigate(Routes.searchResult.route)
+
+                    navController.navigate(Routes.chatbotSearchResult.route)
                 }.throttleFirst()
 
                 },

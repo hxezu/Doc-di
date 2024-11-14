@@ -15,7 +15,6 @@ import com.example.doc_di.domain.pill.Result
 import com.example.doc_di.domain.pill.SearchHistoryDto
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -42,9 +41,6 @@ class SearchViewModel(
     private val _pillInfo = MutableStateFlow<PillInfo>(PillInfo())
     val pillInfo = _pillInfo.asStateFlow()
 
-    private val _pillNameList = MutableStateFlow<List<String>>(emptyList())
-    val pillNameList = _pillNameList.asStateFlow()
-
     private val _showErrorToastChannel = Channel<Boolean>()
 
     private val _isLoading = MutableStateFlow(false)
@@ -57,7 +53,6 @@ class SearchViewModel(
                 _isLoading.value = false
                 when (result) {
                     is Result.Error -> {
-                        Log.d("PillsViewModel", "Result.Error")
                         _showErrorToastChannel.send(true)
                     }
 
@@ -96,42 +91,6 @@ class SearchViewModel(
         option["name"] = pillName
         setOptions(option)
         searchPillsByOptions()
-    }
-
-    fun setPillNameList(pillNameList: List<String>) {
-        _pillNameList.value = pillNameList
-        Log.d("SearchViewModel", "Received pillNameList: $pillNameList")
-        _pills.value = emptyList()
-        pillNameList.forEach { pillName ->
-            setPillListByPillName(pillName)
-        }
-    }
-
-    fun setPillListByPillName(pillName: String) {
-        val option = mutableMapOf<String, String>()
-        option["name"] = pillName
-        setOptions(option)
-
-        // 누적 방식으로 검색 결과 추가
-        viewModelScope.launch {
-            _isLoading.value = true
-            pillsSearchRepository.getPillSearchList(options).collectLatest { result ->
-                _isLoading.value = false
-                when (result) {
-                    is Result.Error -> {
-                        Log.d("SearchViewModel", "Error searching pill by name: $pillName")
-                        _showErrorToastChannel.send(true)
-                    }
-                    is Result.Success -> {
-                        result.data?.let { pillsList ->
-                            // 기존 리스트에 검색 결과 추가
-                            _pills.update { currentList -> currentList + pillsList }
-                            Log.d("SearchViewModel", "Updated pills list: ${_pills.value}")
-                        }
-                    }
-                }
-            }
-        }
     }
 
     fun setPillInfo(searchHistoryDto: SearchHistoryDto) {

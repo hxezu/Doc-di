@@ -2,8 +2,6 @@ package com.example.doc_di.domain.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Parcelize
 data class Medicine(
@@ -42,6 +40,7 @@ data class Medicine(
     val bizrno: String,
     val rateTotal: String,
     val rateAmount: String,
-) : Parcelable{
+): Parcelable{
 
 }
+
