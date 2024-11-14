@@ -12,6 +12,8 @@ import com.example.doc_di.domain.model.Chat
 import com.example.doc_di.domain.model.Medicine
 import com.example.doc_di.domain.model.Message
 import com.example.doc_di.search.SearchViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -30,6 +32,9 @@ class ChatBotViewModel(
 
     private val _medicineList = MutableLiveData<List<Medicine>?>(emptyList())
     val medicineList: LiveData<List<Medicine>?> get() = _medicineList
+
+    private val _chatbotAction = MutableStateFlow<String?>(null)
+    val chatbotAction: StateFlow<String?> get() = _chatbotAction
 
     fun deleteChat(email: String, chatId: Int) {
         viewModelScope.launch {
@@ -103,6 +108,7 @@ class ChatBotViewModel(
                     // 챗봇 응답 처리
                     responseBody?.data?.forEach { rasaDto ->
                         _medicineList.postValue(rasaDto.medicineList)
+                        _chatbotAction.value = rasaDto.custom?.action
                         rasaDto.text?.let { text ->
                             addMessageToChat(email, text, isUser = false, chatId) // 챗봇 메시지 저장
                             loadMessages(chatId)

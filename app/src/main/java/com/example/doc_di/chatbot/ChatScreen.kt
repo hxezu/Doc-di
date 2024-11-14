@@ -72,7 +72,7 @@ import com.example.doc_di.login.rememberImeState
 import com.example.doc_di.search.SearchViewModel
 import com.example.doc_di.search.pillsearch.searchresult.pill_information.ReviewViewModel
 import com.example.doc_di.ui.theme.*
-
+import com.example.doc_di.etc.observeAsState as customObserveAsState
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -85,7 +85,7 @@ fun ChatScreen(
     reviewViewModel: ReviewViewModel,
     chatId: Int? = null
 ) {
-    val userInfo by userViewModel.userInfo.observeAsState()
+    val userInfo by userViewModel.userInfo.customObserveAsState()
     val messages by chatBotViewModel.messages.observeAsState(emptyList())
     var message by remember { mutableStateOf("") }
 
@@ -234,7 +234,7 @@ fun ChatRow(
     chatBotViewModel: ChatBotViewModel,
 
 ) {
-    val isMedicineInfoMessage = chat.content.contains("검색하고 있습니다...")
+    val chatbotAction = chatBotViewModel.chatbotAction.collectAsState()
     val pillList = searchViewModel.pills.collectAsState().value
     val isLoading = searchViewModel.isLoading.collectAsState().value
 
@@ -279,7 +279,7 @@ fun ChatRow(
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 15.dp),
         )
 
-        if(isMedicineInfoMessage){
+        if(chatbotAction.value == "DB_SEARCH"){
             Button(
                 onClick = {{
                     navController.navigate(Routes.chatbotSearchResult.route)
