@@ -76,7 +76,8 @@ class ChatBotViewModel(
     fun createNewChat(email: String, onChatCreated: (String) -> Unit) {
         viewModelScope.launch {
             try {
-                val newChatId = chatRepository.createNewChat(email) // createNewChat은 채팅 ID를 반환
+                val createdAt = getCurrentTime()
+                val newChatId = chatRepository.createNewChat(email, createdAt) // createNewChat은 채팅 ID를 반환
                 onChatCreated(newChatId) // 콜백을 통해 채팅 ID를 전달
                 loadChats(email) // 새로운 채팅 생성 후 목록 갱신
             } catch (e: Exception) {

@@ -234,7 +234,7 @@ fun ChatRow(
     chatBotViewModel: ChatBotViewModel,
 
 ) {
-    val isMedicineInfoMessage = chat.content.contains("알약을 검색한 결과입니다")
+    val isMedicineInfoMessage = chat.content.contains("검색하고 있습니다...")
     val pillList = searchViewModel.pills.collectAsState().value
     val isLoading = searchViewModel.isLoading.collectAsState().value
 
@@ -282,7 +282,6 @@ fun ChatRow(
         if(isMedicineInfoMessage){
             Button(
                 onClick = {{
-
                     navController.navigate(Routes.chatbotSearchResult.route)
                 }.throttleFirst()
 
