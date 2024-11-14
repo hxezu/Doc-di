@@ -88,6 +88,7 @@ fun ChatScreen(
     val userInfo by userViewModel.userInfo.customObserveAsState()
     val messages by chatBotViewModel.messages.observeAsState(emptyList())
     var message by remember { mutableStateOf("") }
+    val email = userInfo?.email
 
     val listState = rememberLazyListState()
     val imeState = rememberImeState()
@@ -188,11 +189,16 @@ fun ChatScreen(
                                 .imePadding()
                         ) {
                             items(messages, key = { it.id }) { message ->
-                                ChatRow(chat = message,
-                                    navController = navController,
-                                    searchViewModel = searchViewModel,
-                                    chatBotViewModel = chatBotViewModel,
-                                )
+                                if (email != null && chatId != null) {
+                                    ChatRow(chat = message,
+                                        email = email,
+                                        navController = navController,
+                                        searchViewModel = searchViewModel,
+                                        chatBotViewModel = chatBotViewModel,
+                                        isLastMessage = message == messages.last(),
+                                        chatId = chatId
+                                    )
+                                }
                             }
                             item {
                                 Spacer(modifier = Modifier.height(90.dp))
@@ -229,10 +235,12 @@ fun ChatScreen(
 @Composable
 fun ChatRow(
     chat: Message,
+    email: String,
     navController: NavController,
     searchViewModel: SearchViewModel,
     chatBotViewModel: ChatBotViewModel,
-
+    isLastMessage: Boolean,
+    chatId: Int
 ) {
     val chatbotAction = chatBotViewModel.chatbotAction.collectAsState()
     val pillList = searchViewModel.pills.collectAsState().value
@@ -279,9 +287,11 @@ fun ChatRow(
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 15.dp),
         )
 
-        if(chatbotAction.value == "DB_SEARCH"){
+        if(isLastMessage && chatbotAction.value == "DB_SEARCH"){
             Button(
                 onClick = {{
+                    chatBotViewModel.addMessageToChat(email, "또 무엇을 도와드릴까요?" , false , chatId)
+                    chatBotViewModel.resetChatbotAction()
                     navController.navigate(Routes.chatbotSearchResult.route)
                 }.throttleFirst()
 

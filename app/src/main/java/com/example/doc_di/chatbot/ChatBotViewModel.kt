@@ -128,7 +128,7 @@ class ChatBotViewModel(
     }
 
     // Firestore에 메시지를 저장하는 함수
-    private fun addMessageToChat(email: String, message: String, isUser: Boolean, chatId: Int) {
+    fun addMessageToChat(email: String, message: String, isUser: Boolean, chatId: Int) {
         viewModelScope.launch {
             try {
                 val newMessage = Message(
@@ -150,5 +150,9 @@ class ChatBotViewModel(
     private fun getCurrentTime(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         return dateFormat.format(Date())
+    }
+
+    fun resetChatbotAction(){
+        _chatbotAction.value = null
     }
 }
