@@ -2,7 +2,7 @@
 **"의약품 검색부터 챗봇 상담까지, 스마트한 건강 관리 앱"**  
 
 <p align="center">
-  <img src="Thumbnail.png" alt="DDocDi" width="200">
+  <img src="Thumbnail.png" alt="DDocDi" width="500">
 </p>
 
 ---
